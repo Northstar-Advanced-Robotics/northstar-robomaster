@@ -15,7 +15,8 @@ public:
     FiremodeIndicator(
         tap::Drivers* drivers,
         control::agitator::MultiShotCvCommandMapping* shootCommand)
-        : drivers(drivers)
+        : drivers(drivers),
+          shootCommand(shootCommand)
     {
         addGraphicsObject(&firemode);
     }
@@ -48,7 +49,7 @@ public:
         }
 
         firemode.calculateNumbers();
-        firemode.x = X_POSITION - firemode.width / 2;
+        // firemode.x = X_POSITION - firemode.width / 2;
     }
 
 private:
@@ -56,14 +57,12 @@ private:
 
     control::agitator::MultiShotCvCommandMapping* shootCommand;
 
-    static constexpr uint16_t X_POSITION =
-        200;  // pixels, all numbers at the same y level on screen
+    static constexpr uint16_t X_POSITION = 20;  // pixels, all numbers at the same y level on screen
     static constexpr uint16_t Y_POSITION = 610;   // pixels, all numbers at the same y level on
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic
-        firemode{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 200, 200};
+    StringGraphic firemode{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 20, 3};
 };
 
 }  // namespace src::control::client_display::graphics
