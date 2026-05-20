@@ -558,7 +558,9 @@ src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
     &turret,
     // &flywheel,
     &agitator,
-    &chassisSubsystem);
+    &chassisSubsystem,
+    &flywheelOnGovernor,
+    leftMousePressedShoot.get());
 
 void initializeSubsystems(Drivers *drivers)
 {

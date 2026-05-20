@@ -6,6 +6,8 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_orientation_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_power_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/countdown.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/firemode_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/flywheel_ready_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hit_ring.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hopper_lid_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/imu_recalibration_indicator.hpp"
@@ -20,6 +22,7 @@
 // #include "subsystems/flywheel/FlywheelSubsystem.hpp"
 // #include "subsystems/turret/turretSubsystem.hpp"
 // #include "subsystems/agitator/HeroagitatorSubsystem.hpp"
+#include "control/agitator/multi_shot_cv_command_mapping.hpp"
 #include "control/agitator/velocity_agitator_subsystem.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 #include "control/clientDisplay/graphics/core/ui_subsystem.hpp"
@@ -40,13 +43,16 @@ public:
         src::control::turret::TurretSubsystem* turret,
         // src::control::flywheel::TwoFlywheelSubsystem* flywheel,
         src::agitator::VelocityAgitatorSubsystem* agitator,
-        src::chassis::ChassisSubsystem* chassis)
+        src::chassis::ChassisSubsystem* chassis,
+        control::governor::FlywheelOnGovernor* flywheelGovernor,
+        control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping)
         : drivers(drivers),
           ui(ui),
           turret(turret),
           //   flywheel(flywheel),
           agitator(agitator),
-          chassis(chassis)
+          chassis(chassis),
+          flywheelGovernor(flywheelGovernor)
     {
         addSubsystemRequirement(ui);
 
@@ -62,6 +68,8 @@ public:
         addGraphicsObject(&velo);
         // addGraphicsObject(&recal);
         addGraphicsObject(&chassisPower);
+        addGraphicsObject(&firemode);
+        addGraphicsObject(&flywheelReady);
     };
 
     void initialize() override { ui->setTopLevelContainer(this); };
@@ -98,6 +106,8 @@ private:
     // src::control::flywheel::TwoFlywheelSubsystem* flywheel;
     src::agitator::VelocityAgitatorSubsystem* agitator;
     src::chassis::ChassisSubsystem* chassis;
+    control::governor::FlywheelOnGovernor* flywheelGovernor;
+    control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping;
 
     // add top level graphics objects here and in the constructor
     LaneAssistLines lane{turret};
@@ -113,5 +123,7 @@ private:
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
     LinearVelocityIndicator velo{chassis};
+    FiremodeIndicator firemode{drivers, multiShotCvCommandMapping};
+    FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
 };
 }  // namespace src::control::client_display::graphics
