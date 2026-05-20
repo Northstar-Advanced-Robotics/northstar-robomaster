@@ -21,7 +21,6 @@
 
 #include "drivers_singleton.hpp"
 
-
 // chassis
 #include "control/chassis/chassis_auto_drive.hpp"
 #include "control/chassis/chassis_beyblade_command.hpp"

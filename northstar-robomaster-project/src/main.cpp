@@ -138,7 +138,7 @@ int main()
         //         {
         //             PROFILE(drivers->profiler, drivers->revMotorTxHandler.heartBeat, ());
         //         }
-        //         PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
+        PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
 
         // #endif
         modm::delay_us(10);

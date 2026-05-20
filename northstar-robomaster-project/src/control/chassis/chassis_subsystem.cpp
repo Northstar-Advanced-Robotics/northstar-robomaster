@@ -187,10 +187,6 @@ float ChassisSubsystem::getMaxWheelSpeed(bool refSerialOnline, float chassisPowe
             CHASSIS_POWER_TO_SPEED_INTERPOLATOR.interpolate(chassisPowerLimit);
     }
 
-    if (!isSprinting)
-    {
-        return lastComputedMaxWheelSpeed.second * CHASSIS_WALK_MULTIPLIER;
-    }
     return lastComputedMaxWheelSpeed.second;
 }
 
@@ -215,6 +211,12 @@ void ChassisSubsystem::driveBasedOnHeading(
     float rotational,
     float heading)
 {
+    if (!isSprinting)
+    {
+        forward *= CHASSIS_WALK_MULTIPLIER;
+        sideways *= CHASSIS_WALK_MULTIPLIER;
+    }
+
     rampControllers[0].setTarget(forward);
 
     double currentOutput = rampControllers[0].getValue();

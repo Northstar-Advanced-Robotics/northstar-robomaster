@@ -26,11 +26,10 @@ static constexpr float CHASSIS_ROTATION_D = 0.01f;
 static constexpr float CHASSIS_ROTATION_MAX_VEL = M_TWOPI;
 static constexpr float AUTO_ROTATION_ALPHA = 0.01f;
 
-static constexpr float CHASSIS_GEAR_RATIO = (187.0f / 3591.0f);
+static constexpr float CHASSIS_GEAR_RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508;
 
 static const float DIST_TO_CENTER = .265;     //.30825f;  // from wheel to center
 static const float WHEEL_DIAMETER_M = .118f;  // 0.118f;
-static const float RAMP_UP_RPM_INCREMENT_MPS = 0.01f;
 
 static constexpr float MAX_CHASSIS_SPEED_MPS = 8.0f;
 

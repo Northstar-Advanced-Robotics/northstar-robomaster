@@ -25,6 +25,7 @@ void VisionComms::initializeUartDelays()
     sendRefTurretDataMsgTimeout.stop();
     sendRobotIDMsgTimeout.stop();
     sendOdometryMsgTimeout.stop();
+    messageOffsetInitializationTimeout.restart(TIME_BEFORE_UART_START);
 }
 
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)

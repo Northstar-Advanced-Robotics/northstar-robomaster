@@ -22,16 +22,15 @@ static constexpr float VELOCITY_PID_MAX_ERROR_SUM = 16'000.0f;  // 0.0f;
 static constexpr float VELOCITY_PID_KV = 0.0f;                  // 0.057f;
 static constexpr float VELOCITY_PID_KS = 0.0f;                  // 350.0f;
 static constexpr float VELOCITY_PID_MAX_OUTPUT = DjiMotor::MAX_OUTPUT_C620;
-static constexpr float CHASSIS_ROTATION_P = 0.9f;
+static constexpr float CHASSIS_ROTATION_P = 4.0f;
 static constexpr float CHASSIS_ROTATION_D = 0.01f;
-static constexpr float CHASSIS_ROTATION_MAX_VEL = 1.0f;
+static constexpr float CHASSIS_ROTATION_MAX_VEL = M_TWOPI;
 static constexpr float AUTO_ROTATION_ALPHA = 0.01f;
 
 static constexpr float CHASSIS_GEAR_RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508;
 
-static const float DIST_TO_CENTER = 0.3429f;  // from wheel to center
-static const float WHEEL_DIAMETER_M = 0.1524f;
-static const float RAMP_UP_RPM_INCREMENT_MPS = 0.021f;
+static const float DIST_TO_CENTER = .265;     //.30825f;  // from wheel to center
+static const float WHEEL_DIAMETER_M = .118f;  // 0.118f;
 
 static constexpr float MAX_CHASSIS_SPEED_MPS = 4.0f;
 
@@ -53,7 +52,8 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     {125, 6'000}};
 // At 9000 rpm the beyblade was around 130, Its over
 
-static constexpr float CHASSIS_ACCEL_VALUE = 0.015f;
+static constexpr float CHASSIS_ACCEL_VALUE = 0.007f;   // 0.015f;
+static constexpr float CHASSIS_DECCEL_VALUE = 0.015f;  // 0.015f;
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
     CHASSIS_POWER_TO_MAX_SPEED_LUT,

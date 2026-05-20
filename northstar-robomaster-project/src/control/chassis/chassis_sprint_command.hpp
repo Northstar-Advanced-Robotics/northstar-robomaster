@@ -23,9 +23,9 @@ public:
 
     const char *getName() const override { return "Chassis sprint"; }
 
-    void initialize() override {}
+    void initialize() override;
 
-    void execute() override;
+    void execute() override {}
 
     void end(bool interrupted) override;
 
