@@ -64,7 +64,7 @@ static constexpr TurretMotorConfig YAW_MOTOR_CONFIG = {
 
 static constexpr TurretMotorConfig PITCH_MOTOR_CONFIG = {
     .startAngle = modm::toRadian(0),  // 7.45
-    .startEncoderValue = 3427,
+    .startEncoderValue = 4750,
     .minAngle = modm::toRadian(-10),
     .maxAngle = modm::toRadian(45),
     .limitMotorAngles = true,
@@ -78,8 +78,8 @@ static constexpr TurretMotorConfig YAW_MOTOR_REV_CONFIG = {
     .limitMotorAngles = false,
 };
 
-static constexpr float TURRET_CG_X = 30.0f;                     // 30.17;
-static constexpr float TURRET_CG_Z = 0.0f;                      // 34.02;
+static constexpr float TURRET_CG_X = 10.0f;                     // 30.17;
+static constexpr float TURRET_CG_Z = 15.0f;                     // 34.02;
 static constexpr float GRAVITY_COMPENSATION_SCALAR = -3300.0f;  // 12000 // 7'000;
 
 namespace world_rel_turret_imu
