@@ -30,11 +30,11 @@ void VisionComms::initializeUartDelays()
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    if (currTime - lastReadFlySky > REMOTE_TIMEOUT)
+    if (flySkyConected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
     {
         flySkyConected = false;
     }
-    if (currTime - lastReadVT13 > REMOTE_TIMEOUT)
+    if (VT13Conected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
     {
         VT13Conected = false;
     }
