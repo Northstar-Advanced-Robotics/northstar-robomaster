@@ -145,9 +145,6 @@ public:
 
     tap::communication::serial::Remote* remote;
 
-    bool VT13Conected = false;
-    bool flySkyConected = false;
-
     uint32_t lastReadVT13 = 0;
     uint32_t lastReadFlySky = 0;
 

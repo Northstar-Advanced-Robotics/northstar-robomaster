@@ -31,13 +31,13 @@ void VisionComms::initializeUartDelays()
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    if (flySkyConected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
+    if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
     {
-        flySkyConected = false;
+        remote->flySkyConnected = false;
     }
-    if (VT13Conected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
+    if (remote->VT13Connected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
     {
-        VT13Conected = false;
+        remote->VT13Connected = false;
     }
     switch (completeMessage.messageType)
     {
@@ -75,17 +75,19 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         }
         case MessageType::FLY_SKY_DATA:
         {
-            if (!VT13Conected)
+            if (!remote->VT13Connected)
             {
                 decodeToFlySkyRemote(completeMessage);
             }
+            return;
         }
         case MessageType::VT13_DATA:
         {
-            if (!flySkyConected)
+            if (!remote->flySkyConnected)
             {
                 decodeToVT13Remote(completeMessage);
             }
+            return;
         }
 
         default:
@@ -196,22 +198,36 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
 
 bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
 {
-    flySkyConected = true;
+    remote->flySkyConnected = true;
     lastReadFlySky = tap::arch::clock::getTimeMilliseconds();
-
     uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_FLY_SKY];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
     std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
     remote->parseBufferFlySky(rxBuffer);
+
+    return true;
 }
 
 bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
 {
-    VT13Conected = true;
+    remote->VT13Connected = true;
     lastReadVT13 = tap::arch::clock::getTimeMilliseconds();
-
     uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_VT13];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
     std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
     remote->parseBufferVT13(rxBuffer);
+
+    return true;
 }
 
 void VisionComms::sendMessage()

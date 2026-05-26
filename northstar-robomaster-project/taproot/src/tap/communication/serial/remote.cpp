@@ -53,6 +53,11 @@ void Remote::read()
         connected = false;  // Remote no longer connected
         reset();            // Reset current remote values
     }
+    if (flySkyConnected || VT13Connected)
+    {
+        return;
+    }
+
     uint8_t data;  // Next byte to be read
     // Read next byte if available and more needed for the current packet
     while (drivers->uart.read(bound_ports::REMOTE_SERIAL_UART_PORT, &data) &&
@@ -253,12 +258,12 @@ void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
     remote.leftVertical = parse_and_scale(rxBuffer[6], rxBuffer[7]);     // CH3: Throttle
     remote.leftHorizontal = parse_and_scale(rxBuffer[8], rxBuffer[9]);   // CH4: Rudder
 
-    // 2. Dials / Knobs (Channels 5-6)
+    // 2. Dials / Knobs (Channels 9-10)
     // (Assuming you want these scaled to -660 to 660 as well)
-    remote.wheel = parse_and_scale(rxBuffer[10], rxBuffer[11]);  // CH5 VRA
-    // remote.dialVrB = parse_and_scale(rxBuffer[12], rxBuffer[13]);  // CH6
+    remote.wheel = parse_and_scale(rxBuffer[18], rxBuffer[19]);  // CH9 VRA
+    // remote.dialVrB = parse_and_scale(rxBuffer[20], rxBuffer[21]);  // CH10
 
-    // 3. Switches (Channels 7-10)
+    // 3. Switches (Channels 5-8)
     auto parse_switch = [](uint8_t low, uint8_t high) -> Remote::SwitchState {
         uint16_t raw_val = low | (high << 8);
         if (raw_val < 1300) return Remote::SwitchState::UP;
@@ -267,13 +272,13 @@ void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
     };
 
     remote.leftSwitch =
-        parse_switch(rxBuffer[14], rxBuffer[15]) == Remote::SwitchState::UP
+        parse_switch(rxBuffer[10], rxBuffer[11]) == Remote::SwitchState::UP
             ? Remote::SwitchState::MID
             : parse_switch(
-                  rxBuffer[16],
-                  rxBuffer[17]);  // If SWA up mid, otherwise up or down based on SWB
-    remote.rightSwitch = parse_switch(rxBuffer[18], rxBuffer[19]);                    // CH9 SWC
-    connected = parse_switch(rxBuffer[20], rxBuffer[21]) == Remote::SwitchState::UP;  // CH10 SWD
+                  rxBuffer[12],
+                  rxBuffer[13]);  // If SWA up mid, otherwise up or down based on SWB
+    remote.rightSwitch = parse_switch(rxBuffer[14], rxBuffer[15]);                      // CH9 SWC
+    connected = parse_switch(rxBuffer[16], rxBuffer[17]) == Remote::SwitchState::DOWN;  // CH10 SWD
 
     // mouse input
     remote.mouse.x = 0;
