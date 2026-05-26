@@ -23,8 +23,8 @@ SentryScanCommand::SentryScanCommand(
       YAW_SPEED(YAW_SPEED * tap::Drivers::DT / 1000.0f)
 {
     assert(MIN_PITCH_ANGLE < MAX_PITCH_ANGLE);
-    assert(MIN_PITCH_ANGLE <= turretSubsystem->pitchMotor.getConfig().minAngle);
-    assert(MAX_PITCH_ANGLE >= turretSubsystem->pitchMotor.getConfig().maxAngle);
+    assert(MIN_PITCH_ANGLE >= turretSubsystem->pitchMotor.getConfig().minAngle);
+    assert(MAX_PITCH_ANGLE <= turretSubsystem->pitchMotor.getConfig().maxAngle);
     addSubsystemRequirement(turretSubsystem);
 }
 
@@ -43,18 +43,18 @@ void SentryScanCommand::execute()
     float yawSetPoint = yawController->getSetpoint().getUnwrappedValue();
     yawController->runController(tap::Drivers::DT, Angle(yawSetPoint + YAW_SPEED));
 
-    float pitchSetPoint = pitchController->getSetpoint().getUnwrappedValue();
-    if (pitchSetPoint >= MAX_PITCH_ANGLE && PITCH_SPEED > 0)
+    WrappedFloat pitchSetPoint = pitchController->getSetpoint();
+    if (pitchSetPoint.minDifference(MAX_PITCH_ANGLE) < 0.05f && PITCH_SPEED > 0)
     {
         PITCH_SPEED = -PITCH_SPEED;
     }
-    else if (pitchSetPoint <= MIN_PITCH_ANGLE && PITCH_SPEED < 0)
+    else if (pitchSetPoint.minDifference(MIN_PITCH_ANGLE) > -0.05f && PITCH_SPEED < 0)
     {
         PITCH_SPEED = -PITCH_SPEED;
     }
     pitchController->runController(
         tap::Drivers::DT,
-        Angle(pitchController->getSetpoint().getUnwrappedValue() + PITCH_SPEED));
+        Angle(pitchSetPoint.getUnwrappedValue() + PITCH_SPEED));
 }
 
 bool SentryScanCommand::isFinished() const

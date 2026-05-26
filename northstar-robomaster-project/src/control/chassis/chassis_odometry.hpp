@@ -4,8 +4,10 @@
 #include "tap/algorithms/wrapped_float.hpp"
 #include "tap/architecture/clock.hpp"
 
+#include "control/turret/turret_motor.hpp"
 #include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/vector.hpp"
+
 
 /*
     Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane
