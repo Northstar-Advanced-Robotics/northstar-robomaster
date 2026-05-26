@@ -34,7 +34,9 @@ public:
         // REF_DATA = 6
         HEALTH = 6,
         REF_TURRET_DATA = 7,
-        VISION_LOCALIZATION = 8
+        VISION_LOCALIZATION = 8,
+        FLY_SKY_DATA = 9,
+        VT13_DATA = 10
     };
 
     struct RefData
@@ -141,6 +143,16 @@ public:
 
     src::chassis::ChassisAutoDrive* chassisAutoDrive;
 
+    tap::communication::serial::Remote* remote;
+
+    bool VT13Conected = false;
+    bool flySkyConected = false;
+
+    uint32_t lastReadVT13 = 0;
+    uint32_t lastReadFlySky = 0;
+
+    uint16_t REMOTE_TIMEOUT = 1000;
+
     tap::motor::DjiMotor* pitchMotor;
 
     struct TurretAimData
@@ -202,6 +214,11 @@ public:
         this->chassisAutoDrive = chassisAutoDrive;
     }
 
+    mockable inline void attachRemote(tap::communication::serial::Remote* remote)
+    {
+        this->remote = remote;
+    }
+
     mockable inline void attachPitchMotor(tap::motor::DjiMotor* pitchMotor)
     {
         this->pitchMotor = pitchMotor;
@@ -233,6 +250,10 @@ private:
     bool decodeToAutoPathData(const ReceivedSerialMessage& message);
 
     bool decodeToVisionAprilTagLocalization(const ReceivedSerialMessage& message);
+
+    bool decodeToFlySkyRemote(const ReceivedSerialMessage& message);
+
+    bool decodeToVT13Remote(const ReceivedSerialMessage& message);
 };
 }  // namespace src::serial
 
