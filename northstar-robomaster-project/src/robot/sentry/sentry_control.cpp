@@ -55,6 +55,7 @@
 #include "control/turret/user/turret_quick_turn_command.hpp"
 #include "control/turret/user/turret_user_control_command.hpp"
 #include "control/turret/user/turret_user_world_relative_command.hpp"
+#include "robot/sentry/sentry_scan_command.hpp"
 #include "robot/standard/standard_turret_subsystem.hpp"
 
 // cv
@@ -298,11 +299,28 @@ cv::TurretCVControlCommand turretCVControlCommand(
     USER_YAW_INPUT_SCALAR,
     USER_PITCH_INPUT_SCALAR);
 
+cv::SentryScanCommand sentryScanCommand(
+    drivers(),
+    &turret,
+    &worldFrameYawTurretImuController,
+    &worldFramePitchTurretImuController,
+    chassisOdometry,
+    cv::SCAN_MIN_PITCH_ANGLE,
+    cv::SCAN_MAX_PITCH_ANGLE,
+    cv::SCAN_PITCH_SPEED,
+    cv::SCAN_YAW_SPEED);
+
 RemoteMapState xCtrlPressed({Remote::Key::X, Remote::Key::CTRL});
 auto xCtrlPressedCvControl = std::make_unique<ToggleCommandMapping>(
     drivers(),
     std::vector<Command *>{&turretCVControlCommand},
     &xCtrlPressed);
+
+MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
+
+Trigger sentryScanTrigger = (Trigger(drivers(), []() {
+                                return matchRunningGovernor.isReady();
+                            })).whileTrue(&sentryScanCommand);
 
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
