@@ -62,9 +62,8 @@ public:
      */
     enum class MouseButton
     {
-        LEFT,   ///< The left mouse button.
-        RIGHT,  ///< The right mouse button.
-        Middle  ///< The middle mouse button.
+        LEFT,  ///< The left mouse button.
+        RIGHT  ///< The right mouse button.
     };
 
     RemoteMapState() = default;
@@ -83,8 +82,6 @@ public:
      * when the left mouse button is pressed.
      * @param[in] mouseButtonRightPressed Initialize the RemoteMapState to match a remote map state
      * when the right mouse button is pressed.
-     * @param[in] mouseButtonMiddlePressed Initialize the RemoteMapState to match a remote map state
-     * when the middle mouse button is pressed.
      * @note `keySet` and `negKeySet` must be mutally exclusive sets, otherwise the `negKeySet` will
      * not be properly initialized.
      */
@@ -94,8 +91,7 @@ public:
         const std::list<tap::communication::serial::Remote::Key> &keySet,
         const std::list<tap::communication::serial::Remote::Key> &negKeySet,
         bool mouseButtonLeftPressed,
-        bool mouseButtonRightPressed,
-        bool mouseButtonMiddlePressed);
+        bool mouseButtonRightPressed);
 
     /**
      * Initializes a RemoteMapState with a single switch to the given switch state.
@@ -176,11 +172,6 @@ public:
     void initRMouseButton();
 
     /**
-     * Initializes the middle mouse button to be mapped when clicked.
-     */
-    void initMMouseButton();
-
-    /**
      * Checks if `this` is a subset of `other`. `this` is a subset of `other` under the following
      * conditions:
      * - Either `this`'s left switch state is `UNKNOWN` or `this`'s left switch state is equal to
@@ -190,8 +181,6 @@ public:
      * - Either `this`'s left mouse button is not initialized or both `this` and `other`'s left
      *   mouse buttons are both initialized.
      * - Either `this`'s right mouse button is not initialized or both `this` and `other`'s right
-     *   mouse buttons are both initialized.
-     * - Either `this`'s middle mouse button is not initialized or both `this` and `other`'s middle
      *   mouse buttons are both initialized.
      * - `this`'s key set is a subset of `other`'s key set, i.e. `(this.keySet & other.keySet) ==
      *   this.keySet`.
@@ -212,8 +201,6 @@ public:
     bool getLMouseButton() const { return lMouseButton; }
 
     bool getRMouseButton() const { return rMouseButton; }
-
-    bool getMMouseButton() const { return mMouseButton; }
 
     /**
      * Straight equality.
@@ -238,8 +225,6 @@ private:
     bool lMouseButton = false;
 
     bool rMouseButton = false;
-
-    bool mMouseButton = false;
 
 };  // class RemoteState
 }  // namespace control

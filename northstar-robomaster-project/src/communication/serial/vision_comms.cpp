@@ -30,15 +30,6 @@ void VisionComms::initializeUartDelays()
 
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
-    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    if (flySkyConected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
-    {
-        flySkyConected = false;
-    }
-    if (VT13Conected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
-    {
-        VT13Conected = false;
-    }
     switch (completeMessage.messageType)
     {
         case MessageType::TURRET_AIM_DATA:
@@ -72,20 +63,6 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         {
             decodeToVisionAprilTagLocalization(completeMessage);
             return;
-        }
-        case MessageType::FLY_SKY_DATA:
-        {
-            if (!VT13Conected)
-            {
-                decodeToFlySkyRemote(completeMessage);
-            }
-        }
-        case MessageType::VT13_DATA:
-        {
-            if (!flySkyConected)
-            {
-                decodeToVT13Remote(completeMessage);
-            }
         }
 
         default:
@@ -192,26 +169,6 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
     chassisOdometry->setGlobalPosition({localizationData.posX, localizationData.posY});
 
     return true;
-}
-
-bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
-{
-    flySkyConected = true;
-    lastReadFlySky = tap::arch::clock::getTimeMilliseconds();
-
-    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_FLY_SKY];
-    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
-    remote->parseBufferFlySky(rxBuffer);
-}
-
-bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
-{
-    VT13Conected = true;
-    lastReadVT13 = tap::arch::clock::getTimeMilliseconds();
-
-    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_VT13];
-    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
-    remote->parseBufferVT13(rxBuffer);
 }
 
 void VisionComms::sendMessage()
