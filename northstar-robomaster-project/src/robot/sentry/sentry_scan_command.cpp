@@ -7,17 +7,24 @@ SentryScanCommand::SentryScanCommand(
     TurretSubsystem *turretSubsystem,
     algorithms::TurretYawControllerInterface *yawController,
     algorithms::TurretPitchControllerInterface *pitchController,
-    float DELTA_MAX,
-    float MAX_ERROR,
-    float ROT_SPEED)
+    src::chassis::ChassisOdometry *chassisOdometry,
+    float MIN_PITCH_ANGLE,
+    float MAX_PITCH_ANGLE,
+    float PITCH_SPEED,
+    float YAW_SPEED)
     : drivers(drivers),
       turretSubsystem(turretSubsystem),
       yawController(yawController),
       pitchController(pitchController),
-      DELTA_MAX(DELTA_MAX),
-      MAX_ERROR(MAX_ERROR),
-      ROT_SPEED(ROT_SPEED)
+      chassisOdometry(chassisOdometry),
+      MIN_PITCH_ANGLE(MIN_PITCH_ANGLE),
+      MAX_PITCH_ANGLE(MAX_PITCH_ANGLE),
+      PITCH_SPEED(PITCH_SPEED * tap::Drivers::DT / 1000.0f),
+      YAW_SPEED(YAW_SPEED * tap::Drivers::DT / 1000.0f)
 {
+    assert(MIN_PITCH_ANGLE < MAX_PITCH_ANGLE);
+    assert(MIN_PITCH_ANGLE <= turretSubsystem->pitchMotor.getConfig().minAngle);
+    assert(MAX_PITCH_ANGLE >= turretSubsystem->pitchMotor.getConfig().maxAngle);
     addSubsystemRequirement(turretSubsystem);
 }
 
@@ -27,23 +34,27 @@ void SentryScanCommand::initialize()
 {
     yawController->initialize();
     pitchController->initialize();
+    pitchController->setSetpoint(Angle(turretSubsystem->pitchMotor.getConfig().startAngle));
     prevTime = tap::arch::clock::getTimeMilliseconds();
-    // used to use offsets
 }
-float debugSetPoint = 0;
+
 void SentryScanCommand::execute()
 {
-    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t dt = currTime - prevTime;
-    prevTime = currTime;
+    float yawSetPoint = yawController->getSetpoint().getUnwrappedValue();
+    yawController->runController(tap::Drivers::DT, Angle(yawSetPoint + YAW_SPEED));
 
-    float Measurement = yawController->getMeasurement().getUnwrappedValue();
-    float SetPoint = yawController->getSetpoint().getUnwrappedValue();
-    debugSetPoint = SetPoint;
-
-    yawController->runController(dt, Angle(SetPoint + ROT_SPEED));
-
-    pitchController->runController(dt, Angle(turretSubsystem->pitchMotor.getConfig().startAngle));
+    float pitchSetPoint = pitchController->getSetpoint().getUnwrappedValue();
+    if (pitchSetPoint >= MAX_PITCH_ANGLE && PITCH_SPEED > 0)
+    {
+        PITCH_SPEED = -PITCH_SPEED;
+    }
+    else if (pitchSetPoint <= MIN_PITCH_ANGLE && PITCH_SPEED < 0)
+    {
+        PITCH_SPEED = -PITCH_SPEED;
+    }
+    pitchController->runController(
+        tap::Drivers::DT,
+        Angle(pitchController->getSetpoint().getUnwrappedValue() + PITCH_SPEED));
 }
 
 bool SentryScanCommand::isFinished() const
