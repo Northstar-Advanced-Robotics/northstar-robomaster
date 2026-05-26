@@ -202,6 +202,9 @@ public:
     void parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13]);
     void parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13]);
 
+    bool flySkyConnected = false;
+    bool VT13Connected = false;
+
 private:
     static const int REMOTE_READ_TIMEOUT = 6;          ///< Timeout delay between valid packets.
     static const int REMOTE_DISCONNECT_TIMEOUT = 100;  ///< Timeout delay for remote disconnect.
