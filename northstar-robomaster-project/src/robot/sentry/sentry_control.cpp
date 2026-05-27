@@ -438,6 +438,10 @@ src::chassis::ChassisDriveCommand chassisDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
 
+src::chassis::ChassisFieldCommand chassisFieldCommand(
+    &chassisSubsystem,
+    &drivers()->controlOperatorInterface);
+
 src::chassis::ChassisOrientDriveCommand chassisOrientDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
@@ -576,7 +580,7 @@ Trigger rightSwitchMidOrientDriveWhenImuCalibrated = (TriggerHelpers::switchStat
                                                           Remote::SwitchState::MID) &&
                                                       Trigger(drivers(), []() {
                                                           return imuCalibratingGovernor.isReady();
-                                                      })).whileTrue(&chassisOrientDriveCommand);
+                                                      })).whileTrue(&chassisFieldCommand);
 
 // auto rightSwitchMidOrientDriveWhenImuCalibrated = std::make_unique<HoldRepeatCommandMapping>(
 //     drivers(),

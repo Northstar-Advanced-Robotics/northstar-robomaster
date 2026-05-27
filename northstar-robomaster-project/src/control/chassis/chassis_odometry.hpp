@@ -8,7 +8,6 @@
 #include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/vector.hpp"
 
-
 /*
     Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane
     +X: Right
@@ -116,7 +115,7 @@ public:
         rotation = calculateRobotHeading();
 
         velocityGlobal = convertLocalToGlobal(velocityLocal);
-        positionGlobal += velocityGlobal * deltaTimeSeconds;
+        // positionGlobal += velocityGlobal * deltaTimeSeconds;
 
         // velocityProjectedGlobal = modm::Vector<float, 2>(velocity3dGlobal.x, velocity3dGlobal.z);
         // positionProjectedGlobal += velocityProjectedGlobal * deltaTimeSeconds;

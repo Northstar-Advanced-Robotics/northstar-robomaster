@@ -109,7 +109,7 @@ public:
         float roll;
 
         // float pitch_vel;
-        // float yaw_vel;
+        float yaw_vel;
         // float roll_vel;
 
     } modm_packed;

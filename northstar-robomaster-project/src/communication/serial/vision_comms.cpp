@@ -313,12 +313,12 @@ void VisionComms::sendRobotOdometry()
         // data->chassis_data.vel_z = 0;             // TODO: see z on position (it doesn't exist)
 
         // Turret Data
-        data->turret_data.pitch = pitchMotor->getPositionWrapped();  // radians
-        data->turret_data.yaw = drivers->bmi088.getYaw();            // radians
-        data->turret_data.roll = drivers->bmi088.getRoll();          // radians
+        data->turret_data.pitch = drivers->bmi088.getPitch();  // radians
+        data->turret_data.yaw = drivers->bmi088.getYaw();      // radians
+        data->turret_data.roll = drivers->bmi088.getRoll();    // radians
 
         // data->turret_data.pitch_vel = pitchMotor->getShaftRPM() / 60 * M_TWOPI;
-        // data->turret_data.yaw_vel = drivers->bmi088.getGz();
+        data->turret_data.yaw_vel = drivers->bmi088.getGz();
         // data->turret_data.roll_vel = drivers->bmi088.getGx();
 
         odometryMessage.setCRC16();
