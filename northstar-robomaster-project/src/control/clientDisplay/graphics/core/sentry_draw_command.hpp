@@ -84,6 +84,7 @@ public:
         chassisPower.update();
         firemode.update();
         flywheelReady.update();
+        imuCalIndicator.update();
     };
 
     // ui subsystem won't do anything until its top level container is set, so we are ok to add

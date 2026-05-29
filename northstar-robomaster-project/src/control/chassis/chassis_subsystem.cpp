@@ -21,7 +21,6 @@ modm::Pair<int, float> lastComputedMaxWheelSpeed = CHASSIS_POWER_TO_MAX_SPEED_LU
 ChassisSubsystem::ChassisSubsystem(
     tap::Drivers* drivers,
     const ChassisConfig& config,
-    src::can::TurretMCBCanComm* turretMcbCanComm,
     src::control::turret::TurretMotor* yawMotor,
     ChassisOdometry* chassisOdometry_)
     : Subsystem(drivers),
@@ -64,7 +63,6 @@ ChassisSubsystem::ChassisSubsystem(
               CHASSIS_GEAR_RATIO),
           Motor(drivers, config.rightBackId, config.canBus, false, "RB", false, CHASSIS_GEAR_RATIO),
       },
-      turretMcbCanComm(turretMcbCanComm),
       yawMotor(yawMotor),
       chassisOdometry(chassisOdometry_)
 {

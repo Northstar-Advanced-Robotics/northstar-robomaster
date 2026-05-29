@@ -72,7 +72,7 @@ struct TriggerHelpers
      * @param[in] drivers A pointer to the drivers singleton.
      * @param[in] channel A channel on the remote.
      * @param[in] thresh A threshold for the value of `channel` on the remote.
-     * @param[in] abs Whether to take the absolute value of `channel`, defaults to true.
+     * @param[in] abs Whether to take the absolute value of `channel`, defaults to false.
      * @return A trigger that is true when the value of `channel` is greater than `thresh`.
      */
     static Trigger channelGreaterThan(
@@ -89,6 +89,31 @@ struct TriggerHelpers
             else
             {
                 return drivers->remote.getChannel(channel) > thresh;
+            }
+        });
+    }
+
+    /**
+     * @param[in] drivers A pointer to the drivers singleton.
+     * @param[in] channel A channel on the remote.
+     * @param[in] thresh A threshold for the value of `channel` on the remote.
+     * @param[in] abs Whether to take the absolute value of `channel`, defaults to false.
+     * @return A trigger that is true when the value of `channel` is less than `thresh`.
+     */
+    static Trigger channelLessThan(
+        Drivers *drivers,
+        Remote::Channel channel,
+        float thresh,
+        bool abs = false)
+    {
+        return Trigger(drivers, [drivers, channel, thresh, abs]() {
+            if (abs)
+            {
+                return std::abs(drivers->remote.getChannel(channel)) < thresh;
+            }
+            else
+            {
+                return drivers->remote.getChannel(channel) < thresh;
             }
         });
     }

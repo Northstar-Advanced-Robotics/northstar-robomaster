@@ -7,7 +7,6 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-#include "communication/can/turret/turret_mcb_can_comm.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 #include "control/chassis/rate_limiters/slew_rate_limiter.hpp"
 #include "modm/math/filter/pid.hpp"
@@ -62,7 +61,6 @@ public:
     ChassisSubsystem(
         tap::Drivers* drivers,
         const ChassisConfig& config,
-        src::can::TurretMCBCanComm* turretMCBCanComm,
         src::control::turret::TurretMotor* yawMotor,
         ChassisOdometry* chassisOdometry_);
 
@@ -204,8 +202,6 @@ private:
     }
 
     src::chassis::ChassisOdometry* chassisOdometry;
-
-    src::can::TurretMCBCanComm* turretMcbCanComm;
 
     src::control::turret::TurretMotor* yawMotor;
 

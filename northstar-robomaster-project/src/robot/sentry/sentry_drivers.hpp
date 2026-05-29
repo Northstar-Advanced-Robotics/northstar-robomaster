@@ -34,7 +34,6 @@
 #include "communication/serial/vision_comms.hpp"
 #include "robot/control_operator_interface.hpp"
 
-
 #endif
 
 namespace src::sentry
@@ -50,7 +49,6 @@ public:
         : tap::Drivers(),
           controlOperatorInterface(this),
           visionComms(this),
-          turretMCBCanCommBus2(this, tap::can::CanBus::CAN_BUS2),
           encoder(true, 1.0f)
     //   revMotorTxHandler(this)
     {
@@ -58,12 +56,10 @@ public:
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
     testing::NiceMock<mock::ControlOperatorInterfaceMock> controlOperatorInterface;
-    testing::NiceMock<mock::TurretMCBCanCommMock> turretMCBCanCommBus2;
 #else
 public:
     control::ControlOperatorInterface controlOperatorInterface;
     serial::VisionComms visionComms;
-    can::TurretMCBCanComm turretMCBCanCommBus2;
     tap::encoder::PwmEncoder encoder;
     // tap::motor::RevMotorTxHandler revMotorTxHandler;
 #endif

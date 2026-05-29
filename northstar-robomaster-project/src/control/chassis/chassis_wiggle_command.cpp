@@ -39,7 +39,7 @@ void ChassisWiggleCommand::execute()
         operatorInterface->getDrivetrainHorizontalTranslation());
     chassis->setVelocityTurretDrive(
         scale(normInput.first),
-        scale(normInput.second),
+        -scale(normInput.second),
         calculateWiggle(dt));
 }
 

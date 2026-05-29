@@ -32,29 +32,19 @@ static constexpr float MAX_M3508_RPM_CHASSIS =
 
 [[maybe_unused]] static modm::Pair<float, float> getNormalizedInput(float vert, float hor)
 {
-    float dist = sqrt((vert * vert) + (hor * hor));
-    if (dist > 1.0f)
+    if (vert == 0.0f && hor == 0.0f)
     {
-        return modm::Pair<float, float>(vert / dist, hor / dist);
+        return modm::Pair<float, float>(0.0f, 0.0f);
     }
-    else
-    {
-        return modm::Pair<float, float>(vert, hor);
-    }
+
+    float magnitude = sqrtf((vert * vert) + (hor * hor));
+
+    float maxDeflection = modm::max(fabsf(vert), fabsf(hor));
+
+    return modm::Pair<float, float>(
+        vert * (maxDeflection / magnitude),
+        hor * (maxDeflection / magnitude));
 }
 }  // namespace src::chassis
-
-static modm::Pair<float, float> getNormalizedInput(float vert, float hor)
-{
-    float dist = sqrt((vert * vert) + (hor * hor));
-    if (dist > 1.0f)
-    {
-        return modm::Pair<float, float>(vert / dist, hor / dist);
-    }
-    else
-    {
-        return modm::Pair<float, float>(vert, hor);
-    }
-}
 
 #endif  // CHASSIS_CONSTANTS_HPP_

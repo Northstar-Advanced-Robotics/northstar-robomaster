@@ -47,7 +47,7 @@ public:
         }
 
         stage.calculateNumbers();
-        stage.x = X_POSITION - stage.width / 2;
+        // stage.x = X_POSITION - stage.width / 2;
     }
 
 private:
@@ -55,13 +55,12 @@ private:
 
     imu::ImuCalibrateCommand* imuCalibrateCommand;
 
-    static constexpr uint16_t X_POSITION =
-        200;  // pixels, all numbers at the same y level on screen
+    static constexpr uint16_t X_POSITION = 20;  // pixels, all numbers at the same y level on screen
     static constexpr uint16_t Y_POSITION = 800;   // pixels, all numbers at the same y level on
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic stage{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 200, 200};
+    StringGraphic stage{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 20, 3};
 };
 
 }  // namespace src::control::client_display::graphics

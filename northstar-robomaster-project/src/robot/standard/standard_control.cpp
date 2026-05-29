@@ -134,8 +134,6 @@ namespace standard_control
 {
 DummySubsystem dummySubsystem(drivers());
 
-inline src::can::TurretMCBCanComm &getTurretMCBCanComm() { return drivers()->turretMCBCanCommBus2; }
-
 // songs
 BuzzerSubsystem buzzerSubsystem(drivers());
 PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
@@ -217,13 +215,7 @@ tap::motor::DjiMotor yawMotor(
     YAW_MOTOR_CONFIG.startEncoderValue,
     &drivers()->encoder);
 
-TurretSubsystem turret(
-    drivers(),
-    &pitchMotor,
-    &yawMotor,
-    PITCH_MOTOR_CONFIG,
-    YAW_MOTOR_CONFIG,
-    &getTurretMCBCanComm());
+TurretSubsystem turret(drivers(), &pitchMotor, &yawMotor, PITCH_MOTOR_CONFIG, YAW_MOTOR_CONFIG);
 
 // turret controlers
 algorithms::ChassisFramePitchTurretController chassisFramePitchTurretController(
@@ -251,20 +243,6 @@ tap::algorithms::SmoothPid worldFramePitchTurretVelPid(world_rel_turret_imu::PIT
 tap::algorithms::SmoothPid worldFrameYawTurretPosPid(world_rel_turret_imu::YAW_POS_PID_CONFIG);
 
 tap::algorithms::SmoothPid worldFrameYawTurretVelPid(world_rel_turret_imu::YAW_VEL_PID_CONFIG);
-
-// for imu can com giving imu data from turret to chassis
-algorithms::
-    WorldFramePitchTurretCanImuCascadePidTurretController worldFramePitchTurretCanImuController(
-        getTurretMCBCanComm(),
-        turret.pitchMotor,
-        worldFramePitchTurretPosPid,
-        worldFramePitchTurretVelPid);
-
-algorithms::WorldFrameYawTurretCanImuCascadePidTurretController worldFrameYawTurretCanImuController(
-    getTurretMCBCanComm(),
-    turret.yawMotor,
-    worldFrameYawTurretPosPid,
-    worldFrameYawTurretVelPid);
 
 // for imu fixed on turret
 algorithms::WorldFramePitchTurretImuCascadePidTurretController worldFramePitchTurretImuController(
@@ -431,7 +409,6 @@ src::chassis::ChassisSubsystem chassisSubsystem(
             src::chassis::VELOCITY_PID_KD,
             src::chassis::VELOCITY_PID_MAX_ERROR_SUM),
     },
-    &drivers()->turretMCBCanCommBus2,
     &turret.yawMotor,
     chassisOdometry);
 
