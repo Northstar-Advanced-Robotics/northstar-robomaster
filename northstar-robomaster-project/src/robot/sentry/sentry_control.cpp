@@ -603,7 +603,8 @@ src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
     &agitator,
     &chassisSubsystem,
     &flywheelOnGovernor,
-    leftMousePressedShoot.get());
+    leftMousePressedShoot.get(),
+    &imuCalibrateCommand);
 
 void initializeSubsystems(Drivers *drivers)
 {

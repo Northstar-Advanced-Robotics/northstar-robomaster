@@ -10,6 +10,7 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/flywheel_ready_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hit_ring.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hopper_lid_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/imu_cal_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/imu_recalibration_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/lane_assist_lines.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/linear_velocity_indicator.hpp"
@@ -17,18 +18,6 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/predicted_remaining_shots_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/reticle.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/supercap_charge_indicator.hpp"
-
-// #include "subsystems/chassis/chassisSubsystem.hpp"
-// #include "subsystems/flywheel/FlywheelSubsystem.hpp"
-// #include "subsystems/turret/turretSubsystem.hpp"
-// #include "subsystems/agitator/HeroagitatorSubsystem.hpp"
-#include "control/agitator/multi_shot_cv_command_mapping.hpp"
-#include "control/agitator/velocity_agitator_subsystem.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
-#include "control/clientDisplay/graphics/core/ui_subsystem.hpp"
-#include "control/clientDisplay/graphics/graphics_objects/graphics_container.hpp"
-#include "control/flywheel/dji_two_flywheel_subsystem.hpp"
-#include "control/turret/turret_subsystem.hpp"
 
 #include "drivers.hpp"
 
@@ -45,7 +34,8 @@ public:
         src::agitator::VelocityAgitatorSubsystem* agitator,
         src::chassis::ChassisSubsystem* chassis,
         control::governor::FlywheelOnGovernor* flywheelGovernor,
-        control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping)
+        control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping,
+        imu::ImuCalibrateCommand* imuCalibrateCommand)
         : drivers(drivers),
           ui(ui),
           turret(turret),
@@ -53,7 +43,8 @@ public:
           agitator(agitator),
           chassis(chassis),
           flywheelGovernor(flywheelGovernor),
-          multiShotCvCommandMapping(multiShotCvCommandMapping)
+          multiShotCvCommandMapping(multiShotCvCommandMapping),
+          imuCalibrateCommand(imuCalibrateCommand)
     {
         addSubsystemRequirement(ui);
 
@@ -71,6 +62,7 @@ public:
         addGraphicsObject(&chassisPower);
         addGraphicsObject(&firemode);
         addGraphicsObject(&flywheelReady);
+        addGraphicsObject(&imuCalIndicator);
     };
 
     void initialize() override { ui->setTopLevelContainer(this); };
@@ -111,6 +103,7 @@ private:
     src::chassis::ChassisSubsystem* chassis;
     control::governor::FlywheelOnGovernor* flywheelGovernor;
     control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping;
+    imu::ImuCalibrateCommand* imuCalibrateCommand;
 
     // add top level graphics objects here and in the constructor
     LaneAssistLines lane{turret};
@@ -128,5 +121,6 @@ private:
     LinearVelocityIndicator velo{chassis};
     FiremodeIndicator firemode{drivers, multiShotCvCommandMapping};
     FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
+    ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
 };
 }  // namespace src::control::client_display::graphics
