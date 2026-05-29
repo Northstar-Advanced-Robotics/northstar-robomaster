@@ -544,7 +544,7 @@ Trigger sentryScanTrigger = (Trigger(drivers(), []() {
 
 Trigger scanWhenWheelLeft =
     TriggerHelpers::channelGreaterThan(drivers(), Remote::Channel::WHEEL, .8)
-        .toggleOnTrue(&sentryScanCommand);
+        .toggleOnTrue(&cvManagerCommand);
 
 // imu commands
 imu::ImuCalibrateCommand imuCalibrateCommand(
@@ -580,7 +580,7 @@ Trigger rightSwitchMidOrientDriveWhenImuCalibrated = (TriggerHelpers::switchStat
                                                           Remote::SwitchState::MID) &&
                                                       Trigger(drivers(), []() {
                                                           return imuCalibratingGovernor.isReady();
-                                                      })).whileTrue(&chassisFieldCommand);
+                                                      })).whileTrue(&chassisOrientDriveCommand);
 
 // auto rightSwitchMidOrientDriveWhenImuCalibrated = std::make_unique<HoldRepeatCommandMapping>(
 //     drivers(),

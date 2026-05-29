@@ -349,9 +349,9 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_IMU_CAL_PID_CONFIG = {
 
 namespace cv
 {
-static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(3 - 12);
-static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(3 + 12);
-static constexpr float SCAN_PITCH_SPEED = 0.8f;
+static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(10 - 7);
+static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(10 + 7);
+static constexpr float SCAN_PITCH_SPEED = 0.6f;
 static constexpr float SCAN_YAW_SPEED = 2.0f;
 }  // namespace cv
 
