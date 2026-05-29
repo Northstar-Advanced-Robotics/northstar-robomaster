@@ -55,6 +55,8 @@
 #include "control/turret/user/turret_quick_turn_command.hpp"
 #include "control/turret/user/turret_user_control_command.hpp"
 #include "control/turret/user/turret_user_world_relative_command.hpp"
+#include "robot/sentry/sentry_cv_manager_command.hpp"
+#include "robot/sentry/sentry_scan_command.hpp"
 #include "robot/standard/standard_turret_subsystem.hpp"
 
 // cv
@@ -436,6 +438,10 @@ src::chassis::ChassisDriveCommand chassisDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
 
+src::chassis::ChassisFieldCommand chassisFieldCommand(
+    &chassisSubsystem,
+    &drivers()->controlOperatorInterface);
+
 src::chassis::ChassisOrientDriveCommand chassisOrientDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
@@ -503,6 +509,43 @@ auto rightSwiitchDownBeyblade = std::make_unique<HoldRepeatCommandMapping>(
     &rightSwitchDown,
     true);
 
+// sentry scan
+cv::SentryScanCommand sentryScanCommand(
+    drivers(),
+    &turret,
+    &worldFrameYawTurretImuController,
+    &worldFramePitchTurretImuController,
+    chassisOdometry,
+    cv::SCAN_MIN_PITCH_ANGLE,
+    cv::SCAN_MAX_PITCH_ANGLE,
+    cv::SCAN_PITCH_SPEED,
+    cv::SCAN_YAW_SPEED);
+
+cv::SentryCvManagerCommand cvManagerCommand(
+    drivers(),
+    drivers()->controlOperatorInterface,
+    drivers()->visionComms,
+    &turret,
+    &worldFrameYawTurretImuController,
+    &worldFramePitchTurretImuController,
+    chassisOdometry,
+    USER_YAW_INPUT_SCALAR,
+    USER_PITCH_INPUT_SCALAR,
+    cv::SCAN_MIN_PITCH_ANGLE,
+    cv::SCAN_MAX_PITCH_ANGLE,
+    cv::SCAN_PITCH_SPEED,
+    cv::SCAN_YAW_SPEED);
+
+MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
+
+Trigger sentryScanTrigger = (Trigger(drivers(), []() {
+                                return matchRunningGovernor.isReady();
+                            })).whileTrue(&cvManagerCommand);
+
+Trigger scanWhenWheelLeft =
+    TriggerHelpers::channelGreaterThan(drivers(), Remote::Channel::WHEEL, .8)
+        .toggleOnTrue(&sentryScanCommand);
+
 // imu commands
 imu::ImuCalibrateCommand imuCalibrateCommand(
     drivers(),
@@ -537,7 +580,7 @@ Trigger rightSwitchMidOrientDriveWhenImuCalibrated = (TriggerHelpers::switchStat
                                                           Remote::SwitchState::MID) &&
                                                       Trigger(drivers(), []() {
                                                           return imuCalibratingGovernor.isReady();
-                                                      })).whileTrue(&chassisOrientDriveCommand);
+                                                      })).whileTrue(&chassisFieldCommand);
 
 // auto rightSwitchMidOrientDriveWhenImuCalibrated = std::make_unique<HoldRepeatCommandMapping>(
 //     drivers(),
@@ -595,6 +638,7 @@ void startSentryCommands(Drivers *drivers)
     drivers->visionComms.attachAutoDrive(chassisAutoDrive);
     drivers->visionComms.attachOdometry(chassisOdometry);
     drivers->visionComms.attachPitchMotor(&pitchMotor);
+    drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(
         0,

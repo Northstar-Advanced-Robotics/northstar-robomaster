@@ -43,6 +43,7 @@ public:
           agitator(agitator),
           chassis(chassis),
           flywheelGovernor(flywheelGovernor),
+          multiShotCvCommandMapping(multiShotCvCommandMapping),
           imuCalibrateCommand(imuCalibrateCommand)
     {
         addSubsystemRequirement(ui);
@@ -81,6 +82,8 @@ public:
         // recal.update();
         // logo doesn't need updating
         chassisPower.update();
+        firemode.update();
+        flywheelReady.update();
     };
 
     // ui subsystem won't do anything until its top level container is set, so we are ok to add

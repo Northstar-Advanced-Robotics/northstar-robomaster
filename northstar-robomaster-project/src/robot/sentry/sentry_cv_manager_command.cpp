@@ -11,11 +11,13 @@ SentryCvManagerCommand::SentryCvManagerCommand(
     src::control::turret::TurretSubsystem *sentryTurretSubsystem,
     src::control::turret::algorithms::TurretYawControllerInterface *yawController,
     src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
+    src::chassis::ChassisOdometry *chassisOdometry,
     float userYawInputScalar,
     float userPitchInputScalar,
-    float DELTA_MAX,
-    float MAX_ERROR,
-    float ROT_SPEED)
+    float MIN_PITCH_ANGLE,
+    float MAX_PITCH_ANGLE,
+    float PITCH_SPEED,
+    float YAW_SPEED)
     : tap::control::ComprisedCommand(drivers),
       visionComms(visionComms),
       turretCVControlCommand(
@@ -26,16 +28,17 @@ SentryCvManagerCommand::SentryCvManagerCommand(
           yawController,
           pitchController,
           userYawInputScalar,
-          userPitchInputScalar,
-          MAX_ERROR),  // +- offset max rads
+          userPitchInputScalar),
       turretScanCommand(
           drivers,
           sentryTurretSubsystem,
           yawController,
           pitchController,
-          DELTA_MAX,
-          MAX_ERROR,
-          ROT_SPEED)
+          chassisOdometry,
+          MIN_PITCH_ANGLE,
+          MAX_PITCH_ANGLE,
+          PITCH_SPEED,
+          YAW_SPEED)
 
 {
     comprisedCommandScheduler.registerSubsystem(sentryTurretSubsystem);

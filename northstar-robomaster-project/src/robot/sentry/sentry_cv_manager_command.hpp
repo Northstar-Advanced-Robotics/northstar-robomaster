@@ -23,11 +23,13 @@ public:
         src::control::turret::TurretSubsystem *sentryTurretSubsystem,
         src::control::turret::algorithms::TurretYawControllerInterface *yawController,
         src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
+        src::chassis::ChassisOdometry *chassisOdometry,
         float userYawInputScalar,
         float userPitchInputScalar,
-        float DELTA_MAX,
-        float MAX_ERROR,
-        float ROT_SPEED);
+        float MIN_PITCH_ANGLE,
+        float MAX_PITCH_ANGLE,
+        float PITCH_SPEED,
+        float YAW_SPEED);
 
     bool isReady() override;
 

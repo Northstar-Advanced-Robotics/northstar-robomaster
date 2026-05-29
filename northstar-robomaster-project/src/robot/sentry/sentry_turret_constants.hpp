@@ -64,9 +64,9 @@ static constexpr TurretMotorConfig YAW_MOTOR_CONFIG = {
 
 static constexpr TurretMotorConfig PITCH_MOTOR_CONFIG = {
     .startAngle = modm::toRadian(0),  // 7.45
-    .startEncoderValue = 4750,
-    .minAngle = modm::toRadian(-10),
-    .maxAngle = modm::toRadian(45),
+    .startEncoderValue = 4050,
+    .minAngle = modm::toRadian(-19),
+    .maxAngle = modm::toRadian(42),
     .limitMotorAngles = true,
 };
 
@@ -346,6 +346,14 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_IMU_CAL_PID_CONFIG = {
 };
 
 }  // namespace chassis_rel
+
+namespace cv
+{
+static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(3 - 12);
+static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(3 + 12);
+static constexpr float SCAN_PITCH_SPEED = 0.8f;
+static constexpr float SCAN_YAW_SPEED = 2.0f;
+}  // namespace cv
 
 }  // namespace src::control::turret
 #endif

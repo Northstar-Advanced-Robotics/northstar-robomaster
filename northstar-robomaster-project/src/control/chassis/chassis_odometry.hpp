@@ -4,6 +4,7 @@
 #include "tap/algorithms/wrapped_float.hpp"
 #include "tap/architecture/clock.hpp"
 
+#include "control/turret/turret_motor.hpp"
 #include "modm/math/geometry/angle.hpp"
 #include "modm/math/geometry/vector.hpp"
 
@@ -114,7 +115,7 @@ public:
         rotation = calculateRobotHeading();
 
         velocityGlobal = convertLocalToGlobal(velocityLocal);
-        positionGlobal += velocityGlobal * deltaTimeSeconds;
+        // positionGlobal += velocityGlobal * deltaTimeSeconds;
 
         // velocityProjectedGlobal = modm::Vector<float, 2>(velocity3dGlobal.x, velocity3dGlobal.z);
         // positionProjectedGlobal += velocityProjectedGlobal * deltaTimeSeconds;

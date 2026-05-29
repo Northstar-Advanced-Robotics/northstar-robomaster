@@ -30,6 +30,15 @@ void VisionComms::initializeUartDelays()
 
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
+    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
+    {
+        remote->flySkyConnected = false;
+    }
+    if (remote->VT13Connected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
+    {
+        remote->VT13Connected = false;
+    }
     switch (completeMessage.messageType)
     {
         case MessageType::TURRET_AIM_DATA:
@@ -62,6 +71,22 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         case MessageType::VISION_LOCALIZATION:
         {
             decodeToVisionAprilTagLocalization(completeMessage);
+            return;
+        }
+        case MessageType::FLY_SKY_DATA:
+        {
+            if (!remote->VT13Connected)
+            {
+                decodeToFlySkyRemote(completeMessage);
+            }
+            return;
+        }
+        case MessageType::VT13_DATA:
+        {
+            if (!remote->flySkyConnected)
+            {
+                decodeToVT13Remote(completeMessage);
+            }
             return;
         }
 
@@ -171,6 +196,40 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
     return true;
 }
 
+bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
+{
+    remote->flySkyConnected = true;
+    lastReadFlySky = tap::arch::clock::getTimeMilliseconds();
+    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_FLY_SKY];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
+    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
+    remote->parseBufferFlySky(rxBuffer);
+
+    return true;
+}
+
+bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
+{
+    remote->VT13Connected = true;
+    lastReadVT13 = tap::arch::clock::getTimeMilliseconds();
+    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_VT13];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
+    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
+    remote->parseBufferVT13(rxBuffer);
+
+    return true;
+}
+
 void VisionComms::sendMessage()
 {  // TODO: make these depend on which robot type is selected to make sure that we only send what we
    // need
@@ -254,12 +313,12 @@ void VisionComms::sendRobotOdometry()
         // data->chassis_data.vel_z = 0;             // TODO: see z on position (it doesn't exist)
 
         // Turret Data
-        data->turret_data.pitch = pitchMotor->getPositionWrapped();  // radians
-        data->turret_data.yaw = drivers->bmi088.getYaw();            // radians
-        data->turret_data.roll = drivers->bmi088.getRoll();          // radians
+        data->turret_data.pitch = drivers->bmi088.getPitch();  // radians
+        data->turret_data.yaw = drivers->bmi088.getYaw();      // radians
+        data->turret_data.roll = drivers->bmi088.getRoll();    // radians
 
         // data->turret_data.pitch_vel = pitchMotor->getShaftRPM() / 60 * M_TWOPI;
-        // data->turret_data.yaw_vel = drivers->bmi088.getGz();
+        data->turret_data.yaw_vel = drivers->bmi088.getGz();
         // data->turret_data.roll_vel = drivers->bmi088.getGx();
 
         odometryMessage.setCRC16();

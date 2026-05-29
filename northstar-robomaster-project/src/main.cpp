@@ -183,9 +183,7 @@ static void initializeIo(Drivers *drivers)
     drivers->bmi088.setTargetTemperature(35.0f);
     drivers->bmi088.setCalibrationSamples(1000);
 
-#ifndef FLY_SKY
     drivers->visionComms.initializeCV();
-#endif
 }
 float debugYaw = 0.0f;
 float debugPitch = 0.0f;
@@ -198,7 +196,6 @@ float debugLastAimDataYaw = 0.0f;
 float debugLastAimDataPitch = 0.0f;
 float dddddgfregr = 0;
 bool uartOnline = false;
-
 bool cal = false;
 bool calibrated = false;
 static void updateIo(Drivers *drivers)
@@ -219,9 +216,7 @@ static void updateIo(Drivers *drivers)
 
 #ifndef TURRET
     drivers->refSerial.updateSerial();
-#ifndef FLY_SKY
     drivers->visionComms.updateSerial();
-#endif
 
     drivers->remote.read();
 
@@ -239,6 +234,5 @@ static void updateIo(Drivers *drivers)
     conneccc = drivers->remote.isConnected();
     dddddgfregr = drivers->encoder.getPosition().getUnwrappedValue();
     uartOnline = drivers->refSerial.getRefSerialReceivingData();
-
 #endif
 }

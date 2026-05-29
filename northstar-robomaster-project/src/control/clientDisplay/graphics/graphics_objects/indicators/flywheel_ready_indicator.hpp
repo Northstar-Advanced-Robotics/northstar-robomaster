@@ -42,8 +42,9 @@ private:
     control::governor::FlywheelOnGovernor* flywheelGovernor;
 
     static constexpr uint16_t X_POSITION =
-        200;  // pixels, all numbers at the same y level on screen
-    static constexpr uint16_t Y_POSITION = 610;   // pixels, all numbers at the same y level on
+        UISubsystem::HALF_SCREEN_WIDTH;  // pixels, all numbers at the same y level on screen
+    static constexpr uint16_t Y_POSITION =
+        UISubsystem::HALF_SCREEN_HEIGHT;          // pixels, all numbers at the same y level on
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 

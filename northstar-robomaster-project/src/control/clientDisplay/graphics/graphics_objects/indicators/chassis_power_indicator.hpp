@@ -20,7 +20,7 @@ public:
         powerDraw.x = X_POSITION;
         powerDraw.y = Y_POSITION;
         powerDraw.height = LINE_HEIGHT;
-        addGraphicsObject(&chargeBarOutline);
+        powerDraw.thickness = TEXT_THICKNESS;
         addGraphicsObject(&chargeBar);
     }
 
@@ -45,8 +45,7 @@ public:
         if (chassisPower > chassis->getChassisPowerLimit())
         {
             powerDraw.color = UISubsystem::Color::RED_AND_BLUE;
-            energyInBuffer -=
-                (chassisPower - chassis->getChassisPowerLimit()) * drivers->DT / 1000.0f;
+            energyInBuffer -= (rawPower - chassis->getChassisPowerLimit()) * drivers->DT / 1000.0f;
         }
         else
         {
@@ -56,8 +55,8 @@ public:
 
         if (energyInBuffer < 0) energyInBuffer = 0;
         if (energyInBuffer > 60) energyInBuffer = 60;
-        float chargeBarLength = (energyInBuffer / 60.0f) * 200;
-        chargeBar.x2 = X_POSITION - 100 + chargeBarLength;
+        float chargeBarLength = (energyInBuffer / 60.0f) * LINE_WIDTH;
+        chargeBar.x2 = X_POSITION - LINE_WIDTH / 2 + chargeBarLength;
     }
 
 private:
@@ -65,34 +64,29 @@ private:
 
     src::chassis::ChassisSubsystem* chassis;
 
-    static constexpr uint16_t X_POSITION =
-        600;  // pixels, all numbers at the same y level on screen
-    static constexpr uint16_t Y_POSITION = 300;   // pixels, all numbers at the same y level on
-                                                  // screen
-    static constexpr uint16_t LINE_HEIGHT = 100;  // pixels, this is a large number
+    static constexpr uint16_t X_POSITION = UISubsystem::HALF_SCREEN_WIDTH;
+    static constexpr uint16_t Y_POSITION = 100;
+    static constexpr uint16_t LINE_HEIGHT = 100;
+    static constexpr uint16_t LINE_WIDTH = 600;
+    static constexpr uint16_t TEXT_HEIGHT = 60;
 
-    float RECHARGE_PER_CYCLE = 15 * drivers->DT / 1000.0f;
+    static constexpr uint16_t TEXT_THICKNESS = 3;
+
+    float RECHARGE_PER_CYCLE = 60 * drivers->DT / 1000.0f;
 
     float energyInBuffer = 60.0f;
 
-    static constexpr uint8_t BUFFER_SIZE = 10;
+    static constexpr uint8_t BUFFER_SIZE = 250;
     float powerBuffer[BUFFER_SIZE] = {0.0f};
     uint8_t bufferIndex = 0;
 
     IntegerGraphic powerDraw{};
-    UnfilledRectangle chargeBarOutline{
-        UISubsystem::Color::RED_AND_BLUE,
-        X_POSITION - 300,
-        Y_POSITION - 200,
-        200,
-        LINE_HEIGHT,
-        2};
     Line chargeBar{
         UISubsystem::Color::RED_AND_BLUE,
-        X_POSITION - 300,
-        Y_POSITION - 200,
-        X_POSITION - 100,
-        Y_POSITION - 200,
+        X_POSITION - LINE_WIDTH / 2,
+        Y_POSITION,
+        X_POSITION + LINE_WIDTH / 2,
+        Y_POSITION,
         16};
 };
 

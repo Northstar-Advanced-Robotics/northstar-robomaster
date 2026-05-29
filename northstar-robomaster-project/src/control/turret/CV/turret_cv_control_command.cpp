@@ -74,7 +74,7 @@ void TurretCVControlCommand::execute()
         const WrappedFloat yawSetpoint = Angle(visionComms.getLastAimData(turretID).yaw);
         yawController->runController(dt, yawSetpoint);
 
-        withinAimingTolerance =  // TODO calculate off the distance
+        withinAimingTolerance =
             (abs(visionComms.getLastAimData(turretID).yaw -
                  yawController->getMeasurement().getUnwrappedValue()) <
                  visionComms.getLastAimData(turretID).maxErrorYaw &&
