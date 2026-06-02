@@ -1,7 +1,3 @@
-//#define FLY_SKY
-#ifdef FLY_SKY
-#include "robot/fly_sky_control_operator_interface.hpp"
-#else
 /*
  * Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
  *
@@ -50,70 +46,31 @@ public:
     static constexpr int16_t USER_MOUSE_PITCH_MAX = 1000;
     static constexpr float USER_MOUSE_YAW_SCALAR = (1.0f / USER_MOUSE_YAW_MAX);
     static constexpr float USER_MOUSE_PITCH_SCALAR = (1.0f / USER_MOUSE_PITCH_MAX);
-    static constexpr float SPEED_REDUCTION_SCALAR = (1.0f / 3.0f);
-    static constexpr float USER_STICK_SENTRY_DRIVE_SCALAR = 5000.0f;
 
-    ControlOperatorInterface(tap::Drivers *drivers) : remote(drivers->remote) {}
+    ControlOperatorInterface(tap::Drivers *drivers) : drivers(drivers) {}
 
     /**
      * @return the value used for turret yaw rotation, between about -1 and 1
      *      this value can be greater or less than (-1, 1) since the mouse input has no
      *      clear lower and upper bound.
      */
-    mockable float getTurretYawInput(uint8_t turretID);
+    mockable float getTurretYawInput();
 
     /**
-     * @returns the value used for turret pitch rotation, between about -1 and 1
+     * @return the value used for turret pitch rotation, between about -1 and 1
      *      this value can be greater or less than (-1, 1) since the mouse input has no
      *      clear lower and upper bound.
      */
-    mockable float getTurretPitchInput(uint8_t turretID);
+    mockable float getTurretPitchInput();
 
-    static constexpr float MAX_ACCELERATION_X = 10'000.0f;
-    static constexpr float MAX_DECELERATION_X = 20'000.0f;
-
-    static constexpr float MAX_ACCELERATION_Y = 9'000.0f;
-    static constexpr float MAX_DECELERATION_Y = 20'000.0f;
-
-    static constexpr float MAX_ACCELERATION_R = 40'000.0f;
-    static constexpr float MAX_DECELERATION_R = 50'000.0f;
-
-    // STEP 1 (Tank Drive): Add getChassisTankLeftInput and getChassisTankRightInput function
-    // declarations
     float getDrivetrainHorizontalTranslation();
-
-    float getMecanumHorizontalTranslationKeyBoard();
 
     float getDrivetrainVerticalTranslation();
 
-    float getMecanumVerticalTranslationKeyBoard();
-
-    float getDrivetrainRotation();
-
     float getDrivetrainRotationalTranslation();
 
-    float getMecanumRotationKeyBoard();
-
-    /**
-     * @returns whether or not the key to disable diagonal drive is pressed.
-     * The key is shared with the speed scaling key.
-     */
-    bool isSlowMode();
-
-    bool isRightSwitchUp();
-    bool isRightSwitchMid();
-
-    bool isGKeyPressed();
-
-    void checkToggleBeyBlade();
-
-    /**
-     * Scales `value` when ctrl/shift are pressed and returns the scaled value.
-     */
-    float applyChassisSpeedScaling(float value);
-
 private:
-    tap::communication::serial::Remote &remote;
+    tap::Drivers *drivers;
 
     uint32_t prevUpdateCounterX = 0;
     uint32_t prevUpdateCounterY = 0;
@@ -123,21 +80,12 @@ private:
     tap::algorithms::LinearInterpolationPredictor chassisYInput;
     tap::algorithms::LinearInterpolationPredictor chassisRInput;
 
-    tap::algorithms::Ramp chassisXInputRamp;
-    tap::algorithms::Ramp chassisYInputRamp;
-    tap::algorithms::Ramp chassisRInputRamp;
-
     uint32_t prevChassisXInputCalledTime = 0;
     uint32_t prevChassisYInputCalledTime = 0;
     uint32_t prevChassisRInputCalledTime = 0;
-    /**
-     * Scales `value` when ctrl/shift are pressed and returns the scaled value.
-     */
 };
 }  // namespace control
 
 }  // namespace src
 
 #endif  // CONTROL_OPERATOR_INTERFACE_HPP_
-
-#endif  // FLY_SKY

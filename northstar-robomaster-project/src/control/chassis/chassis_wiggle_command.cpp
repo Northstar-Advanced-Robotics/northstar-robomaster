@@ -31,16 +31,10 @@ void ChassisWiggleCommand::execute()
     uint32_t dt = currTime - prevTime;
     prevTime = currTime;
 
-    auto scale = [](float raw) -> float {
-        return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
-    };
     modm::Pair<float, float> normInput = getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
-    chassis->setVelocityTurretDrive(
-        scale(normInput.first),
-        -scale(normInput.second),
-        calculateWiggle(dt));
+    chassis->setVelocityTurretDrive(normInput.first, -normInput.second, calculateWiggle(dt));
 }
 
 void ChassisWiggleCommand::end([[maybe_unused]] bool interrupted)

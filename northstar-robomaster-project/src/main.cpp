@@ -34,8 +34,6 @@
 #include "tap/architecture/profiler.hpp"
 
 /* communication includes ---------------------------------------------------*/
-#include "communication/serial/fly_sky.hpp"
-
 #include "drivers_singleton.hpp"
 
 /* error handling includes --------------------------------------------------*/

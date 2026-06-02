@@ -19,17 +19,26 @@
 
 #include "standard_turret_subsystem.hpp"
 
-#include "communication/can/turret/turret_mcb_can_comm.hpp"
-
 namespace src::control::turret
 {
-float StandardTurretSubsystem::getWorldYaw() const { return getTurretMCB()->getYaw(); }
+StandardTurretSubsystem::StandardTurretSubsystem(
+    tap::Drivers* drivers,
+    tap::motor::MotorInterface* pitchMotor,
+    tap::motor::MotorInterface* yawMotor,
+    const TurretMotorConfig& pitchMotorConfig,
+    const TurretMotorConfig& yawMotorConfig)
+    : RobotTurretSubsystem(drivers, pitchMotor, yawMotor, pitchMotorConfig, yawMotorConfig),
+      imu(&drivers->bmi088)
+{
+}
 
-float StandardTurretSubsystem::getWorldPitch() const { return getTurretMCB()->getPitch(); }
+float StandardTurretSubsystem::getWorldYaw() const { return imu->getYaw(); }
+
+float StandardTurretSubsystem::getWorldPitch() const { return imu->getPitch(); }
 
 uint32_t StandardTurretSubsystem::getLastMeasurementTimeMicros() const
 {
-    return getTurretMCB()->getIMUDataTimestamp();
+    return tap::arch::clock::getTimeMicroseconds();
 }
 
 }  // namespace src::control::turret

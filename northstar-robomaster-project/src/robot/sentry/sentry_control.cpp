@@ -268,7 +268,8 @@ RemoteMapState rightMousePressed(RemoteMapState::MouseButton::RIGHT);
 auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     drivers(),
     std::vector<Command *>{&turretCVControlCommand},
-    &rightMousePressed);
+    &rightMousePressed,
+    true);
 
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
@@ -321,11 +322,11 @@ GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProject
 
 CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
 
-RemoteMapState rPressed({Remote::Key::R});
-auto rPressedCVGovernorToggle =
+RemoteMapState cPressed({Remote::Key::C});
+auto cPressedCVGovernorToggle =
     std::make_unique<CycleStateCommandMapping<bool, 2, CvOnTargetGovernor>>(
         drivers(),
-        &rPressed,
+        &cPressed,
         true,
         &cvOnTargetGovernor,
         &CvOnTargetGovernor::setGovernorEnabled);
@@ -440,11 +441,11 @@ FiredRecentlyGovernor firedRecentlyGovernor(drivers(), 5000);
 PlateHitGovernor plateHitGovernor(drivers(), 5000);
 
 // chassis Mappings
-RemoteMapState bPressed({Remote::Key::B});
-auto bPressedBeyblade = std::make_unique<HoldRepeatCommandMapping>(
+RemoteMapState fPressed({Remote::Key::F});
+auto fPressedBeyblade = std::make_unique<HoldRepeatCommandMapping>(
     drivers(),
     std::vector<Command *>{&chassisBeyBladeCommand},
-    &bPressed,
+    &fPressed,
     true);
 
 RemoteMapState rPressed({Remote::Key::R});
@@ -611,9 +612,9 @@ void registerSentryIoMappings(Drivers *drivers)
 {
     drivers->commandMapper.addMap(std::move(leftMousePressedShoot));
     drivers->commandMapper.addMap(std::move(xPressedFlywheels));
-    drivers->commandMapper.addMap(std::move(bPressedBeyblade));
+    drivers->commandMapper.addMap(std::move(fPressedBeyblade));
     drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
-    drivers->commandMapper.addMap(std::move(rPressedCVGovernorToggle));
+    drivers->commandMapper.addMap(std::move(cPressedCVGovernorToggle));
     drivers->commandMapper.addMap(std::move(qOrEPressedCycleShotSpeed));
     drivers->commandMapper.addMap(std::move(gPressedWiggle));
     drivers->commandMapper.addMap(std::move(rPressedOrientDrive));

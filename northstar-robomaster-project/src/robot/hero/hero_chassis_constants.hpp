@@ -15,9 +15,9 @@ using tap::motor::DjiMotor;
 
 namespace src::chassis
 {
-static constexpr float VELOCITY_PID_KP = 6.0f;                  // 10.0f;
+static constexpr float VELOCITY_PID_KP = 10.0f;                 // 10.0f;
 static constexpr float VELOCITY_PID_KI = 0.0f;                  // 0.0f;
-static constexpr float VELOCITY_PID_KD = 0.0f;                  // 1.25f;
+static constexpr float VELOCITY_PID_KD = 1.0f;                  // 1.25f;
 static constexpr float VELOCITY_PID_MAX_ERROR_SUM = 16'000.0f;  // 0.0f;
 static constexpr float VELOCITY_PID_KV = 0.0f;                  // 0.057f;
 static constexpr float VELOCITY_PID_KS = 0.0f;                  // 350.0f;
@@ -32,11 +32,15 @@ static constexpr float CHASSIS_GEAR_RATIO = tap::motor::DjiMotorEncoder::GEAR_RA
 static const float DIST_TO_CENTER = .265;     //.30825f;  // from wheel to center
 static const float WHEEL_DIAMETER_M = .118f;  // 0.118f;
 
-static constexpr float MAX_CHASSIS_SPEED_MPS = 4.0f;
+static constexpr float CHASSIS_WALK_SPEED_MPS = 1.5f;
+
+// m/s/s
+static constexpr float CHASSIS_ACCEL_VALUE = 3.5f;
+static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
+// rad/s/s
+static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
 
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
-
-static constexpr float CHASSIS_WALK_MULTIPLIER = 0.5f;
 
 static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     /*
@@ -51,9 +55,6 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     {100, 5'200},
     {125, 6'000}};
 // At 9000 rpm the beyblade was around 130, Its over
-
-static constexpr float CHASSIS_ACCEL_VALUE = 0.007f;   // 0.015f;
-static constexpr float CHASSIS_DECCEL_VALUE = 0.015f;  // 0.015f;
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
     CHASSIS_POWER_TO_MAX_SPEED_LUT,

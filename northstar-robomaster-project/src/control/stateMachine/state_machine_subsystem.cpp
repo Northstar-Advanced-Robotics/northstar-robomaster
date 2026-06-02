@@ -1,4 +1,3 @@
-//#define FLY_SKY
 #include "tap/algorithms/math_user_utils.hpp"
 
 #include "control/chassis/constants/chassis_constants.hpp"
@@ -29,15 +28,9 @@ bool beyblade = false;
 
 void StateMachineSubsystem::refresh()
 {
-    // return;
-#ifdef FLY_SKY
-    if (drivers->remote.getChannel(5))
-    {
-#else
     if (drivers->remote.getSwitch(tap::communication::serial::Remote::Switch::RIGHT_SWITCH) !=
         tap::communication::serial::Remote::SwitchState::UP)
     {
-#endif
         chassisSubsystem->setIsSprinting(false);
         return;
     }
