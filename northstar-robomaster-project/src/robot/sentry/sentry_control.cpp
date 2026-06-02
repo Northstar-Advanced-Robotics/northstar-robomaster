@@ -30,7 +30,6 @@
 #include "control/chassis/chassis_drive_to_point_command.hpp"
 #include "control/chassis/chassis_field_command.hpp"
 #include "control/chassis/chassis_orient_drive_command.hpp"
-#include "control/chassis/chassis_sprint_command.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 #include "control/chassis/chassis_wiggle_command.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
@@ -166,6 +165,92 @@ auto leftSwitchUpFlywheels = std::make_unique<ToggleCommandMapping>(
     std::vector<Command *>{&flywheelRunCommand},
     &leftSwitchUp);
 
+// agitator subsystem
+VelocityAgitatorSubsystem agitator(
+    drivers(),
+    constants::AGITATOR_PID_CONFIG,
+    constants::AGITATOR_CONFIG);
+
+// agitator commands
+ConstantVelocityAgitatorCommand rotateAgitator(agitator, constants::AGITATOR_ROTATE_CONFIG);
+
+UnjamSpokeAgitatorCommand unjamAgitator(agitator, constants::AGITATOR_UNJAM_CONFIG);
+
+MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
+    *drivers(),
+    agitator,
+    rotateAgitator,
+    unjamAgitator);
+
+// agitator governors
+HeatLimitGovernor heatLimitGovernor(
+    *drivers(),
+    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1,
+    constants::HEAT_LIMIT_BUFFER);
+
+FlywheelOnGovernor flywheelOnGovernor(flywheel);
+
+RefSystemProjectileLaunchedGovernor refSystemProjectileLaunchedGovernor(
+    drivers()->refSerial,
+    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1);
+
+ManualFireRateReselectionManager manualFireRateReselectionManager;
+
+FireRateLimitGovernor fireRateLimitGovernor(manualFireRateReselectionManager);
+
+GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched(
+    {&agitator},
+    rotateAndUnjamAgitator,
+    {&refSystemProjectileLaunchedGovernor, &fireRateLimitGovernor, &flywheelOnGovernor});
+
+extern cv::TurretCVControlCommand turretCVControlCommand;
+CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
+
+RemoteMapState cPressed({Remote::Key::C});
+auto cPressedCVGovernorToggle =
+    std::make_unique<CycleStateCommandMapping<bool, 2, CvOnTargetGovernor>>(
+        drivers(),
+        &cPressed,
+        true,
+        &cvOnTargetGovernor,
+        &CvOnTargetGovernor::setGovernorEnabled);
+
+GovernorLimitedCommand<2> rotateAndUnjamAgitatorWithHeatAndCVLimiting(
+    {&agitator},
+    rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched,
+    {&heatLimitGovernor, &cvOnTargetGovernor});
+
+RemoteMapState leftMousePressed(RemoteMapState::MouseButton::LEFT);
+auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
+    *drivers(),
+    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
+    leftMousePressed,
+    &manualFireRateReselectionManager,
+    cvOnTargetGovernor,
+    &rotateAgitator);
+
+RemoteMapState leftSwitchDown(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN);
+auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
+    *drivers(),
+    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
+    leftSwitchDown,
+    &manualFireRateReselectionManager,
+    cvOnTargetGovernor,
+    &rotateAgitator);
+
+RemoteMapState qPressed({Remote::Key::Q});
+RemoteMapState ePressed({Remote::Key::E});
+auto qOrEPressedCycleShotSpeed = std::make_unique<CycleStateCommandMapping<
+    MultiShotCvCommandMapping::LaunchMode,
+    MultiShotCvCommandMapping::NUM_SHOOTER_STATES,
+    MultiShotCvCommandMapping>>(
+    drivers(),
+    &qPressed,
+    MultiShotCvCommandMapping::SINGLE,
+    leftMousePressedShoot.get(),
+    &MultiShotCvCommandMapping::setShooterState,
+    ePressed);
+
 // turret subsystem
 tap::motor::DjiMotor pitchMotor(
     drivers(),
@@ -271,102 +356,6 @@ auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     &rightMousePressed,
     true);
 
-// agitator subsystem
-VelocityAgitatorSubsystem agitator(
-    drivers(),
-    constants::AGITATOR_PID_CONFIG,
-    constants::AGITATOR_CONFIG);
-
-// agitator commands
-ConstantVelocityAgitatorCommand rotateAgitator(agitator, constants::AGITATOR_ROTATE_CONFIG);
-
-UnjamSpokeAgitatorCommand unjamAgitator(agitator, constants::AGITATOR_UNJAM_CONFIG);
-
-MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
-    *drivers(),
-    agitator,
-    rotateAgitator,
-    unjamAgitator);
-
-// agitator governors
-HeatLimitGovernor heatLimitGovernor(
-    *drivers(),
-    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1,
-    constants::HEAT_LIMIT_BUFFER);
-
-FlywheelOnGovernor flywheelOnGovernor(flywheel);
-
-RefSystemProjectileLaunchedGovernor refSystemProjectileLaunchedGovernor(
-    drivers()->refSerial,
-    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1);
-
-ManualFireRateReselectionManager manualFireRateReselectionManager;
-
-SetFireRateCommand setFireRateCommandFullAuto(
-    &dummySubsystem,
-    manualFireRateReselectionManager,
-    40,
-    &rotateAgitator);
-SetFireRateCommand setFireRateCommand10RPS(
-    &dummySubsystem,
-    manualFireRateReselectionManager,
-    10,
-    &rotateAgitator);
-
-FireRateLimitGovernor fireRateLimitGovernor(manualFireRateReselectionManager);
-
-GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched(
-    {&agitator},
-    rotateAndUnjamAgitator,
-    {&refSystemProjectileLaunchedGovernor, &fireRateLimitGovernor, &flywheelOnGovernor});
-
-CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
-
-RemoteMapState cPressed({Remote::Key::C});
-auto cPressedCVGovernorToggle =
-    std::make_unique<CycleStateCommandMapping<bool, 2, CvOnTargetGovernor>>(
-        drivers(),
-        &cPressed,
-        true,
-        &cvOnTargetGovernor,
-        &CvOnTargetGovernor::setGovernorEnabled);
-
-GovernorLimitedCommand<2> rotateAndUnjamAgitatorWithHeatAndCVLimiting(
-    {&agitator},
-    rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched,
-    {&heatLimitGovernor, &cvOnTargetGovernor});
-
-RemoteMapState leftMousePressed(RemoteMapState::MouseButton::LEFT);
-auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
-    *drivers(),
-    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
-    leftMousePressed,
-    &manualFireRateReselectionManager,
-    cvOnTargetGovernor,
-    &rotateAgitator);
-
-RemoteMapState leftSwitchDown(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN);
-auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
-    *drivers(),
-    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
-    leftSwitchDown,
-    &manualFireRateReselectionManager,
-    cvOnTargetGovernor,
-    &rotateAgitator);
-
-RemoteMapState qPressed({Remote::Key::Q});
-RemoteMapState ePressed({Remote::Key::E});
-auto qOrEPressedCycleShotSpeed = std::make_unique<CycleStateCommandMapping<
-    MultiShotCvCommandMapping::LaunchMode,
-    MultiShotCvCommandMapping::NUM_SHOOTER_STATES,
-    MultiShotCvCommandMapping>>(
-    drivers(),
-    &qPressed,
-    MultiShotCvCommandMapping::SINGLE,
-    leftMousePressedShoot.get(),
-    &MultiShotCvCommandMapping::setShooterState,
-    ePressed);
-
 // chassis odometry
 src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
     &drivers()->bmi088,
@@ -429,11 +418,6 @@ src::chassis::ChassisDriveToPointCommand driveToOneMeterForward(
     1,
     0.02);
 
-src::chassis::ChassisSprintCommand chassisSprintCommand(&chassisSubsystem);
-
-Trigger chassisSprint =
-    TriggerHelpers::button(drivers(), Remote::Key::SHIFT).whileTrue(&chassisSprintCommand);
-
 // Chassis Governors
 
 FiredRecentlyGovernor firedRecentlyGovernor(drivers(), 5000);
@@ -467,7 +451,7 @@ auto gPressedWiggle = std::make_unique<ToggleCommandMapping>(
     &gPressed);
 
 RemoteMapState rightSwitchDown(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN);
-auto rightSwiitchDownBeyblade = std::make_unique<HoldRepeatCommandMapping>(
+auto rightswitchDownBeyblade = std::make_unique<HoldRepeatCommandMapping>(
     drivers(),
     std::vector<Command *>{&chassisBeyBladeCommand},
     &rightSwitchDown,
@@ -564,6 +548,9 @@ src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
     leftMousePressedShoot.get(),
     &imuCalibrateCommand);
 
+Trigger ctrlCPressedUI =
+    TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&sentryDrawCommand);
+
 void initializeSubsystems(Drivers *drivers)
 {
     chassisSubsystem.initialize();
@@ -620,7 +607,7 @@ void registerSentryIoMappings(Drivers *drivers)
     drivers->commandMapper.addMap(std::move(rPressedOrientDrive));
     drivers->commandMapper.addMap(std::move(bPressedNormDrive));
 
-    drivers->commandMapper.addMap(std::move(rightSwiitchDownBeyblade));
+    drivers->commandMapper.addMap(std::move(rightswitchDownBeyblade));
     drivers->commandMapper.addMap(std::move(leftSwitchDownPressedShoot));
     drivers->commandMapper.addMap(std::move(leftSwitchUpFlywheels));
 
@@ -628,12 +615,12 @@ void registerSentryIoMappings(Drivers *drivers)
     /// Triggers don't need to be added to the command mapper since they register themselves with
     /// the command scheduler when they are constructed, but just listing them here for clarity
     /*
-    chassisSprint
     sentryScanTrigger
     scanWhenWheelLeft
     ctrlZPressedImuCal
     imuCalWhenWheelRight
     rightSwitchMidOrientDriveWhenImuCalibrated
+    ctrlCPressedUI
     */
 }
 }  // namespace sentry_control

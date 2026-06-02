@@ -7,7 +7,8 @@ VisionComms::VisionComms(tap::Drivers* drivers)
       lastAimData(),
       chassisOdometry(nullptr),
       chassisAutoDrive(nullptr),
-      pitchMotor(nullptr)
+      pitchMotor(nullptr),
+      remote(nullptr)
 {
 }
 
@@ -31,13 +32,16 @@ void VisionComms::initializeUartDelays()
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
+    if (remote != nullptr)
     {
-        remote->flySkyConnected = false;
-    }
-    if (remote->VT13Connected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
-    {
-        remote->VT13Connected = false;
+        if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
+        {
+            remote->flySkyConnected = false;
+        }
+        if (remote->VT13Connected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
+        {
+            remote->VT13Connected = false;
+        }
     }
     switch (completeMessage.messageType)
     {
@@ -75,7 +79,7 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         }
         case MessageType::FLY_SKY_DATA:
         {
-            if (!remote->VT13Connected)
+            if (remote != nullptr && !remote->VT13Connected)
             {
                 decodeToFlySkyRemote(completeMessage);
             }
@@ -83,7 +87,7 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         }
         case MessageType::VT13_DATA:
         {
-            if (!remote->flySkyConnected)
+            if (remote != nullptr && !remote->flySkyConnected)
             {
                 decodeToVT13Remote(completeMessage);
             }
@@ -144,6 +148,11 @@ bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
 {
+    if (chassisOdometry == nullptr)
+    {
+        return false;
+    }
+
     if (sizeof(OdometryData) > message.header.dataLength)
     {
         return false;
@@ -161,7 +170,10 @@ bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 {
-    assert(chassisAutoDrive != nullptr);
+    if (chassisAutoDrive == nullptr)
+    {
+        return false;
+    }
 
     if (sizeof(CubicBezier::CurveData) > message.header.dataLength)
     {
@@ -182,7 +194,10 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage& message)
 {
-    assert(chassisOdometry != nullptr);
+    if (chassisOdometry == nullptr)
+    {
+        return false;
+    }
 
     if (sizeof(VisionComms::AprilTagLocalizationData) > message.header.dataLength)
     {
@@ -198,6 +213,10 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
 
 bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
 {
+    if (remote == nullptr)
+    {
+        return false;
+    }
     remote->flySkyConnected = true;
     lastReadFlySky = tap::arch::clock::getTimeMilliseconds();
     uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_FLY_SKY];
@@ -215,6 +234,10 @@ bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
 {
+    if (remote == nullptr)
+    {
+        return false;
+    }
     remote->VT13Connected = true;
     lastReadVT13 = tap::arch::clock::getTimeMilliseconds();
     uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_VT13];
@@ -235,10 +258,12 @@ void VisionComms::sendMessage()
    // need
     if (messageOffsetInitializationTimeout.isExpired())
     {
+#ifdef TARGET_SENTRY
         sendRobotOdometry();
-        sendRobotIdMessage();
         sendHealthData();
         sendTurretRefData();
+#endif
+        sendRobotIdMessage();
     }
     else
     {

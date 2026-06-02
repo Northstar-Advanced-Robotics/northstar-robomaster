@@ -62,7 +62,7 @@ public:
         tap::Drivers* drivers,
         const ChassisConfig& config,
         src::control::turret::TurretMotor* yawMotor,
-        ChassisOdometry* chassisOdometry_);
+        ChassisOdometry* chassisOdometry_ = nullptr);
 
     void initialize() override;
 

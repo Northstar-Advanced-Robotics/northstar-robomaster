@@ -271,10 +271,13 @@ void ChassisSubsystem::refresh()
         runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
     }
 
-    chassisOdometry->updateOdometry(
-        motors[static_cast<int>(MotorId::LF)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::LB)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
+    if (chassisOdometry != nullptr)
+    {
+        chassisOdometry->updateOdometry(
+            motors[static_cast<int>(MotorId::LF)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::LB)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
+    }
 }
 }  // namespace src::chassis
