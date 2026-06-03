@@ -20,6 +20,9 @@
 #ifndef STANDARD_TURRET_SUBSYSTEM_HPP_
 #define STANDARD_TURRET_SUBSYSTEM_HPP_
 
+#include "tap/communication/sensors/imu/bmi088/bmi088.hpp"
+#include "tap/drivers.hpp"
+
 #include "control/turret/robot_turret_subsystem.hpp"
 
 namespace src::control::turret
@@ -29,12 +32,23 @@ namespace src::control::turret
  */
 class StandardTurretSubsystem final : public RobotTurretSubsystem
 {
-    using RobotTurretSubsystem::RobotTurretSubsystem;
+public:
+    StandardTurretSubsystem(
+        tap::Drivers* drivers,
+        tap::motor::MotorInterface* pitchMotor,
+        tap::motor::MotorInterface* yawMotor,
+        const TurretMotorConfig& pitchMotorConfig,
+        const TurretMotorConfig& yawMotorConfig);
+    // using RobotTurretSubsystem::RobotTurretSubsystem;
     float getWorldYaw() const override;
     float getWorldPitch() const override;
     uint32_t getLastMeasurementTimeMicros() const override;
     modm::Vector3f getTurretOffset() const override { return modm::Vector3f(0, 0, 0); };
     float getPitchOffset() const override { return 0; };
+
+private:
+    tap::communication::sensors::imu::bmi088::Bmi088* imu;
+
 };  // class StandardTurretSubsystem
 
 }  // namespace src::control::turret

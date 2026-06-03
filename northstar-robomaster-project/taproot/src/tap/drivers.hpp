@@ -66,8 +66,6 @@
 #include "tap/motor/dji_motor_terminal_serial_handler.hpp"
 #include "tap/motor/dji_motor_tx_handler.hpp"
 
-#include "communication/serial/fly_sky.hpp"
-
 #endif
 
 namespace tap
@@ -136,12 +134,7 @@ public:
     gpio::Leds leds;
     gpio::Pwm pwm;
     communication::serial::RefSerial refSerial;
-//#define FLY_SKY
-#ifdef FLY_SKY
-    communication::serial::FlySky remote;
-#else
     communication::serial::Remote remote;
-#endif
     communication::serial::Uart uart;
     communication::serial::TerminalSerial terminalSerial;
     control::CommandMapper commandMapper;

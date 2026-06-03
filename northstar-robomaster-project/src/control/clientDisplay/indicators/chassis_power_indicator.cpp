@@ -43,7 +43,7 @@ modm::ResumableResult<void> ChassisPowerIndicator::update()
     chassisPower = chassisSubsystem.getChassisPowerDraw();
 
     numberIndicator.setIndicatorState(chassisPower);
-    // if (chassisPower > chassisSubsystem.getChassisPowerLimit())
+    // if (chassisPower > chassisSubsystem.ChassisSubsystem::getChassisPowerLimit(drivers))
     // {
     // }
 

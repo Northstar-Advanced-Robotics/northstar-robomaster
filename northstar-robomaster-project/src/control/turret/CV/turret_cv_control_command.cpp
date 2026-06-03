@@ -86,12 +86,12 @@ void TurretCVControlCommand::execute()
     {
         const WrappedFloat pitchSetpoint =
             pitchController->getSetpoint() +
-            userPitchInputScalar * controlOperatorInterface.getTurretPitchInput(turretID);
+            userPitchInputScalar * controlOperatorInterface.getTurretPitchInput();
         pitchController->runController(dt, pitchSetpoint);
 
         const WrappedFloat yawSetpoint =
             yawController->getSetpoint() +
-            userYawInputScalar * controlOperatorInterface.getTurretYawInput(turretID);
+            userYawInputScalar * controlOperatorInterface.getTurretYawInput();
         yawController->runController(dt, yawSetpoint);
 
         withinAimingTolerance = false;

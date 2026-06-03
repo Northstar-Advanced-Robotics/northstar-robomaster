@@ -19,24 +19,15 @@ ChassisDriveCommand::ChassisDriveCommand(
     addSubsystemRequirement(chassis);
 }
 
-float y = 0;
-float x = 0;
-
 void ChassisDriveCommand::execute()
 {
-    auto scale = [](float raw) -> float {
-        return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
-    };
     modm::Pair<float, float> normInput = getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
     chassis->setVelocityTurretDrive(
-        scale(normInput.first),
-        -scale(normInput.second),
+        normInput.first,
+        -normInput.second,
         operatorInterface->getDrivetrainRotationalTranslation());
-
-    x = operatorInterface->getDrivetrainHorizontalTranslation();
-    y = operatorInterface->getDrivetrainVerticalTranslation();
 }
 
 void ChassisDriveCommand::end([[maybe_unused]] bool interrupted)

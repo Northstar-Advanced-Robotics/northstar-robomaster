@@ -93,6 +93,7 @@ public:
         chassisPower.update();
         firemode.update();
         flywheelReady.update();
+        imuCalIndicator.update();
         cvIndicator.update();
     };
 

@@ -42,10 +42,12 @@ public:
         powerDraw.calculateNumbers();
         powerDraw.x = X_POSITION - powerDraw.width / 2;
 
-        if (chassisPower > chassis->getChassisPowerLimit())
+        if (chassisPower > chassis->ChassisSubsystem::getChassisPowerLimit(drivers))
         {
             powerDraw.color = UISubsystem::Color::RED_AND_BLUE;
-            energyInBuffer -= (rawPower - chassis->getChassisPowerLimit()) * drivers->DT / 1000.0f;
+            energyInBuffer -=
+                (rawPower - chassis->ChassisSubsystem::getChassisPowerLimit(drivers)) *
+                drivers->DT / 1000.0f;
         }
         else
         {

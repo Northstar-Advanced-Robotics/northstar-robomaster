@@ -85,10 +85,7 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = -3300.0f;  // 12000 // 7'00
 namespace world_rel_turret_imu
 {
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    // .kp = 60.0f,
-    // .ki = 0.0f,
-    // .kd = 5.0f,
-    .kp = 12.0f,  // Test bot = kp 25.0f * 2 / 3, kd 2.4 * 2 / 3 // Main bot = kp 30, kd 3
+    .kp = 12.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -99,17 +96,6 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
     .tRProportionalKalman = 0.0f,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
-    // .kp = 22.0f,
-    // .ki = 0.0f,
-    // .kd = 0.3f,
-    // .maxICumulative = 0.0f,
-    // .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,
-    // .tQDerivativeKalman = 1.0f,
-    // .tRDerivativeKalman = 0.0f,
-    // .tQProportionalKalman = 1.0f,
-    // .tRProportionalKalman = 0.0f,
-    // .errDeadzone = 0.0f,
-    // .errorDerivativeFloor = 0.0f,
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = {
@@ -127,11 +113,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    // .kp = 2000.0f,
-    // .ki = 20.0f,
-    // .kd = 500.0f,
-    .kp = 2300.0f,  // Test bot = kp 9000.0f * 2 / 3, kd 900.0f * 2 / 3 // Main Bot kp = 10000 kd =
-                    // 1000
+    .kp = 2300.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1'000.0f,
@@ -141,17 +123,6 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
     .tRProportionalKalman = 0.5f,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
-    // .kp = 20'000.0f,
-    // .ki = 100.0f,
-    // .kd = 0.0f,
-    // .maxICumulative = 2'000.0f,
-    // .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,
-    // .tQDerivativeKalman = 1.0f,
-    // .tRDerivativeKalman = 0.0f,
-    // .tQProportionalKalman = 1.0f,
-    // .tRProportionalKalman = 0.5f,
-    // .errDeadzone = 0.0f,
-    // .errorDerivativeFloor = 0.0f,
 };
 
 static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_CONFIG = {
@@ -349,9 +320,9 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_IMU_CAL_PID_CONFIG = {
 
 namespace cv
 {
-static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(3 - 12);
-static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(3 + 12);
-static constexpr float SCAN_PITCH_SPEED = 0.8f;
+static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(10 - 7);
+static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(10 + 7);
+static constexpr float SCAN_PITCH_SPEED = 0.6f;
 static constexpr float SCAN_YAW_SPEED = 2.0f;
 }  // namespace cv
 

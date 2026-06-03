@@ -40,11 +40,6 @@
 
 #include "modm/math/filter/pid.hpp"
 
-namespace src::can
-{
-class TurretMCBCanComm;
-}
-
 namespace src::control::turret::algorithms
 {
 class TurretPitchControllerInterface;
@@ -75,8 +70,7 @@ public:
         tap::motor::MotorInterface* pitchMotor,
         tap::motor::MotorInterface* yawMotor,
         const TurretMotorConfig& pitchMotorConfig,
-        const TurretMotorConfig& yawMotorConfig,
-        const src::can::TurretMCBCanComm* turretMCB);
+        const TurretMotorConfig& yawMotorConfig);
 
     void initialize() override;
 
@@ -95,8 +89,6 @@ public:
         return true;
     }  // pitchMotor.isOnline() && yawMotor.isOnline(); }
 
-    const inline src::can::TurretMCBCanComm* getTurretMCB() const { return turretMCB; }
-
 #ifdef ENV_UNIT_TESTS
     testing::NiceMock<mock::TurretMotorMock> pitchMotor;
     testing::NiceMock<mock::TurretMotorMock> yawMotor;
@@ -107,8 +99,6 @@ public:
     TurretMotorDJI yawMotor;
 #endif
 
-protected:
-    const src::can::TurretMCBCanComm* turretMCB;
 };  // class TurretSubsystem
 
 }  // namespace src::control::turret

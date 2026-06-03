@@ -7,7 +7,6 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-#include "communication/can/turret/turret_mcb_can_comm.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 #include "control/chassis/rate_limiters/slew_rate_limiter.hpp"
 #include "modm/math/filter/pid.hpp"
@@ -62,9 +61,8 @@ public:
     ChassisSubsystem(
         tap::Drivers* drivers,
         const ChassisConfig& config,
-        src::can::TurretMCBCanComm* turretMCBCanComm,
         src::control::turret::TurretMotor* yawMotor,
-        ChassisOdometry* chassisOdometry_);
+        ChassisOdometry* chassisOdometry_ = nullptr);
 
     void initialize() override;
 
@@ -135,7 +133,7 @@ public:
      *
      * @return The max chassis power limit.
      */
-    float getChassisPowerLimit()
+    static inline float getChassisPowerLimit(tap::Drivers* drivers)
     {
         return drivers->refSerial.getRobotData().chassis.powerConsumptionLimit;
     }
@@ -149,16 +147,51 @@ public:
      * @param chassisPowerLimit The chassis power limit in watts.
      * @return The max chassis wheel speed.
      */
-    float getMaxWheelSpeed(bool refSerialOnline, float chassisPowerLimit);
+    static inline float getMaxWheelSpeed(bool refSerialOnline, float chassisPowerLimit)
+    {
+        if (!refSerialOnline)
+        {
+            chassisPowerLimit = 80;
+        }
+
+        // only re-interpolate when needed (since this function is called a lot and the chassis
+        // power limit rarely changes, this helps cut down on unnecessary array
+        // searching/interpolation)
+        if (lastComputedMaxWheelSpeed.first != (int)chassisPowerLimit)
+        {
+            lastComputedMaxWheelSpeed.first = (int)chassisPowerLimit;
+            lastComputedMaxWheelSpeed.second =
+                CHASSIS_POWER_TO_SPEED_INTERPOLATOR.interpolate(chassisPowerLimit);
+        }
+
+        return lastComputedMaxWheelSpeed.second;
+    }
 
     /**
-     * Gets the max chassis current output.
-     *
-     * @param refSerialOnline Is the ref system online and connected.
-     * @param chassisPowerLimit The chassis power limit in watts.
-     * @return The max chassis current.
+     * @param[out] ramp Ramp that should have acceleration applied to. The ramp is updated some
+     * increment based on the passed in acceleration values. Ramp stores values in some units.
+     * @param[in] maxAcceleration Positive acceleration value to apply to the ramp in units/time^2.
+     * @param[in] maxDeceleration Negative acceleration value to apply to the ramp, in units/time^2.
+     * @param[in] dt Change in time since this function was last called, in units of some time.
      */
-    float getMaxCurrentOutput(bool refSerialOnline, float chassisPowerLimit);
+    static inline void applyAccelerationToRamp(
+        tap::algorithms::Ramp& ramp,
+        float maxAcceleration,
+        float maxDeceleration,
+        float dt)
+    {
+        if (getSign(ramp.getTarget()) == getSign(ramp.getValue()) &&
+            abs(ramp.getTarget()) > abs(ramp.getValue()))
+        {
+            // we are trying to speed up
+            ramp.update(maxAcceleration * dt);
+        }
+        else
+        {
+            // we are trying to slow down
+            ramp.update(maxDeceleration * dt);
+        }
+    }
 
     ChassisOdometry* getChassisOdometry() { return chassisOdometry; }
 
@@ -203,9 +236,9 @@ private:
         return mps / (M_PI * src::chassis::WHEEL_DIAMETER_M) * 60.0f / CHASSIS_GEAR_RATIO;
     }
 
-    src::chassis::ChassisOdometry* chassisOdometry;
+    static modm::Pair<int, float> lastComputedMaxWheelSpeed;
 
-    src::can::TurretMCBCanComm* turretMcbCanComm;
+    src::chassis::ChassisOdometry* chassisOdometry;
 
     src::control::turret::TurretMotor* yawMotor;
 
@@ -215,7 +248,7 @@ private:
 
     std::array<Pid, static_cast<uint8_t>(MotorId::NUM_MOTORS)> pidControllers;
 
-    std::array<tap::algorithms::Ramp, static_cast<uint8_t>(2)> rampControllers;
+    std::array<tap::algorithms::Ramp, static_cast<uint8_t>(3)> rampControllers;
 
     /**
      * @return The turret yaw angle in radians.
