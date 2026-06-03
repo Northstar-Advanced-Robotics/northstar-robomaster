@@ -336,7 +336,6 @@ void WorldFramePitchTurretImuCascadePidTurretController::initialize()
         velocityPid,
         worldFrameSetpoint);
 }
-float debugpidOut = 0;
 void WorldFramePitchTurretImuCascadePidTurretController::runController(  // TODO for actual use
                                                                          // change back to pitch
     const uint32_t dt,
@@ -366,7 +365,6 @@ void WorldFramePitchTurretImuCascadePidTurretController::runController(  // TODO
         TURRET_CG_Z,
         turretMotor.getChassisFrameMeasuredAngle().getWrappedValue(),
         GRAVITY_COMPENSATION_SCALAR);
-    debugpidOut = pidOut;
     turretMotor.setMotorOutput(pidOut);
 }
 

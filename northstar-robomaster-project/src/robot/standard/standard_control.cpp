@@ -440,9 +440,9 @@ Trigger ctrlZPressedImuCal = (TriggerHelpers::button(drivers(), Remote::Key::Z) 
                               TriggerHelpers::button(drivers(), Remote::Key::CTRL))
                                  .onTrue(&imuCalibrateCommand);
 
-Trigger imuCalWhenWheelRight =
-    TriggerHelpers::channelLessThan(drivers(), Remote::Channel::WHEEL, -0.8)
-        .onTrue(&imuCalibrateCommand);
+// Trigger imuCalWhenWheelRight =
+//     TriggerHelpers::channelLessThan(drivers(), Remote::Channel::WHEEL, -0.8)
+//         .onTrue(&imuCalibrateCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
@@ -481,14 +481,14 @@ void registerStandardSubsystems(Drivers *drivers)
 
 void setDefaultStandardCommands([[maybe_unused]] Drivers *drivers)
 {
-    chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
+    chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
     ui.setDefaultCommand(&infantryDrawCommand);
 }
 
 void startStandardCommands(Drivers *drivers)
 {
-    drivers->visionComms.attachPitchMotor(&pitchMotor);
+    // drivers->visionComms.attachPitchMotor(&pitchMotor);
     drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(

@@ -48,7 +48,7 @@ static constexpr float USER_PITCH_INPUT_SCALAR = 0.02f;
 
 static constexpr tap::can::CanBus CAN_BUS_YAW = tap::can::CanBus::CAN_BUS1;
 static constexpr tap::can::CanBus CAN_BUS_PITCH = tap::can::CanBus::CAN_BUS2;
-static constexpr tap::motor::MotorId PITCH_MOTOR_ID = tap::motor::MOTOR5;  // 1
+static constexpr tap::motor::MotorId PITCH_MOTOR_ID = tap::motor::MOTOR6;  // 2
 
 static constexpr tap::motor::MotorId YAW_MOTOR_ID_1 =
     tap::motor::MotorId::MOTOR7;  // May have to change these
@@ -64,7 +64,7 @@ static constexpr TurretMotorConfig YAW_MOTOR_CONFIG = {
 
 static constexpr TurretMotorConfig PITCH_MOTOR_CONFIG = {
     .startAngle = modm::toRadian(0),  // 7.45
-    .startEncoderValue = 4950,        // 3427,
+    .startEncoderValue = 4174,
     .minAngle = modm::toRadian(-40),
     .maxAngle = modm::toRadian(45),
     .limitMotorAngles = true,
@@ -85,7 +85,7 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = 0.0f;  //-3300.0f;  // 1200
 namespace world_rel_turret_imu
 {
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 6.0f,
+    .kp = 15.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -113,10 +113,10 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 1100.0f,
-    .ki = 0.0f,
+    .kp = 1200.0f,
+    .ki = 3.0f,
     .kd = 0.0f,
-    .maxICumulative = 1'000.0f,
+    .maxICumulative = 1000.0f,
     .maxOutput = tap::motor::DjiMotor::MAX_OUTPUT_C620,
     .tRDerivativeKalman = 0.0f,
     .tQProportionalKalman = 1.0f,
@@ -126,7 +126,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
 };
 
 static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_CONFIG = {
-    .kp = 0.0f,
+    .kp = 16.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.5f,
@@ -165,10 +165,10 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_AUTO_AIM_CONFIG 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig PITCH_VEL_PID_CONFIG = {
-    .kp = 0.0f,
-    .ki = 0.0f,
+    .kp = 14'000.0f,
+    .ki = 20.0f,
     .kd = 0.0f,
-    .maxICumulative = 0.0f,
+    .maxICumulative = 5000.0f,
     .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,  // 0.0f
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 0.0f,
@@ -176,17 +176,6 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_VEL_PID_CONFIG = {
     .tRProportionalKalman = 0.5f,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
-    // .kp = 10'000.0f,
-    // .ki = 0.0f,
-    // .kd = 100.0f,
-    // .maxICumulative = 0.0f,
-    // .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,
-    // .tQDerivativeKalman = 1.0f,
-    // .tRDerivativeKalman = 0.0f,
-    // .tQProportionalKalman = 1.0f,
-    // .tRProportionalKalman = 0.5f,
-    // .errDeadzone = 0.0f,
-    // .errorDerivativeFloor = 0.0f,
 };
 
 }  // namespace world_rel_turret_imu
