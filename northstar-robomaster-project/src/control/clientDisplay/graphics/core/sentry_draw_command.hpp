@@ -6,6 +6,8 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_orientation_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_power_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/countdown.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/cv_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/dot_crosshair.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/firemode_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/flywheel_ready_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hit_ring.hpp"
@@ -35,7 +37,9 @@ public:
         src::chassis::ChassisSubsystem* chassis,
         control::governor::FlywheelOnGovernor* flywheelGovernor,
         control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping,
-        imu::ImuCalibrateCommand* imuCalibrateCommand)
+        imu::ImuCalibrateCommand* imuCalibrateCommand,
+        src::serial::VisionComms* visionComms,
+        src::control::governor::CvOnTargetGovernor* cvOnTargetGovernor)
         : drivers(drivers),
           ui(ui),
           turret(turret),
@@ -44,7 +48,10 @@ public:
           chassis(chassis),
           flywheelGovernor(flywheelGovernor),
           multiShotCvCommandMapping(multiShotCvCommandMapping),
-          imuCalibrateCommand(imuCalibrateCommand)
+          imuCalibrateCommand(imuCalibrateCommand),
+          visionComms(visionComms),
+          cvOnTargetGovernor(cvOnTargetGovernor)
+
     {
         addSubsystemRequirement(ui);
 
@@ -52,7 +59,7 @@ public:
         // addGraphicsObject(&supercap);
         addGraphicsObject(&orient);
         // addGraphicsObject(&peek);
-        addGraphicsObject(&reticle);
+        // addGraphicsObject(&reticle);
         addGraphicsObject(&ring);
         // addGraphicsObject(&remain);
         addGraphicsObject(&numbers);
@@ -63,6 +70,8 @@ public:
         addGraphicsObject(&firemode);
         addGraphicsObject(&flywheelReady);
         addGraphicsObject(&imuCalIndicator);
+        addGraphicsObject(&dotCrosshair);
+        addGraphicsObject(&cvIndicator);
     };
 
     void initialize() override { ui->setTopLevelContainer(this); };
@@ -73,7 +82,7 @@ public:
         // supercap.update();
         orient.update();
         // peek.update();
-        reticle.update();
+        // reticle.update();
         ring.update();
         // remain.update();
         numbers.update();
@@ -85,6 +94,7 @@ public:
         firemode.update();
         flywheelReady.update();
         imuCalIndicator.update();
+        cvIndicator.update();
     };
 
     // ui subsystem won't do anything until its top level container is set, so we are ok to add
@@ -105,13 +115,15 @@ private:
     control::governor::FlywheelOnGovernor* flywheelGovernor;
     control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping;
     imu::ImuCalibrateCommand* imuCalibrateCommand;
+    src::serial::VisionComms* visionComms;
+    src::control::governor::CvOnTargetGovernor* cvOnTargetGovernor;
 
     // add top level graphics objects here and in the constructor
     LaneAssistLines lane{turret};
     // SupercapChargeIndicator supercap{chassis};
     ChassisOrientationIndicator orient{true, drivers, turret, chassis};
     PeekingLines peek{chassis, turret};
-    Reticle reticle{drivers, turret /*agitator*/};
+    // Reticle reticle{drivers, turret /*agitator*/};
     HitRing ring{drivers, turret};
     // PredictedRemainingShotsIndicator remain{drivers, agitator};
     AllRobotHealthNumbers numbers{drivers};
@@ -123,5 +135,7 @@ private:
     FiremodeIndicator firemode{drivers, multiShotCvCommandMapping};
     FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
+    DotCrosshair dotCrosshair{drivers};
+    CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};
 };
 }  // namespace src::control::client_display::graphics

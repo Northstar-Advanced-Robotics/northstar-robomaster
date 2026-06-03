@@ -546,7 +546,9 @@ src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
     &chassisSubsystem,
     &flywheelOnGovernor,
     leftMousePressedShoot.get(),
-    &imuCalibrateCommand);
+    &imuCalibrateCommand,
+    &drivers()->visionComms,
+    &cvOnTargetGovernor);
 
 Trigger ctrlCPressedUI =
     TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&sentryDrawCommand);

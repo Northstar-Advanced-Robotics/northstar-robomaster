@@ -60,7 +60,7 @@ private:
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic stage{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 20, 3};
+    StringGraphic stage{UISubsystem::Color::GREEN, "FireMode: ", X_POSITION, Y_POSITION, 200, 200};
 };
 
 }  // namespace src::control::client_display::graphics

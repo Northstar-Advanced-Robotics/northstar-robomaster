@@ -21,7 +21,7 @@ public:
         powerDraw.y = Y_POSITION;
         powerDraw.height = LINE_HEIGHT;
         powerDraw.thickness = TEXT_THICKNESS;
-        addGraphicsObject(&chargeBar);
+        // addGraphicsObject(&chargeBar);
     }
 
     void update()
@@ -55,10 +55,10 @@ public:
             energyInBuffer += RECHARGE_PER_CYCLE;
         }
 
-        if (energyInBuffer < 0) energyInBuffer = 0;
-        if (energyInBuffer > 60) energyInBuffer = 60;
-        float chargeBarLength = (energyInBuffer / 60.0f) * LINE_WIDTH;
-        chargeBar.x2 = X_POSITION - LINE_WIDTH / 2 + chargeBarLength;
+        // if (energyInBuffer < 0) energyInBuffer = 0;
+        // if (energyInBuffer > 60) energyInBuffer = 60;
+        // float chargeBarLength = (energyInBuffer / 60.0f) * LINE_WIDTH;
+        // chargeBar.x2 = X_POSITION - LINE_WIDTH / 2 + chargeBarLength;
     }
 
 private:
@@ -83,13 +83,13 @@ private:
     uint8_t bufferIndex = 0;
 
     IntegerGraphic powerDraw{};
-    Line chargeBar{
-        UISubsystem::Color::RED_AND_BLUE,
-        X_POSITION - LINE_WIDTH / 2,
-        Y_POSITION,
-        X_POSITION + LINE_WIDTH / 2,
-        Y_POSITION,
-        16};
+    // Line chargeBar{
+    //     UISubsystem::Color::RED_AND_BLUE,
+    //     X_POSITION - LINE_WIDTH / 2,
+    //     Y_POSITION,
+    //     X_POSITION + LINE_WIDTH / 2,
+    //     Y_POSITION,
+    //     16};
 };
 
 }  // namespace src::control::client_display::graphics

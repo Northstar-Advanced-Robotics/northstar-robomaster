@@ -2,10 +2,13 @@
 
 #include "tap/control/command.hpp"
 
+#include "control/agitator/velocity_agitator_subsystem.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/all_robot_health_numbers.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_orientation_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_power_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/countdown.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/cv_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/dot_crosshair.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hit_ring.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hopper_lid_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/imu_recalibration_indicator.hpp"
@@ -15,17 +18,6 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/predicted_remaining_shots_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/reticle.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/supercap_charge_indicator.hpp"
-
-// #include "subsystems/chassis/chassisSubsystem.hpp"
-// #include "subsystems/flywheel/FlywheelSubsystem.hpp"
-// #include "subsystems/turret/turretSubsystem.hpp"
-// #include "subsystems/agitator/HeroagitatorSubsystem.hpp"
-#include "control/agitator/velocity_agitator_subsystem.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
-#include "control/clientDisplay/graphics/core/ui_subsystem.hpp"
-#include "control/clientDisplay/graphics/graphics_objects/graphics_container.hpp"
-#include "control/flywheel/dji_two_flywheel_subsystem.hpp"
-#include "control/turret/turret_subsystem.hpp"
 
 #include "drivers.hpp"
 
@@ -113,5 +105,7 @@ private:
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
     LinearVelocityIndicator velo{chassis};
+    DotCrosshair crosshair{drivers};
+    CVIndicator cvIndicator{drivers, turret->getVisionComms(), turret->getCvOnTargetGovernor()};
 };
 }  // namespace src::control::client_display::graphics
