@@ -62,9 +62,9 @@ float ControlOperatorInterface::getTurretPitchInput()
     input = drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL) +
             static_cast<float>(limitVal<int16_t>(
                 drivers->remote.getMouseY(),
-                -USER_MOUSE_YAW_MAX,
-                USER_MOUSE_YAW_MAX)) *
-                USER_MOUSE_YAW_SCALAR;
+                -USER_MOUSE_PITCH_MAX,
+                USER_MOUSE_PITCH_MAX)) *
+                USER_MOUSE_PITCH_SCALAR;
     if (!compareFloatClose(input, 0, .01))
     {
         return input;
@@ -77,15 +77,21 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t dt = currTime - prevChassisXInputCalledTime;
-    prevChassisXInputCalledTime = currTime;
-
-    float output = 0.0f;
 
     float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
                                  ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f);
+                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
+
+    if (prevUpdateCounterY != updateCounter)
+    {
+        chassisYInput.update(
+            drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
+            currTime);
+        prevUpdateCounterY = updateCounter;
+    }
+
+    float output = 0.0f;
 
     if (drivers->remote.keyPressed(Remote::Key::A) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -110,14 +116,6 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
         output += maxWheelSpeedMPS;
     }
 
-    if (prevUpdateCounterY != updateCounter)
-    {
-        chassisYInput.update(
-            drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) * maxWheelSpeedMPS,
-            currTime);
-        prevUpdateCounterY = updateCounter;
-    }
-
     output = limitVal<float>(
         chassisYInput.getInterpolatedValue(currTime) + output,
         -maxWheelSpeedMPS,
@@ -131,15 +129,21 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
-    uint32_t dt = currTime - prevChassisXInputCalledTime;
-    prevChassisXInputCalledTime = currTime;
-
-    float output = 0.0f;
 
     float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
                                  ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f);
+                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
+
+    if (prevUpdateCounterX != updateCounter)
+    {
+        chassisXInput.update(
+            drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) * maxWheelSpeedMPS,
+            currTime);
+        prevUpdateCounterX = updateCounter;
+    }
+
+    float output = 0.0f;
 
     if (drivers->remote.keyPressed(Remote::Key::S) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -162,14 +166,6 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
         output += maxWheelSpeedMPS;
-    }
-
-    if (prevUpdateCounterX != updateCounter)
-    {
-        chassisXInput.update(
-            drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) * maxWheelSpeedMPS,
-            currTime);
-        prevUpdateCounterX = updateCounter;
     }
 
     output = limitVal<float>(

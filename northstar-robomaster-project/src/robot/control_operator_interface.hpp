@@ -79,10 +79,6 @@ private:
     tap::algorithms::LinearInterpolationPredictor chassisXInput;
     tap::algorithms::LinearInterpolationPredictor chassisYInput;
     tap::algorithms::LinearInterpolationPredictor chassisRInput;
-
-    uint32_t prevChassisXInputCalledTime = 0;
-    uint32_t prevChassisYInputCalledTime = 0;
-    uint32_t prevChassisRInputCalledTime = 0;
 };
 }  // namespace control
 

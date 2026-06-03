@@ -532,7 +532,7 @@ namespace src::standard
 {
 imu::ImuCalibrateCommandBase *getImuCalibrateCommand()
 {
-    return &standard_control::imuCalibrateCommand;
+    return nullptr;  //&standard_control::imuCalibrateCommand;
 }
 
 void initSubsystemCommands(src::standard::Drivers *drivers)
