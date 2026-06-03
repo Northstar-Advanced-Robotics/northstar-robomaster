@@ -4,6 +4,7 @@
 #include "control/clientDisplay/graphics/core/ui_subsystem.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/atomic_graphics_objects.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/graphics_container.hpp"
+#include "control/governor/flywheel_on_governor.hpp"
 
 namespace src::control::client_display::graphics
 {
@@ -50,12 +51,23 @@ public:
 
         firemode.calculateNumbers();
         // firemode.x = X_POSITION - firemode.width / 2;
+
+        if (flywheelGovernor->isReady())
+        {
+            firemode.color = UISubsystem::Color::GREEN;
+        }
+        else
+        {
+            firemode.color = UISubsystem::Color::BLACK;
+        }
     }
 
 private:
     tap::Drivers* drivers;
 
     control::agitator::MultiShotCvCommandMapping* shootCommand;
+
+    control::governor::FlywheelOnGovernor* flywheelGovernor;
 
     static constexpr uint16_t X_POSITION = 20;  // pixels, all numbers at the same y level on screen
     static constexpr uint16_t Y_POSITION = 610;   // pixels, all numbers at the same y level on
