@@ -1,11 +1,6 @@
 #ifndef USING_CHASSIS_HPP_
 #define USING_CHASSIS_HPP_
 
-#include "tap/control/hold_command_mapping.hpp"
-#include "tap/control/hold_repeat_command_mapping.hpp"
-#include "tap/control/remote_map_state.hpp"
-#include "tap/control/toggle_command_mapping.hpp"
-
 #include "control/governor/fired_recently_governor.hpp"
 #include "control/governor/plate_hit_governor.hpp"
 #include "robot/testbed/test_def.hpp"
@@ -23,30 +18,32 @@ src::control::turret::TurretMotor* yawMotor = &turretSubsystem.yawMotor;
 
 #else
 
-tap::motor::RevMotor yawMotor1(
-    drivers(),
-    YAW_MOTOR_ID_1,
-    CAN_BUS_MOTORS,
-    tap::motor::RevMotor::ControlMode::DUTY_CYCLE,  // Change from duty cycle
-    true,
-    "YawMotor1",
-    1,
-    YAW_MOTOR_CONFIG.startEncoderValue,
-    &drivers()->encoder);
+/// TODO UPDATE THIS FOR NEW CODE
+// tap::motor::RevMotor yawMotor1(
+//     drivers(),
+//     YAW_MOTOR_ID_1,
+//     CAN_BUS_MOTORS,
+//     tap::motor::RevMotor::ControlMode::DUTY_CYCLE,  // Change from duty cycle
+//     true,
+//     "YawMotor1",
+//     1,
+//     YAW_MOTOR_CONFIG.startEncoderValue,
+//     &drivers()->encoder);
 
-tap::motor::RevMotor yawMotor2(
-    drivers(),
-    YAW_MOTOR_ID_2,
-    CAN_BUS_MOTORS,
-    tap::motor::RevMotor::ControlMode::DUTY_CYCLE,
-    false,
-    "YawMotor2",
-    1,
-    YAW_MOTOR_CONFIG.startEncoderValue);
+// tap::motor::RevMotor yawMotor2(
+//     drivers(),
+//     YAW_MOTOR_ID_2,
+//     CAN_BUS_MOTORS,
+//     tap::motor::RevMotor::ControlMode::DUTY_CYCLE,
+//     false,
+//     "YawMotor2",
+//     1,
+//     YAW_MOTOR_CONFIG.startEncoderValue);
 
-src::control::turret::TurretDoubleMotorRev yawTurretMotor(&yawMotor1, &yawMotor2, YAW_MOTOR_CONFIG);
+// src::control::turret::TurretDoubleMotorRev yawTurretMotor(&yawMotor1, &yawMotor2,
+// YAW_MOTOR_CONFIG);
 
-src::control::turret::TurretMotor* yawMotor = &yawTurretMotor;
+// src::control::turret::TurretMotor* yawMotor = &yawTurretMotor;
 
 #endif
 

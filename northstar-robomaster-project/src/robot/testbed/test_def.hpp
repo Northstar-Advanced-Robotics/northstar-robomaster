@@ -1,19 +1,30 @@
 #ifndef TEST_DEF_HPP_
 #define TEST_DEF_HPP_
 
-#define USING_CHASSIS
+#include <memory>
+
+#include "tap/control/governor/governor_limited_command.hpp"
+#include "tap/control/hold_command_mapping.hpp"
+#include "tap/control/hold_repeat_command_mapping.hpp"
+#include "tap/control/remote_map_state.hpp"
+#include "tap/control/toggle_command_mapping.hpp"
+#include "tap/control/trigger.hpp"
+#include "tap/control/trigger_helpers.hpp"
+
+#include "control/agitator/multi_shot_cv_command_mapping.hpp"
+
+// #define USING_CHASSIS
 // #define USING_TURRET
 #define USING_AGITATOR
 // #define USING_FLYWHEEL
 // #define USING_REV
-#define USING_HUD
+// #define USING_HUD
 
 #include "control/dummy_subsystem.hpp"
 
 #include "drivers_singleton.hpp"
 
 src::testbed::driversFunc drivers = src::testbed::DoNotUse_getDrivers;
-inline src::can::TurretMCBCanComm &getTurretMCBCanComm() { return drivers()->turretMCBCanCommBus2; }
 DummySubsystem dummySubsystem(drivers());
 
 #ifdef USING_CHASSIS

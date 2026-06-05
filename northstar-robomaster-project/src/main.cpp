@@ -45,6 +45,7 @@
 #include "robot/robot_control.hpp"
 
 /* robot includes ---------------------------------------------------------*/
+#include "tap/communication/gpio/pwm.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(tap::Drivers::DT);
@@ -150,6 +151,7 @@ static void initializeIo(Drivers *drivers)
     drivers->analog.init();
     drivers->digital.init();
     drivers->leds.init();
+    drivers->pwm.init();
 
     // if controller is on when the robot turns on, wait for it to be off.
     // This is to prevent the shredding of wires
@@ -160,15 +162,22 @@ static void initializeIo(Drivers *drivers)
     {
         drivers->remote.read();
         if (drivers->remote.isConnected())
+        {
             i = 0;
+            drivers->pwm.write(0.5f, tap::gpio::Pwm::Buzzer);
+            drivers->pwm.setTimerFrequency(tap::gpio::Pwm::TIMER4, 1500);
+        }
         else
+        {
             i++;
-        modm::delay_us(10);
+            drivers->pwm.write(0.0f, tap::gpio::Pwm::Buzzer);
+        }
+
+        modm::delay_ms(2);
     }
 
     drivers->leds.set(tap::gpio::Leds::Blue, true);
 
-    drivers->pwm.init();
     drivers->can.initialize();
     drivers->errorController.init();
 

@@ -1,10 +1,6 @@
 #ifndef USING_TURRET_HPP_
 #define USING_TURRET_HPP_
 
-#include "tap/control/hold_command_mapping.hpp"
-#include "tap/control/press_command_mapping.hpp"
-#include "tap/control/remote_map_state.hpp"
-
 #include "robot/testbed/test_def.hpp"
 
 using namespace tap::control;
@@ -49,11 +45,7 @@ tap::motor::RevMotor yawMotor2(
 
 src::control::turret::TurretDoubleMotorRev yawTurretMotor(&yawMotor1, &yawMotor2, YAW_MOTOR_CONFIG);
 
-TurretSubsystem turretSubsystem(
-    drivers(),
-    pitchTurretMotor,
-    yawTurretMotor,
-    &getTurretMCBCanComm());
+TurretSubsystem turretSubsystem(drivers(), pitchTurretMotor, yawTurretMotor);
 
 // turret controlers
 src::control::turret::algorithms::
@@ -84,21 +76,6 @@ tap::algorithms::SmoothPid worldFramePitchTurretVelPid(world_rel_turret_imu::PIT
 tap::algorithms::SmoothPid worldFrameYawTurretPosPid(world_rel_turret_imu::YAW_POS_PID_CONFIG);
 
 tap::algorithms::SmoothPid worldFrameYawTurretVelPid(world_rel_turret_imu::YAW_VEL_PID_CONFIG);
-
-// for imu can com giving imu data from turret to chassis
-src::control::turret::algorithms::
-    WorldFramePitchTurretCanImuCascadePidTurretController worldFramePitchTurretCanImuController(
-        getTurretMCBCanComm(),
-        turretSubsystem.pitchMotor,
-        worldFramePitchTurretPosPid,
-        worldFramePitchTurretVelPid);
-
-src::control::turret::algorithms::
-    WorldFrameYawTurretCanImuCascadePidTurretController worldFrameYawTurretCanImuController(
-        getTurretMCBCanComm(),
-        turretSubsystem.yawMotor,
-        worldFrameYawTurretPosPid,
-        worldFrameYawTurretVelPid);
 
 // for imu fixed on turret
 src::control::turret::algorithms::

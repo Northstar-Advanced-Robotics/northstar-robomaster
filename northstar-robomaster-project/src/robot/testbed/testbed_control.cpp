@@ -8,14 +8,10 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-#include "control/agitator/multi_shot_cv_command_mapping.hpp"
-#include "control/cycle_state_command_mapping.hpp"
-
 // imu
 #include "control/imu/imu_calibrate_command.hpp"
 
 // safe disconnect
-#include "communication/RevMotorTesterSingleMotor.hpp"
 #include "control/safe_disconnect.hpp"
 
 // governor
@@ -48,27 +44,6 @@ src::control::RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers(
 #ifdef USING_FLYWHEEL
 
 #endif  // USING_FLYWHEEL
-
-ChassisPowerIndicator chassisPower(refSerialTransmitter, drivers()->refSerial, chassisSubsystem);
-
-TextHudIndicators textHudIndicators(
-    *drivers(),
-    agitator,
-    // imuCalibrateCommand,
-    {&chassisBeyBladeCommand},
-    refSerialTransmitter);
-
-std::vector<HudIndicator *> hudIndicators = {
-    &ammoIndicator,
-    &circleCrosshair,
-    &textHudIndicators,
-    &chassisPower
-    // &visionIndicator,
-    // &flyWheelIndicator,
-    //&shootingModeIndicator,
-    /*&cvAimingIndicator*/};
-
-ClientDisplayCommand clientDisplayCommand(*drivers(), clientDisplay, hudIndicators);
 
 void initializeSubsystems(src::testbed::Drivers *drivers)
 {
@@ -143,12 +118,10 @@ void startTestCommands(src::testbed::Drivers *drivers)
 void registerTestIoMappings(src::testbed::Drivers *drivers)
 {
 #ifdef USING_AGITATOR
-    drivers->commandMapper.addMap(&leftMousePressedShoot);
-    drivers->commandMapper.addMap(&leftSwitchDownPressedShoot);
-    drivers->commandMapper.addMap(&qPressed10RPS);
-    // drivers->commandMapper.addMap(&ePressed20RPS);
-    // drivers->commandMapper.addMap(&rPressedFullAuto);
-
+    // rightSwitchUp10RPS
+    // rightSwitchMid20RPS
+    // rightSwitchDownFullAuto
+    // leftSwitchDownPressedShoot
 #endif
 #ifdef USING_FLYWHEEL
     drivers->commandMapper.addMap(&fPressed);
