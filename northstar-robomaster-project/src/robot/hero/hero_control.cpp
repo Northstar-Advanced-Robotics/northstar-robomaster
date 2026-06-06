@@ -206,6 +206,10 @@ GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProject
     rotateAndUnjamAgitator,
     {&refSystemProjectileLaunchedGovernor, &fireRateLimitGovernor, &flywheelOnGovernor});
 
+// Trigger rightSwitchUpRotateAndUnjamAgitator =
+//     TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)
+//         .onTrue(&rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched);
+
 extern cv::TurretCVControlCommand turretCVControlCommand;
 CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
 

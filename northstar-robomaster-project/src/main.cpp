@@ -173,7 +173,7 @@ static void initializeIo(Drivers *drivers)
             drivers->pwm.write(0.0f, tap::gpio::Pwm::Buzzer);
         }
 
-        modm::delay_ms(2);
+        modm::delay_us(10);
     }
 
     drivers->leds.set(tap::gpio::Leds::Blue, true);

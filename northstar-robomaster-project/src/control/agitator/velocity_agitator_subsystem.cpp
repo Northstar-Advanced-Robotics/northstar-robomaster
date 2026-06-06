@@ -85,7 +85,6 @@ float VelocityAgitatorSubsystem::getCurrentValueIntegral() const
     }
     return agitatorMotor.getEncoder()->getPosition().getUnwrappedValue();
 }
-
 void VelocityAgitatorSubsystem::runVelocityPidControl()
 {
     const uint32_t curTime = tap::arch::clock::getTimeMilliseconds();
