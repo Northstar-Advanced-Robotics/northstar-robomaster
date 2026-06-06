@@ -537,21 +537,21 @@ src::stateMachine::StateMachineSubsystem stateMachineSubsystem =
     src::stateMachine::StateMachineSubsystem(drivers(), &chassisSubsystem, chassisAutoDrive);
 
 src::control::client_display::graphics::UISubsystem ui(drivers());
-src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
-    drivers(),
-    &ui,
-    &turret,
-    // &flywheel,
-    &agitator,
-    &chassisSubsystem,
-    &flywheelOnGovernor,
-    leftMousePressedShoot.get(),
-    &imuCalibrateCommand,
-    &drivers()->visionComms,
-    &cvOnTargetGovernor);
+// src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
+//     drivers(),
+//     &ui,
+//     &turret,
+//     // &flywheel,
+//     &agitator,
+//     &chassisSubsystem,
+//     &flywheelOnGovernor,S
+//     leftMousePressedShoot.get(),
+//     &imuCalibrateCommand,
+//     &drivers()->visionComms,
+//     &cvOnTargetGovernor);
 
-Trigger ctrlCPressedUI =
-    TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&sentryDrawCommand);
+// Trigger ctrlCPressedUI =
+//     TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&sentryDrawCommand);
 
 void initializeSubsystems(Drivers *drivers)
 {
@@ -577,7 +577,7 @@ void setDefaultSentryCommands([[maybe_unused]] Drivers *drivers)
 {
     // chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
-    ui.setDefaultCommand(&sentryDrawCommand);
+    // ui.setDefaultCommand(&sentryDrawCommand);
 }
 
 void startSentryCommands(Drivers *drivers)

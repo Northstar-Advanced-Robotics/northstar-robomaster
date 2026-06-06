@@ -94,6 +94,7 @@ public:
         firemode.update();
         flywheelReady.update();
         imuCalIndicator.update();
+        dotCrosshair.update();
         cvIndicator.update();
     };
 

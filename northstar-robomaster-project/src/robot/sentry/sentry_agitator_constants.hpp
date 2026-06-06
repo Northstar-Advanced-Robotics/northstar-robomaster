@@ -21,7 +21,7 @@ static constexpr uint16_t HEAT_LIMIT_BUFFER = 25;
 // position PID terms
 // PID terms for standard
 static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
-    .kp = 3'000.0f,
+    .kp = 4'000.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -29,12 +29,12 @@ static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
 };
-static constexpr int AGITATOR_NUM_POCKETS = 11;         // number of balls in one rotation
-static constexpr float AGITATOR_MAX_ROF = 30.0f;        // balls per second
-static constexpr float OVERSHOOT_FUDGE_FACTOR = .2586;  // how much agitator overshoots
+static constexpr int AGITATOR_NUM_POCKETS = 11;       // number of balls in one rotation
+static constexpr float AGITATOR_MAX_ROF = 30.0f;      // balls per second
+static constexpr float OVERSHOOT_FUDGE_FACTOR = .15;  // how much agitator overshoots
 
 static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
-    .gearRatio = 1 / (36.0f),
+    .gearRatio = 1 / (36.0f) * (20.0f / 21.0f),
     .agitatorMotorId = tap::motor::MOTOR5,
     .agitatorCanBusId = tap::can::CanBus::CAN_BUS1,
     .isAgitatorInverted = false,
