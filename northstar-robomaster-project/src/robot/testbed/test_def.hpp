@@ -3,6 +3,7 @@
 
 #include <memory>
 
+#include "tap/control/concurrent_command.hpp"
 #include "tap/control/governor/governor_limited_command.hpp"
 #include "tap/control/hold_command_mapping.hpp"
 #include "tap/control/hold_repeat_command_mapping.hpp"
@@ -16,6 +17,7 @@
 // #define USING_CHASSIS
 // #define USING_TURRET
 #define USING_AGITATOR
+// #define USING_HERO_AGITATOR
 // #define USING_FLYWHEEL
 // #define USING_REV
 // #define USING_HUD
@@ -76,6 +78,32 @@ DummySubsystem dummySubsystem(drivers());
 #include "control/agitator/set_fire_rate_command.hpp"
 #include "control/agitator/unjam_spoke_agitator_command.hpp"
 #include "control/agitator/velocity_agitator_subsystem.hpp"
+
+#endif
+
+#ifdef USING_HERO_AGITATOR
+#include "tap/control/setpoint/commands/move_unjam_integral_comprised_command.hpp"
+
+#include "control/governor/flywheel_on_governor.hpp"
+#include "control/governor/ref_system_projectile_launched_governor.hpp"
+
+// flywheel
+#include "control/flywheel/dji_two_flywheel_subsystem.hpp"
+#include "control/flywheel/flywheel_constants.hpp"
+#include "control/flywheel/two_flywheel_run_command.hpp"
+
+// agitator
+#include "control/agitator/constant_velocity_agitator_command.hpp"
+#include "control/agitator/constants/agitator_constants.hpp"
+#include "control/agitator/set_fire_rate_command.hpp"
+#include "control/agitator/unjam_spoke_agitator_command.hpp"
+#include "control/agitator/velocity_agitator_subsystem.hpp"
+
+// kicker
+#include "control/kicker/constant_velocity_kicker_command.hpp"
+#include "control/kicker/constants/kicker_constants.hpp"
+#include "control/kicker/kicker_subsystem.hpp"
+#include "control/kicker/kicker_subsystem_config.hpp"
 
 #endif
 

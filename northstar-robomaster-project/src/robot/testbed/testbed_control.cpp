@@ -34,6 +34,7 @@
 #include "using_agitator.hpp"
 #include "using_chassis.hpp"
 #include "using_flywheel.hpp"
+#include "using_hero_agitator.hpp"
 #include "using_hud.hpp"
 #include "using_turret.hpp"
 
@@ -50,6 +51,11 @@ void initializeSubsystems(src::testbed::Drivers *drivers)
     dummySubsystem.initialize();
 #ifdef USING_AGITATOR
     agitator.initialize();
+#endif
+#ifdef USING_HERO_AGITATOR
+    agitator.initialize();
+    flywheel.initialize();
+    kicker.initialize();
 #endif
 #ifdef USING_FLYWHEEL
     flywheel.initialize();
@@ -73,6 +79,11 @@ void registerTestSubsystems(src::testbed::Drivers *drivers)
 
 #ifdef USING_AGITATOR
     drivers->commandScheduler.registerSubsystem(&agitator);
+#endif
+#ifdef USING_HERO_AGITATOR
+    drivers->commandScheduler.registerSubsystem(&agitator);
+    drivers->commandScheduler.registerSubsystem(&flywheel);
+    drivers->commandScheduler.registerSubsystem(&kicker);
 #endif
 #ifdef USING_FLYWHEEL
     drivers->commandScheduler.registerSubsystem(&flywheel);
@@ -122,6 +133,10 @@ void registerTestIoMappings(src::testbed::Drivers *drivers)
     // rightSwitchMid20RPS
     // rightSwitchDownFullAuto
     // leftSwitchDownPressedShoot
+#endif
+#ifdef USING_HERO_AGITATOR
+    // leftSwitchDownRotateAndUnjamAgitatorWithKicker
+    // leftSwitchUpRunFlywheel
 #endif
 #ifdef USING_FLYWHEEL
     drivers->commandMapper.addMap(&fPressed);
