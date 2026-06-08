@@ -34,7 +34,7 @@ public:
         }
         else
         {
-            status.color = UISubsystem::Color::BLACK;
+            status.color = UISubsystem::Color::PURPLISH_RED;
         }
 
         if (visionComms->getSomeTurretHasTarget())
@@ -68,16 +68,21 @@ private:
 
     static constexpr uint16_t STATUS_X_POSITION =
         20;  // pixels, all numbers at the same y level on screen
-    static constexpr uint16_t STATUS_Y_POSITION = 610;  // pixels, all numbers at the same y level
+    static constexpr uint16_t STATUS_Y_POSITION = 750;  // pixels, all numbers at the same y level
                                                         // on scre
     static constexpr uint16_t ON_TARGET_X_POSITION = 20;
 
-    static constexpr uint16_t ON_TARGET_Y_POSITION = 500;
+    static constexpr uint16_t ON_TARGET_Y_POSITION = 700;
 
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic
-        status{UISubsystem::Color::BLACK, "CV: ", STATUS_X_POSITION, STATUS_Y_POSITION, 20, 3};
+    StringGraphic status{
+        UISubsystem::Color::PURPLISH_RED,
+        "CV: ",
+        STATUS_X_POSITION,
+        STATUS_Y_POSITION,
+        20,
+        3};
 
     StringGraphic onTarget{
         UISubsystem::Color::GREEN,

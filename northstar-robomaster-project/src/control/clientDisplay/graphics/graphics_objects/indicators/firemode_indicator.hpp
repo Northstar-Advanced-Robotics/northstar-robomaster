@@ -15,9 +15,11 @@ class FiremodeIndicator : public GraphicsContainer
 public:
     FiremodeIndicator(
         tap::Drivers* drivers,
-        control::agitator::MultiShotCvCommandMapping* shootCommand)
+        control::agitator::MultiShotCvCommandMapping* shootCommand,
+        control::governor::FlywheelOnGovernor* flywheelGovernor)
         : drivers(drivers),
-          shootCommand(shootCommand)
+          shootCommand(shootCommand),
+          flywheelGovernor(flywheelGovernor)
     {
         addGraphicsObject(&firemode);
     }
@@ -58,7 +60,7 @@ public:
         }
         else
         {
-            firemode.color = UISubsystem::Color::BLACK;
+            firemode.color = UISubsystem::Color::PURPLISH_RED;
         }
     }
 
@@ -74,7 +76,8 @@ private:
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic firemode{UISubsystem::Color::BLACK, "FireMode: ", X_POSITION, Y_POSITION, 20, 3};
+    StringGraphic
+        firemode{UISubsystem::Color::PURPLISH_RED, "FireMode: ", X_POSITION, Y_POSITION, 20, 3};
 };
 
 }  // namespace src::control::client_display::graphics

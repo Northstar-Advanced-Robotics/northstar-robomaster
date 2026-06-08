@@ -24,26 +24,35 @@ public:
         // if(drivers->remote.keyPressed(Remote::Key::R))
         //     drivers->recal.requestRecalibration();
 
-        switch (imuCalibrateCommand->getCalibrationState())
+        if (!imuCalibrateCommand->GetIsComandRunning())
         {
-            case control::imu::ImuCalibrateCommand::CalibrationState::WAITING_FOR_SYSTEMS_ONLINE:
-                stage.setString("Calibration: Wating for systems");
-                break;
-            case control::imu::ImuCalibrateCommand::CalibrationState::LOCKING_TURRET:
-                stage.setString("Calibration: Locking turret");
-                break;
-            case control::imu::ImuCalibrateCommand::CalibrationState::CALIBRATING_IMU:
-                stage.setString("Calibration: Calibrating IMU");
-                break;
-            case control::imu::ImuCalibrateCommand::CalibrationState::BUZZING:
-                stage.setString("Calibration: Buzzing");
-                break;
-            case control::imu::ImuCalibrateCommand::CalibrationState::WAITING_CALIBRATION_COMPLETE:
-                stage.setString("Calibration: Waiting for completion");
-                break;
-            default:
-                stage.setString("Calibration: None");
-                break;
+            stage.setString("Calibration: Ctrl+Z to calibrate");
+        }
+        else
+        {
+            switch (imuCalibrateCommand->getCalibrationState())
+            {
+                case control::imu::ImuCalibrateCommand::CalibrationState::
+                    WAITING_FOR_SYSTEMS_ONLINE:
+                    stage.setString("Calibration: Wating for systems");
+                    break;
+                case control::imu::ImuCalibrateCommand::CalibrationState::LOCKING_TURRET:
+                    stage.setString("Calibration: Locking turret");
+                    break;
+                case control::imu::ImuCalibrateCommand::CalibrationState::CALIBRATING_IMU:
+                    stage.setString("Calibration: Calibrating IMU");
+                    break;
+                case control::imu::ImuCalibrateCommand::CalibrationState::BUZZING:
+                    stage.setString("Calibration: Buzzing");
+                    break;
+                case control::imu::ImuCalibrateCommand::CalibrationState::
+                    WAITING_CALIBRATION_COMPLETE:
+                    stage.setString("Calibration: Waiting for completion");
+                    break;
+                default:
+                    stage.setString("Calibration: None");
+                    break;
+            }
         }
 
         stage.calculateNumbers();
@@ -60,7 +69,7 @@ private:
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
-    StringGraphic stage{UISubsystem::Color::GREEN, "FireMode: ", X_POSITION, Y_POSITION, 200, 200};
+    StringGraphic stage{UISubsystem::Color::GREEN, "Calibration: ", X_POSITION, Y_POSITION, 20, 3};
 };
 
 }  // namespace src::control::client_display::graphics

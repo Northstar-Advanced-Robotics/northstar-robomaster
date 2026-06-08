@@ -59,6 +59,6 @@ void TurretSubsystem::refresh()
     yawMotor.updateMotorAngle();
     pitchMotor.updateMotorAngle();
 
-    motorAngle = yawMotor.getChassisFrameMeasuredAngle().getUnwrappedValue();
+    motorAngle = pitchMotor.getChassisFrameMeasuredAngle().getUnwrappedValue();
 }
 }  // namespace src::control::turret

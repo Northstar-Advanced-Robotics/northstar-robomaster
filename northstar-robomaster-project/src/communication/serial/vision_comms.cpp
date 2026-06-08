@@ -32,6 +32,7 @@ void VisionComms::initializeUartDelays()
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
     if (remote != nullptr)
     {
         if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)

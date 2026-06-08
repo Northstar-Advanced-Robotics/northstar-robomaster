@@ -94,7 +94,6 @@ public:
         firemode.update();
         flywheelReady.update();
         imuCalIndicator.update();
-        dotCrosshair.update();
         cvIndicator.update();
     };
 
@@ -133,7 +132,7 @@ private:
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
     LinearVelocityIndicator velo{chassis};
-    FiremodeIndicator firemode{drivers, multiShotCvCommandMapping};
+    FiremodeIndicator firemode{drivers, multiShotCvCommandMapping, flywheelGovernor};
     FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
     DotCrosshair dotCrosshair{drivers};

@@ -186,17 +186,17 @@ public:
 
     mockable bool isCvOnline() const;
 
-    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 1) const
+    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 0) const
     {
         return lastAimData[turretID];
     }
 
-    mockable inline bool isAimDataUpdated(uint8_t turretID = 1) const
+    mockable inline bool isAimDataUpdated(uint8_t turretID = 0) const
     {
         return aimDataUpdated[turretID];
     }
 
-    mockable inline bool getSomeTurretHasTarget(uint8_t turretID = 1) const
+    mockable inline bool getSomeTurretHasTarget(uint8_t turretID = 0) const
     {
         return isAimDataUpdated();
     }

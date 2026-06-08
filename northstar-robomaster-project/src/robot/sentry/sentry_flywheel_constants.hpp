@@ -42,9 +42,9 @@ enum Spin : u_int8_t
 
 static constexpr modm::Pair<float, float> MPS_TO_RPM[] = {
     {0.0f, 0.0f},
-    {15.0f, 4714.0f},
-    {18.0f, 5621.0f},
-    {24.5f, 7700.0f}};
+    {15.0f, 4514.0f},
+    {18.0f, 5421.0f},
+    {24.5f, 7500.0f}};
 
 // SPIN_TO_INTERPOLATABLE_MPS_TO_RPM = {
 //     {{{{0.0f, 0.0f},
