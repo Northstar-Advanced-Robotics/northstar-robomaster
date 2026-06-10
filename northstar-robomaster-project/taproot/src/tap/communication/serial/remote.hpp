@@ -220,7 +220,11 @@ private:
     static const int REMOTE_READ_TIMEOUT = 6;          ///< Timeout delay between valid packets.
     static const int REMOTE_DISCONNECT_TIMEOUT = 100;  ///< Timeout delay for remote disconnect.
     static const int REMOTE_INT_PRI = 12;              ///< Interrupt priority.
+#ifdef FLYSKY
+    static constexpr float ANALOG_MAX_VALUE = 500.0f;  ///< Max value received by one of the sticks.
+#else
     static constexpr float ANALOG_MAX_VALUE = 660.0f;  ///< Max value received by one of the sticks.
+#endif
 
     /// The current remote information
     struct RemoteInfo

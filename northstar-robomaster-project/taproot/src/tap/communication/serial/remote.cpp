@@ -305,17 +305,28 @@ void Remote::parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13])
     remote.updateCounter++;
 }
 
+uint16_t Conected_raw = 0;
 void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
 {
     lastRead = tap::arch::clock::getTimeMilliseconds();
+
+    for (int i = 0; i < 14; i++)
+    {
+        uint8_t high = rxBuffer[3 + i * 2];
+        if (high < 0x03 || high > 0x07)
+        {
+            return;  // discard corrupted packet entirely
+        }
+    }
+
     // --- FLYSKY i-BUS PARSING ---
     // Assuming rxBuffer is your 32-byte incoming frame
 
     // Helper lambda to unpack, center, and scale the joystick values
     auto parse_and_scale = [](uint8_t low_byte, uint8_t high_byte) -> int16_t {
         int32_t raw = low_byte | (high_byte << 8);
-        // Center at 0 (raw - 1500) and scale by 1.32 to hit -660 to 660
-        return static_cast<int16_t>((raw - 1500) * 1.32);
+        // Center at 0 (raw - 1500) +- 500
+        return static_cast<int16_t>(raw - 1500);
     };
 
     // 1. Remote Joysticks (Channels 1-4)
@@ -330,21 +341,30 @@ void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
     // remote.dialVrB = parse_and_scale(rxBuffer[20], rxBuffer[21]);  // CH10
 
     // 3. Switches (Channels 5-8)
-    auto parse_switch = [](uint8_t low, uint8_t high) -> Remote::SwitchState {
+    auto parse_3_way_switch = [](uint8_t low, uint8_t high) -> Remote::SwitchState {
         uint16_t raw_val = low | (high << 8);
-        if (raw_val < 1300) return Remote::SwitchState::UP;
-        if (raw_val > 1700) return Remote::SwitchState::DOWN;
+        if (raw_val < 1250) return Remote::SwitchState::UP;
+        if (raw_val > 1750) return Remote::SwitchState::DOWN;
         return Remote::SwitchState::MID;
     };
 
+    auto parse_2_way_switch = [](uint8_t low, uint8_t high) -> Remote::SwitchState {
+        uint16_t raw_val = low | (high << 8);
+        if (raw_val <= 1500) return Remote::SwitchState::UP;
+        if (raw_val > 1500) return Remote::SwitchState::DOWN;
+        return Remote::SwitchState::UNKNOWN;  // Shouldn't happen for a 2-way switch
+    };
+
     remote.leftSwitch =
-        parse_switch(rxBuffer[10], rxBuffer[11]) == Remote::SwitchState::UP
+        parse_2_way_switch(rxBuffer[10], rxBuffer[11]) == Remote::SwitchState::UP
             ? Remote::SwitchState::MID
-            : parse_switch(
+            : parse_2_way_switch(
                   rxBuffer[12],
                   rxBuffer[13]);  // If SWA up mid, otherwise up or down based on SWB
-    remote.rightSwitch = parse_switch(rxBuffer[14], rxBuffer[15]);                      // CH9 SWC
-    connected = parse_switch(rxBuffer[16], rxBuffer[17]) == Remote::SwitchState::DOWN;  // CH10 SWD
+    remote.rightSwitch = parse_3_way_switch(rxBuffer[14], rxBuffer[15]);  // CH9 SWC
+    Conected_raw = rxBuffer[16] | (rxBuffer[17] << 8);
+    connected =
+        parse_2_way_switch(rxBuffer[16], rxBuffer[17]) == Remote::SwitchState::DOWN;  // CH10 SWD
 
     // mouse input
     remote.mouse.x = 0;
