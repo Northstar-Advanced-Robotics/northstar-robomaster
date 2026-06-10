@@ -1,3 +1,5 @@
+#define FlYSKY
+
 /*
  * Copyright (c) 2020-2021 NorthStart
  *
@@ -223,7 +225,9 @@ static void updateIo(Drivers *drivers)
 
 #ifndef TURRET
     drivers->refSerial.updateSerial();
+#ifndef FLYSKY
     drivers->visionComms.updateSerial();
+#endif
 
     drivers->remote.read();
 
