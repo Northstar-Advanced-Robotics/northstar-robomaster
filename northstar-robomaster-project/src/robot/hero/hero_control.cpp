@@ -227,6 +227,10 @@ GovernorLimitedCommand<2> rotateAndUnjamAgitatorWithHeatAndCVLimiting(
     rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched,
     {&heatLimitGovernor, &cvOnTargetGovernor});
 
+ConcurrentRaceCommand<2> rotateAndUnjamAgitatorWithKicker(
+    {&rotateAndUnjamAgitatorWithHeatAndCVLimiting, &rotateKicker},
+    "Rotate and Unjam Agitator with Kicker");
+
 // agitator mappings
 RemoteMapState qPressed({tap::communication::serial::Remote::Key::Q});
 auto qPressed1RPS = std::make_unique<ToggleCommandMapping>(
@@ -243,7 +247,7 @@ auto ePressed5RPS = std::make_unique<ToggleCommandMapping>(
 RemoteMapState leftMousePressed = RemoteMapState(RemoteMapState::MouseButton::LEFT);
 auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
-    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
+    rotateAndUnjamAgitatorWithKicker,
     leftMousePressed,
     &manualFireRateReselectionManager,
     cvOnTargetGovernor,
@@ -252,7 +256,7 @@ auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
 RemoteMapState leftSwitchDown(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN);
 auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
-    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
+    rotateAndUnjamAgitatorWithKicker,
     leftSwitchDown,
     &manualFireRateReselectionManager,
     cvOnTargetGovernor,
@@ -275,20 +279,31 @@ tap::motor::DjiMotor pitchMotor(
     1,
     PITCH_MOTOR_CONFIG.startEncoderValue);
 
-tap::motor::DoubleDjiMotor yawMotor(
+tap::motor::DjiMotor yawMotor(
     drivers(),
-    YAW_MOTOR_ID_1,
     YAW_MOTOR_ID_2,
     CAN_BUS_YAW,
-    CAN_BUS_YAW,
     true,
-    true,
-    "YawMotor1",
-    "YawMotor2",
+    "YawMotor",
     false,
     1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(1.0f / 3.6f),
     YAW_MOTOR_CONFIG.startEncoderValue,
     &drivers()->encoder);
+
+// tap::motor::DoubleDjiMotor yawMotor(
+//     drivers(),
+//     YAW_MOTOR_ID_1,
+//     YAW_MOTOR_ID_2,
+//     CAN_BUS_YAW,
+//     CAN_BUS_YAW,
+//     true,
+//     true,
+//     "YawMotor1",
+//     "YawMotor2",
+//     false,
+//     1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(1.0f / 3.6f),
+//     YAW_MOTOR_CONFIG.startEncoderValue,
+//     &drivers()->encoder);
 
 TurretSubsystem turret(drivers(), &pitchMotor, &yawMotor, PITCH_MOTOR_CONFIG, YAW_MOTOR_CONFIG);
 
@@ -456,7 +471,7 @@ imu::ImuCalibrateCommand imuCalibrateCommand(
         &turret,
         &chassisFrameYawTurretController,
         &chassisFramePitchTurretController,
-        false,
+        true,
     }},
     &chassisSubsystem,
     &playStartupSongCommand);
@@ -508,7 +523,7 @@ void registerHeroSubsystems(Drivers *drivers)
 
 void setDefaultHeroCommands(Drivers *drivers)
 {
-    chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
+    chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
     ui.setDefaultCommand(&heroDrawCommand);
 }
@@ -518,13 +533,8 @@ void startHeroCommands(Drivers *drivers)
     drivers->visionComms.attachPitchMotor(&pitchMotor);
     drivers->visionComms.attachRemote(&drivers->remote);
 
-    drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(
-        0,
-        0,
-        0,
-        0,
-        modm::toRadian(180),
-        modm::toRadian(180)));
+    drivers->bmi088.setMountingTransform(
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(0)));
     // pitch up needs to be negitive up is on motor side
     // right neg
 }
@@ -563,7 +573,7 @@ namespace src::hero
 {
 imu::ImuCalibrateCommandBase *getImuCalibrateCommand()
 {
-    return nullptr;  //&hero_control::imuCalibrateCommand; //TODO tune to make work
+    return &hero_control::imuCalibrateCommand;
 }
 
 void initSubsystemCommands(src::hero::Drivers *drivers)
