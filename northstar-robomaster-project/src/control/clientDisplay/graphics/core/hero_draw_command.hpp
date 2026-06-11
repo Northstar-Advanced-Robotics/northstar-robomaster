@@ -6,23 +6,16 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_orientation_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_power_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/countdown.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/cv_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/firemode_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/hit_ring.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/imu_cal_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/imu_recalibration_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/lane_assist_lines.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/linear_velocity_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/predicted_remaining_shots_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/reticle.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/supercap_charge_indicator.hpp"
-// #include "subsystems/chassis/chassisSubsystem.hpp"
-// #include "subsystems/flywheel/FlywheelSubsystem.hpp"
-// #include "subsystems/turret/turretSubsystem.hpp"
-// #include "subsystems/agitator/HeroagitatorSubsystem.hpp"
-#include "control/agitator/velocity_agitator_subsystem.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
-#include "control/clientDisplay/graphics/core/ui_subsystem.hpp"
-#include "control/clientDisplay/graphics/graphics_objects/graphics_container.hpp"
-#include "control/flywheel/dji_two_flywheel_subsystem.hpp"
-#include "control/turret/turret_subsystem.hpp"
 
 #include "drivers.hpp"
 
@@ -37,13 +30,23 @@ public:
         src::control::turret::TurretSubsystem* turret,
         // src::control::flywheel::TwoFlywheelSubsystem* flywheel,
         src::agitator::VelocityAgitatorSubsystem* agitator,
-        src::chassis::ChassisSubsystem* chassis)
+        src::chassis::ChassisSubsystem* chassis,
+        control::governor::FlywheelOnGovernor* flywheelGovernor,
+        control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping,
+        imu::ImuCalibrateCommand* imuCalibrateCommand,
+        src::serial::VisionComms* visionComms,
+        src::control::governor::CvOnTargetGovernor* cvOnTargetGovernor)
         : drivers(drivers),
           ui(ui),
           turret(turret),
           //   flywheel(flywheel),
           agitator(agitator),
-          chassis(chassis)
+          chassis(chassis),
+          flywheelGovernor(flywheelGovernor),
+          multiShotCvCommandMapping(multiShotCvCommandMapping),
+          imuCalibrateCommand(imuCalibrateCommand),
+          visionComms(visionComms),
+          cvOnTargetGovernor(cvOnTargetGovernor)
     {
         addSubsystemRequirement(ui);
 
@@ -96,12 +99,18 @@ private:
     src::agitator::VelocityAgitatorSubsystem* agitator;
     src::chassis::ChassisSubsystem* chassis;
 
+    control::governor::FlywheelOnGovernor* flywheelGovernor;
+    control::agitator::MultiShotCvCommandMapping* multiShotCvCommandMapping;
+    imu::ImuCalibrateCommand* imuCalibrateCommand;
+    src::serial::VisionComms* visionComms;
+    src::control::governor::CvOnTargetGovernor* cvOnTargetGovernor;
+
     // add top level graphics objects here and in the constructor
     LaneAssistLines lane{turret};
     // SupercapChargeIndicator supercap{chassis};
     ChassisOrientationIndicator orient{true, drivers, turret, chassis};
-    Reticle reticle{drivers, turret};
     HitRing ring{drivers, turret};
+    Reticle reticle{drivers, turret};
     // PredictedRemainingShotsIndicator remain{drivers, agitator};
     AllRobotHealthNumbers numbers{drivers};
     Countdown countdown{drivers};
@@ -109,5 +118,8 @@ private:
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
     LinearVelocityIndicator velo{chassis};
+    ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
+    FiremodeIndicator firemode{drivers, multiShotCvCommandMapping, flywheelGovernor};
+    CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};
 };
 }  // namespace src::control::client_display::graphics

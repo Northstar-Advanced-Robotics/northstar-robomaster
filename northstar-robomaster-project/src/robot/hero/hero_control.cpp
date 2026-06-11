@@ -479,7 +479,12 @@ src::control::client_display::graphics::HeroDrawCommand heroDrawCommand(
     &turret,
     // &flywheel,
     &agitator,
-    &chassisSubsystem);
+    &chassisSubsystem,
+    &flywheelOnGovernor,
+    leftMousePressedShoot.get(),
+    &imuCalibrateCommand,
+    &drivers()->visionComms,
+    &cvOnTargetGovernor);
 
 Trigger ctrlCPressedUI = TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&heroDrawCommand);
 

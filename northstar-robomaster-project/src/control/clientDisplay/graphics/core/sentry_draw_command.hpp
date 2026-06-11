@@ -68,7 +68,7 @@ public:
         // addGraphicsObject(&recal);
         addGraphicsObject(&chassisPower);
         addGraphicsObject(&firemode);
-        addGraphicsObject(&flywheelReady);
+        // addGraphicsObject(&flywheelReady);
         addGraphicsObject(&imuCalIndicator);
         addGraphicsObject(&dotCrosshair);
         addGraphicsObject(&cvIndicator);
@@ -92,7 +92,7 @@ public:
         // logo doesn't need updating
         chassisPower.update();
         firemode.update();
-        flywheelReady.update();
+        // flywheelReady.update();
         imuCalIndicator.update();
         cvIndicator.update();
     };
@@ -133,7 +133,7 @@ private:
     ChassisPowerIndicator chassisPower{drivers, chassis};
     LinearVelocityIndicator velo{chassis};
     FiremodeIndicator firemode{drivers, multiShotCvCommandMapping, flywheelGovernor};
-    FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
+    // FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
     DotCrosshair dotCrosshair{drivers};
     CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};
