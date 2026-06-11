@@ -106,7 +106,7 @@ private:
     int getCurrentBarrelCoolingRate() const
     {
         int coolingRate = drivers->refSerial.getRobotData().turret.coolingRate;
-#if defined(TARRGET_HERO)
+#if defined(TARGET_HERO)
         return coolingRate / 100.0f;
 #else
         return coolingRate / 10.0f;

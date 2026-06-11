@@ -150,7 +150,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
 
 // flywheel commands
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 24.0f);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.0f);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
@@ -486,13 +486,13 @@ cv::SentryCvManagerCommand cvManagerCommand(
 
 MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
-Trigger sentryScanTrigger = (Trigger(drivers(), []() {
-                                return matchRunningGovernor.isReady();
-                            })).whileTrue(&cvManagerCommand);
+// Trigger sentryScanTrigger = (Trigger(drivers(), []() {
+//                                 return matchRunningGovernor.isReady();
+//                             })).whileTrue(&cvManagerCommand);
 
 Trigger scanWhenWheelLeft =
     TriggerHelpers::channelGreaterThan(drivers(), Remote::Channel::WHEEL, .8)
-        .toggleOnTrue(&cvManagerCommand);
+        .toggleOnTrue(&turretCVControlCommand);  //&cvManagerCommand
 
 // imu commands
 imu::ImuCalibrateCommand imuCalibrateCommand(
@@ -587,13 +587,8 @@ void startSentryCommands(Drivers *drivers)
     drivers->visionComms.attachPitchMotor(&pitchMotor);
     drivers->visionComms.attachRemote(&drivers->remote);
 
-    drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(
-        0,
-        0,
-        0,
-        0,
-        modm::toRadian(180),
-        modm::toRadian(180)));
+    drivers->bmi088.setMountingTransform(
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(0)));
 }
 // from RM upside down left hand rule 180 around roll
 

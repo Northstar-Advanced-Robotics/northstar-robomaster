@@ -1,3 +1,5 @@
+#ifdef TARGET_TEST_BED
+
 #ifndef TEST_DEF_HPP_
 #define TEST_DEF_HPP_
 
@@ -130,6 +132,8 @@ DummySubsystem dummySubsystem(drivers());
 #include "control/clientDisplay/indicators/shooting_mode_indicator.hpp"
 #include "control/clientDisplay/indicators/text_hud_indicators.hpp"
 #include "control/clientDisplay/indicators/vision_indicator.hpp"
+
+#endif
 
 #endif
 

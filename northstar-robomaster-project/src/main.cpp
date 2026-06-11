@@ -1,4 +1,4 @@
-#define FlYSKY
+// #define FLYSKY
 
 /*
  * Copyright (c) 2020-2021 NorthStart
@@ -188,12 +188,15 @@ static void initializeIo(Drivers *drivers)
 
     drivers->refSerial.initialize();
 
-    drivers->bmi088.initialize(500, 0.00f, 0.000f);
+    drivers->bmi088.initialize(500, 0.05f, 0.000f);
     drivers->bmi088.setTargetTemperature(35.0f);
     drivers->bmi088.setCalibrationSamples(2000);
 
     drivers->visionComms.initializeCV();
 }
+float debugXAccel = 0.0f;
+float debugYAccel = 0.0f;
+float debugZAccel = 0.0f;
 float debugYaw = 0.0f;
 float debugPitch = 0.0f;
 float debugRoll = 0.0f;
@@ -236,6 +239,9 @@ static void updateIo(Drivers *drivers)
         cal = false;
         drivers->bmi088.requestCalibration();
     }
+    debugXAccel = drivers->bmi088.getAx();
+    debugYAccel = drivers->bmi088.getAy();
+    debugZAccel = drivers->bmi088.getAz();
     debugYawV = drivers->bmi088.getGz();
     debugYaw = modm::toDegree(drivers->bmi088.getYaw());
     debugPitchV = drivers->bmi088.getGy();

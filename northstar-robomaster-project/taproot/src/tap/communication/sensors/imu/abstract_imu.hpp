@@ -88,15 +88,15 @@ public:
     mockable inline float getAz() const override { return imuData.accG.z(); }
     mockable inline float getAzMinusG() const { return imuData.accG.z() - GRAVITY_MPS2; }
 
-    mockable inline float getGx() const override { return imuData.gyroRadPerSec.x(); }
-    mockable inline float getGy() const override { return imuData.gyroRadPerSec.y(); }
-    mockable inline float getGz() const override { return imuData.gyroRadPerSec.z(); }
+    mockable inline float getGx() const override { return -imuData.gyroRadPerSec.x(); }
+    mockable inline float getGy() const override { return -imuData.gyroRadPerSec.y(); }
+    mockable inline float getGz() const override { return -imuData.gyroRadPerSec.z(); }
 
     mockable inline float getTemp() const { return imuData.temperature; }
 
-    virtual inline float getYaw() const override { return mahonyAlgorithm.getYaw(); }
-    virtual inline float getPitch() const override { return mahonyAlgorithm.getPitch(); }
-    virtual inline float getRoll() const override { return mahonyAlgorithm.getRoll(); }
+    virtual inline float getYaw() const override { return -mahonyAlgorithm.getYaw(); }
+    virtual inline float getPitch() const override { return -mahonyAlgorithm.getPitch(); }
+    virtual inline float getRoll() const override { return -mahonyAlgorithm.getRoll(); }
 
     struct ImuData
     {

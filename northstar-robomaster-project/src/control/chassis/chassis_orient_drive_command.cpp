@@ -26,9 +26,11 @@ void ChassisOrientDriveCommand::initialize()
 
 void ChassisOrientDriveCommand::execute()
 {
-    float rotationOffset =
-        tap::algorithms::WrappedFloat(chassis->getChassisZeroTurret(), -M_PI_4, M_PI_4)
-            .getWrappedValue();
+    float rotationOffset = tap::algorithms::WrappedFloat(
+                               chassis->getChassisZeroTurret(),
+                               -M_TWOPI,
+                               M_TWOPI)  // M_PI_4 for 90 sides
+                               .getWrappedValue();
     float rotationFromPID = chassis->chassisSpeedRotationPID(rotationOffset);
 
     float rotationalAlpha = std::max<float>(1.0f - abs(rotationOffset) / M_PI, AUTO_ROTATION_ALPHA);
