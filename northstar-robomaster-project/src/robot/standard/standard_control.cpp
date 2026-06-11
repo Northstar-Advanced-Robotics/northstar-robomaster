@@ -453,7 +453,12 @@ src::control::client_display::graphics::InfantryDrawCommand infantryDrawCommand(
     &turret,
     // &flywheel,
     &agitator,
-    &chassisSubsystem);
+    &chassisSubsystem,
+    &flywheelOnGovernor,
+    leftMousePressedShoot.get(),
+    &imuCalibrateCommand,
+    &drivers()->visionComms,
+    &cvOnTargetGovernor);
 
 Trigger ctrlCPressedUI =
     TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&infantryDrawCommand);
