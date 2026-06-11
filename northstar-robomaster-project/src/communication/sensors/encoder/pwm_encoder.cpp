@@ -30,7 +30,7 @@ void PwmEncoder::initialize()
         modm::platform::Timer12::InputCaptureMapping::InputOwn,
         modm::platform::Timer12::InputCapturePrescaler::Div1,
         modm::platform::Timer12::InputCapturePolarity::Rising,
-        0  // Filter
+        15  // Filter
     );
 
     // --- Channel 2 Setup (Duty Cycle / Falling Edge) ---
@@ -40,7 +40,7 @@ void PwmEncoder::initialize()
         modm::platform::Timer12::InputCaptureMapping::InputOther,
         modm::platform::Timer12::InputCapturePrescaler::Div1,
         modm::platform::Timer12::InputCapturePolarity::Falling,
-        0  // Filter
+        15  // Filter
     );
 
     // 4. Reset counter on Rising Edge (Slave Mode)
@@ -63,6 +63,21 @@ void PwmEncoder::update()
     uint32_t period = modm::platform::Timer12::getCompareValue(1);
 
     if (period == 0) return;
+
+    const uint32_t EXPECTED_PERIOD = 1365;
+    const uint32_t PERIOD_TOLERANCE = 50;
+
+    if (period < (EXPECTED_PERIOD - PERIOD_TOLERANCE) ||
+        period > (EXPECTED_PERIOD + PERIOD_TOLERANCE))
+    {
+        std::cout << "fuck" << std::endl;
+        return;
+    }
+
+    if (pulseWidth > period)
+    {
+        pulseWidth = period;
+    }
 
     // Calculate position: (PulseWidth / Period) * 1024
     uint16_t encoderActual = (pulseWidth * ENC_RESOLUTION) / period;
