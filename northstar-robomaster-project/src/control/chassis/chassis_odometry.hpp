@@ -30,7 +30,6 @@ class ChassisOdometry
     float RPS_TO_MPS;
     float DIST_TO_CENT;
 
-    modm::Vector<float, 2> positionGlobal;
     modm::Vector<float, 2> velocityGlobal;
     modm::Vector<float, 2> velocityLocal;
     modm::Vector<float, 2> velocitySmoothedLocal;
@@ -39,9 +38,33 @@ class ChassisOdometry
     modm::Vector<float, 2> velocityProjectedGlobal;
 
     // radians
-    float rotation;
+    float globalImuRotationOffset;
 
     uint32_t previousTimeMicroSeconds = 0;
+
+    struct Pose
+    {
+        float x;
+        float y;
+        float theta;
+    };
+
+    struct OdomMsg
+    {
+        uint32_t timestamp;
+        Pose local_pose;
+        float imu_yaw;
+        float turret_yaw;  // From yaw motor
+    };
+
+    static constexpr int BUFFER_SIZE = 200;
+
+    OdomMsg odomBuffer[BUFFER_SIZE];
+    int bufferIndex = 0;
+
+    Pose global_offset;
+    Pose finalPositionGlobal;
+    Pose mcbGlobalPose;
 
 public:
     ChassisOdometry(
@@ -57,29 +80,69 @@ public:
         zeroOdometry();
     }
 
-    modm::Vector<float, 2> getPositionGlobal() { return positionGlobal; }
+    modm::Vector<float, 2> getPositionGlobal()
+    {
+        return {finalPositionGlobal.x, finalPositionGlobal.y};
+    }
     modm::Vector<float, 2> getVelocityGlobal() { return velocityGlobal; }
     modm::Vector<float, 2> getVelocityLocal() { return velocityLocal; }
     modm::Vector<float, 2> getPositionProjectedGlobal() { return positionProjectedGlobal; }
     modm::Vector<float, 2> getVelocityProjectedGlobal() { return velocityProjectedGlobal; }
     modm::Vector<float, 3> getVelocity3dGlobal() { return velocity3dGlobal; }
-    float getRotation() { return rotation; }
+    float getRotation() { return finalPositionGlobal.theta; }
 
     void zeroOdometry()
     {
-        positionGlobal = modm::Vector<float, 2>(0, 0);
+        finalPositionGlobal = {0, 0, 0};
         velocityGlobal = modm::Vector<float, 2>(0, 0);
         velocityLocal = modm::Vector<float, 2>(0, 0);
     }
 
-    void setOdometry(modm::Vector2f pos, modm::Vector2f velo, float rot)
+    void updateOdometryWithVisionData(uint32_t timestamp, float posX, float posY, float heading)
     {
-        positionGlobal = pos;
-        velocityGlobal = velo;
-        rotation = rot;
+        OdomMsg historical_data = get_historical_data(timestamp);
+
+        float vision_chassis_heading = heading - historical_data.turret_yaw;
+
+        global_offset.x = posX - historical_data.local_pose.x;
+        global_offset.y = posY - historical_data.local_pose.y;
+        global_offset.theta =
+            tap::algorithms::Angle(vision_chassis_heading - historical_data.local_pose.theta)
+                .getWrappedValue();
+
+        globalImuRotationOffset =
+            tap::algorithms::Angle(-heading - historical_data.imu_yaw + M_PI_2).getWrappedValue();
     }
 
-    void setGlobalPosition(modm::Vector2f pos) { positionGlobal = pos; }
+    OdomMsg get_historical_data(uint32_t target_timestamp_us)
+    {
+        OdomMsg closest_entry;
+        closest_entry.local_pose = finalPositionGlobal;
+        closest_entry.imu_yaw = imu->getYaw();
+
+        uint32_t smallest_time_diff = 0xFFFFFFFF;
+
+        for (int i = 0; i < BUFFER_SIZE; i++)
+        {
+            uint32_t diff;
+            if (odomBuffer[i].timestamp > target_timestamp_us)
+            {
+                diff = odomBuffer[i].timestamp - target_timestamp_us;
+            }
+            else
+            {
+                diff = target_timestamp_us - odomBuffer[i].timestamp;
+            }
+
+            if (diff < smallest_time_diff)
+            {
+                smallest_time_diff = diff;
+                closest_entry = odomBuffer[i];
+            }
+        }
+
+        return closest_entry;
+    }
 
     // input is in radians per second
     void updateOdometry(float motorRPS_LF, float motorRPS_LB, float motorRPS_RF, float motorRPS_RB)
@@ -106,25 +169,33 @@ public:
         velocityLocal.x = localVelX;
         velocityLocal.y = localVelY;
 
-        velocitySmoothedLocal = vectorLowPassFilter(velocityLocal, velocitySmoothedLocal, 0.5f);
+        mcbGlobalPose.theta = calculateRobotHeading();
 
-        // velocity3dGlobal = flatLocalVelTo3dGlobalVel(velocityLocal);
+        velocityGlobal = convertLocalToGlobal(velocityLocal, mcbGlobalPose.theta);
 
-        // double radiansPerSec = (mps_LF + mps_RF + mps_LB + mps_RB) / (4 * DIST_TO_CENT);
-        // rotation -= radiansPerSec * deltaTimeSeconds;
-        rotation = calculateRobotHeading();
+        mcbGlobalPose.x += velocityGlobal.x * deltaTimeSeconds;
+        mcbGlobalPose.y += velocityGlobal.y * deltaTimeSeconds;
 
-        velocityGlobal = convertLocalToGlobal(velocityLocal);
-        // positionGlobal += velocityGlobal * deltaTimeSeconds;
+        OdomMsg new_odom_msg{
+            .timestamp = currentTimeMicroSeconds,
+            .local_pose = mcbGlobalPose,
+            .imu_yaw = imu->getYaw(),
+            .turret_yaw = turretYaw->getChassisFrameMeasuredAngle().getWrappedValue()};
 
-        // velocityProjectedGlobal = modm::Vector<float, 2>(velocity3dGlobal.x, velocity3dGlobal.z);
-        // positionProjectedGlobal += velocityProjectedGlobal * deltaTimeSeconds;
+        odomBuffer[bufferIndex] = new_odom_msg;
+        bufferIndex = (bufferIndex + 1) % BUFFER_SIZE;
+
+        finalPositionGlobal.x = mcbGlobalPose.x + global_offset.x;
+        finalPositionGlobal.y = mcbGlobalPose.y + global_offset.y;
+        finalPositionGlobal.theta = mcbGlobalPose.theta + global_offset.theta;
     }
 
-    modm::Vector<float, 2> convertLocalToGlobal(const modm::Vector<float, 2>& local)
+    modm::Vector<float, 2> convertLocalToGlobal(
+        const modm::Vector<float, 2>& local,
+        float globalHeading)
     {
-        float cosR = cosf(rotation);
-        float sinR = sinf(rotation);
+        float cosR = cosf(globalHeading);
+        float sinR = sinf(globalHeading);
 
         return modm::Vector<float, 2>(
             local.x * cosR + local.y * sinR,
@@ -134,7 +205,8 @@ public:
     float calculateRobotHeading()
     {
         return tap::algorithms::Angle(
-                   imu->getYaw() - turretYaw->getChassisFrameMeasuredAngle().getWrappedValue())
+                   imu->getYaw() + globalImuRotationOffset -
+                   turretYaw->getChassisFrameMeasuredAngle().getWrappedValue())
             .getWrappedValue();
     }
 

@@ -137,6 +137,8 @@ public:
     {
         float posX;
         float posY;
+        float heading;
+        uint32_t timestamp;
     } modm_packed;
 
     src::chassis::ChassisOdometry* chassisOdometry;

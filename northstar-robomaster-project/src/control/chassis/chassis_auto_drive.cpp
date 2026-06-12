@@ -31,9 +31,15 @@ float globVelY = 0;
 float ldX = 0;
 float ldY = 0;
 float d = 0;
-
+float debugglobalposex = 0;
+float debugglobalposey = 0;
+float debugglobalposerot = 0;
 void ChassisAutoDrive::updateAutoDrive()
 {
+    debugglobalposex = chassisOdometry->getPositionGlobal().x;
+    debugglobalposey = chassisOdometry->getPositionGlobal().y;
+    debugglobalposerot = chassisOdometry->getRotation();
+
     if (!tryUpdatePath())
     {
         desiredGlobalVelocity = modm::Vector<float, 2>(0, 0);

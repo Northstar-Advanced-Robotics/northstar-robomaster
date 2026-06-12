@@ -52,6 +52,7 @@ void StateMachineSubsystem::refresh()
     }
 
     chassisAutoDrive->updateAutoDrive();
+    return;
     modm::Vector<float, 2> desiredGlobalVelocity = chassisAutoDrive->getDesiredGlobalVelocity();
     float desiredRotation = chassisAutoDrive->getDesiredRotation();
     chassisSubsystem->setIsSprinting(true);

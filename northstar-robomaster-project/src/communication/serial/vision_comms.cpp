@@ -192,7 +192,7 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 
     return true;
 }
-
+uint32_t latency = 0;
 bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage& message)
 {
     if (chassisOdometry == nullptr)
@@ -207,7 +207,15 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
 
     VisionComms::AprilTagLocalizationData localizationData;
     std::memcpy(&localizationData, message.data, sizeof(VisionComms::AprilTagLocalizationData));
-    chassisOdometry->setGlobalPosition({localizationData.posX, localizationData.posY});
+    uint32_t currentTime = tap::arch::clock::getTimeMicroseconds();
+
+    latency = currentTime - localizationData.timestamp;
+
+    chassisOdometry->updateOdometryWithVisionData(
+        localizationData.timestamp,
+        localizationData.posX,
+        localizationData.posY,
+        localizationData.heading);
 
     return true;
 }
