@@ -198,11 +198,11 @@ GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProject
 extern cv::TurretCVControlCommand turretCVControlCommand;
 CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
 
-RemoteMapState cPressed({Remote::Key::C});
-auto cPressedCVGovernorToggle =
+RemoteMapState cPressedNotCtrl({Remote::Key::C}, {Remote::Key::CTRL});
+auto cPressedNotCtrlCVGovernorToggle =
     std::make_unique<CycleStateCommandMapping<bool, 2, CvOnTargetGovernor>>(
         drivers(),
-        &cPressed,
+        &cPressedNotCtrl,
         true,
         &cvOnTargetGovernor,
         &CvOnTargetGovernor::setGovernorEnabled);
@@ -460,8 +460,9 @@ src::control::client_display::graphics::InfantryDrawCommand infantryDrawCommand(
     &drivers()->visionComms,
     &cvOnTargetGovernor);
 
-Trigger ctrlCPressedUI =
-    TriggerHelpers::button(drivers(), Remote::Key::C).onTrue(&infantryDrawCommand);
+Trigger ctrlCPressedUI = (TriggerHelpers::button(drivers(), Remote::Key::C) &&
+                          TriggerHelpers::button(drivers(), Remote::Key::CTRL))
+                             .onTrue(&infantryDrawCommand);
 
 void initializeSubsystems([[maybe_unused]] Drivers *drivers)
 {
@@ -506,7 +507,7 @@ void registerStandardIoMappings(Drivers *drivers)
     drivers->commandMapper.addMap(std::move(xPressedFlywheels));
     drivers->commandMapper.addMap(std::move(fPressedBeyblade));
     drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
-    drivers->commandMapper.addMap(std::move(cPressedCVGovernorToggle));
+    drivers->commandMapper.addMap(std::move(cPressedNotCtrlCVGovernorToggle));
     drivers->commandMapper.addMap(std::move(qOrEPressedCycleShotSpeed));
     drivers->commandMapper.addMap(std::move(gPressedWiggle));
     drivers->commandMapper.addMap(std::move(rPressedOrientDrive));
