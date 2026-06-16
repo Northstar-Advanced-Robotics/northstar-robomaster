@@ -85,7 +85,7 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = 0.0f;  //-3300.0f;  // 1200
 namespace world_rel_turret_imu
 {
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 15.0f,
+    .kp = 12.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -113,8 +113,8 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 1200.0f,
-    .ki = 3.0f,
+    .kp = 1000.0f,
+    .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1000.0f,
     .maxOutput = tap::motor::DjiMotor::MAX_OUTPUT_C620,
@@ -165,8 +165,8 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_AUTO_AIM_CONFIG 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig PITCH_VEL_PID_CONFIG = {
-    .kp = 14'000.0f,
-    .ki = 20.0f,
+    .kp = 12'000.0f,
+    .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 5000.0f,
     .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,  // 0.0f

@@ -16,10 +16,10 @@ public:
 private:
     tap::Drivers* drivers;
 
-    static constexpr uint16_t X_POSITION = UISubsystem::HALF_SCREEN_WIDTH;
-    static constexpr uint16_t Y_POSITION = UISubsystem::HALF_SCREEN_HEIGHT - 100;
-    static constexpr uint16_t RADIUS = 20;
-    static constexpr uint16_t THICKNESS = 5;
+    static constexpr uint16_t X_POSITION = UISubsystem::HALF_SCREEN_WIDTH - 75;
+    static constexpr uint16_t Y_POSITION = UISubsystem::HALF_SCREEN_HEIGHT - 75;
+    static constexpr uint16_t RADIUS = 5;
+    static constexpr uint16_t THICKNESS = 2;
 
     UnfilledCircle crosshair{UISubsystem::Color::CYAN, X_POSITION, Y_POSITION, RADIUS, THICKNESS};
 };

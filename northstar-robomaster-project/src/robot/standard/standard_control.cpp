@@ -142,7 +142,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
 
 // flywheel commands
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 24.0f);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 21.0f);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
@@ -393,11 +393,10 @@ PlateHitGovernor plateHitGovernor(drivers(), 5000);
 
 // chassis Mappings
 RemoteMapState fPressed({Remote::Key::F});
-auto fPressedBeyblade = std::make_unique<HoldRepeatCommandMapping>(
+auto fPressedBeyblade = std::make_unique<ToggleCommandMapping>(
     drivers(),
     std::vector<Command *>{&chassisBeyBladeCommand},
-    &fPressed,
-    true);
+    &fPressed);
 
 RemoteMapState rPressed({Remote::Key::R});
 auto rPressedOrientDrive = std::make_unique<ToggleCommandMapping>(
@@ -487,7 +486,7 @@ void registerStandardSubsystems(Drivers *drivers)
 
 void setDefaultStandardCommands([[maybe_unused]] Drivers *drivers)
 {
-    chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
+    chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
     ui.setDefaultCommand(&infantryDrawCommand);
 }
@@ -533,7 +532,7 @@ namespace src::standard
 {
 imu::ImuCalibrateCommandBase *getImuCalibrateCommand()
 {
-    return nullptr;  //&standard_control::imuCalibrateCommand;
+    return &standard_control::imuCalibrateCommand;
 }
 
 void initSubsystemCommands(src::standard::Drivers *drivers)
