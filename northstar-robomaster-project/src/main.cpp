@@ -1,4 +1,4 @@
-// #define FLYSKY
+#define FLYSKY
 
 /*
  * Copyright (c) 2020-2021 NorthStart

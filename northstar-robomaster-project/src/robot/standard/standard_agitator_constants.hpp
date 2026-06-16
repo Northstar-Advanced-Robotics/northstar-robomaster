@@ -56,7 +56,7 @@ static constexpr tap::control::setpoint::MoveIntegralCommand::Config AGITATOR_RO
 };
 
 constexpr float UNJAM_VELOCITY = 0.35 * AGITATOR_MAX_ROF * (M_TWOPI / AGITATOR_NUM_POCKETS);
-constexpr float UNJAM_DISTANCE = 0.6f * (M_TWOPI / AGITATOR_NUM_POCKETS);
+constexpr float UNJAM_DISTANCE = 2.0f * (M_TWOPI / AGITATOR_NUM_POCKETS);
 static constexpr src::control::agitator::UnjamSpokeAgitatorCommand::Config AGITATOR_UNJAM_CONFIG = {
     .targetUnjamIntegralChange = UNJAM_DISTANCE,
     .unjamSetpoint = UNJAM_VELOCITY,
