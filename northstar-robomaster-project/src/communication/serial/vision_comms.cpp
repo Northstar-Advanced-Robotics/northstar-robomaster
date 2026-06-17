@@ -268,10 +268,10 @@ void VisionComms::sendMessage()
     if (messageOffsetInitializationTimeout.isExpired())
     {
 #ifdef TARGET_SENTRY
-        sendRobotOdometry();
         sendHealthData();
         sendTurretRefData();
 #endif
+        sendRobotOdometry();
         sendRobotIdMessage();
     }
     else

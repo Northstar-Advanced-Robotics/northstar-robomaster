@@ -348,6 +348,12 @@ auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     &rightMousePressed,
     true);
 
+src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
+    &drivers()->bmi088,
+    &turret.yawMotor,
+    src::chassis::DIST_TO_CENTER,
+    src::chassis::WHEEL_DIAMETER_M);
+
 // chassis subsystem
 src::chassis::ChassisSubsystem chassisSubsystem(
     drivers(),
@@ -363,7 +369,8 @@ src::chassis::ChassisSubsystem chassisSubsystem(
             src::chassis::VELOCITY_PID_KD,
             src::chassis::VELOCITY_PID_MAX_ERROR_SUM),
     },
-    &turret.yawMotor);
+    &turret.yawMotor,
+    chassisOdometry);
 
 src::chassis::ChassisDriveCommand chassisDriveCommand(
     &chassisSubsystem,
@@ -493,7 +500,8 @@ void setDefaultStandardCommands([[maybe_unused]] Drivers *drivers)
 
 void startStandardCommands(Drivers *drivers)
 {
-    // drivers->visionComms.attachPitchMotor(&pitchMotor);
+    drivers->visionComms.attachPitchMotor(&pitchMotor);
+    drivers->visionComms.attachOdometry(chassisOdometry);
     drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(
