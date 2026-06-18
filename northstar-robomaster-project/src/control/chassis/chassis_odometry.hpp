@@ -31,6 +31,7 @@ class ChassisOdometry
     float DIST_TO_CENT;
 
     modm::Vector<float, 2> velocityGlobal;
+    modm::Vector<float, 2> velocityGlobalVision;
     modm::Vector<float, 2> velocityLocal;
     modm::Vector<float, 2> velocitySmoothedLocal;
     modm::Vector<float, 3> velocity3dGlobal;
@@ -85,6 +86,7 @@ public:
         return {finalPositionGlobal.x, finalPositionGlobal.y};
     }
     modm::Vector<float, 2> getVelocityGlobal() { return velocityGlobal; }
+    modm::Vector<float, 2> getVelocityGlobalVision() { return velocityGlobalVision; }
     modm::Vector<float, 2> getVelocityLocal() { return velocityLocal; }
     modm::Vector<float, 2> getPositionProjectedGlobal() { return positionProjectedGlobal; }
     modm::Vector<float, 2> getVelocityProjectedGlobal() { return velocityProjectedGlobal; }
@@ -94,24 +96,30 @@ public:
     void zeroOdometry()
     {
         finalPositionGlobal = {0, 0, 0};
+        mcbGlobalPose = {0, 0, 0};
+        global_offset = {0, 0, 0};
         velocityGlobal = modm::Vector<float, 2>(0, 0);
+        velocityGlobalVision = modm::Vector<float, 2>(0, 0);
         velocityLocal = modm::Vector<float, 2>(0, 0);
+        globalImuRotationOffset = 0;
     }
 
     void updateOdometryWithVisionData(uint32_t timestamp, float posX, float posY, float heading)
     {
         OdomMsg historical_data = get_historical_data(timestamp);
 
-        float vision_chassis_heading = heading - historical_data.turret_yaw;
+        globalImuRotationOffset =
+            tap::algorithms::Angle(-heading - historical_data.imu_yaw + M_PI_2).getWrappedValue();
+
+        float vision_chassis_heading =
+            tap::algorithms::Angle(-heading + M_PI_2 - historical_data.turret_yaw)
+                .getWrappedValue();
 
         global_offset.x = posX - historical_data.local_pose.x;
         global_offset.y = posY - historical_data.local_pose.y;
         global_offset.theta =
             tap::algorithms::Angle(vision_chassis_heading - historical_data.local_pose.theta)
                 .getWrappedValue();
-
-        globalImuRotationOffset =
-            tap::algorithms::Angle(-heading - historical_data.imu_yaw + M_PI_2).getWrappedValue();
     }
 
     OdomMsg get_historical_data(uint32_t target_timestamp_us)
@@ -173,6 +181,8 @@ public:
 
         velocityGlobal = convertLocalToGlobal(velocityLocal, mcbGlobalPose.theta);
 
+        velocityGlobalVision = velocityGlobal.rotate(globalImuRotationOffset);
+
         mcbGlobalPose.x += velocityGlobal.x * deltaTimeSeconds;
         mcbGlobalPose.y += velocityGlobal.y * deltaTimeSeconds;
 
@@ -187,7 +197,8 @@ public:
 
         finalPositionGlobal.x = mcbGlobalPose.x + global_offset.x;
         finalPositionGlobal.y = mcbGlobalPose.y + global_offset.y;
-        finalPositionGlobal.theta = mcbGlobalPose.theta + global_offset.theta;
+        finalPositionGlobal.theta =
+            tap::algorithms::Angle(mcbGlobalPose.theta + global_offset.theta).getWrappedValue();
     }
 
     modm::Vector<float, 2> convertLocalToGlobal(

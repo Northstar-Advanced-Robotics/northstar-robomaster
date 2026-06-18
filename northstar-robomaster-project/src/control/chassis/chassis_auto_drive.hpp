@@ -15,13 +15,13 @@ namespace src::chassis
 {
 class ChassisAutoDrive
 {
-    static constexpr float MAXIMUM_MPS = 2.0f;
+    static constexpr float MAXIMUM_MPS = 1.2f;
     static constexpr float MINIMUM_MPS = 0.55f;
 
     static constexpr float T_INCREASE_MULT = 0.01f;
     static constexpr float T_INCREASE = T_INCREASE_MULT * MAXIMUM_MPS;
 
-    static constexpr float T_CHECK_MULT = 0.005f;
+    static constexpr float T_CHECK_MULT = 0.025f;
     static constexpr float T_CHECK = T_CHECK_MULT * MAXIMUM_MPS;
 
     static constexpr float T_LOOKAHEAD_MULT = 0.08f;

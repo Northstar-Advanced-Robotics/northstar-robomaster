@@ -492,7 +492,7 @@ MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
 Trigger scanWhenWheelLeft =
     TriggerHelpers::channelGreaterThan(drivers(), Remote::Channel::WHEEL, .8)
-        .toggleOnTrue(&turretCVControlCommand);  //&cvManagerCommand
+        .toggleOnTrue(&cvManagerCommand);  //&turretCVControlCommand
 
 // imu commands
 imu::ImuCalibrateCommand imuCalibrateCommand(
