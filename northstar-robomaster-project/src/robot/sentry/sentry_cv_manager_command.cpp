@@ -6,9 +6,9 @@ namespace src::control::turret::cv
 {
 SentryCvManagerCommand::SentryCvManagerCommand(
     tap::Drivers *drivers,
-    src::control::ControlOperatorInterface &controlOperatorInterface,
     src::serial::VisionComms &visionComms,
     src::control::turret::TurretSubsystem *sentryTurretSubsystem,
+    src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand,
     src::control::turret::algorithms::TurretYawControllerInterface *yawController,
     src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
     src::chassis::ChassisOdometry *chassisOdometry,
@@ -20,15 +20,7 @@ SentryCvManagerCommand::SentryCvManagerCommand(
     float YAW_SPEED)
     : tap::control::ComprisedCommand(drivers),
       visionComms(visionComms),
-      turretCVControlCommand(
-          drivers,
-          controlOperatorInterface,
-          visionComms,
-          sentryTurretSubsystem,
-          yawController,
-          pitchController,
-          userYawInputScalar,
-          userPitchInputScalar),
+      turretCVControlCommand(turretCVControlCommand),
       turretScanCommand(
           drivers,
           sentryTurretSubsystem,

@@ -204,7 +204,12 @@ GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProject
     {&refSystemProjectileLaunchedGovernor, &fireRateLimitGovernor, &flywheelOnGovernor});
 
 extern cv::TurretCVControlCommand turretCVControlCommand;
-CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
+CvOnTargetGovernor cvOnTargetGovernor(
+    drivers(),
+    drivers()->visionComms,
+    turretCVControlCommand,
+    0,
+    true);
 
 RemoteMapState cPressedNotCtrl({Remote::Key::C}, {Remote::Key::CTRL});
 auto cPressedNotCtrlCVGovernorToggle =
@@ -471,9 +476,9 @@ cv::SentryScanCommand sentryScanCommand(
 
 cv::SentryCvManagerCommand cvManagerCommand(
     drivers(),
-    drivers()->controlOperatorInterface,
     drivers()->visionComms,
     &turret,
+    turretCVControlCommand,
     &worldFrameYawTurretImuController,
     &worldFramePitchTurretImuController,
     chassisOdometry,

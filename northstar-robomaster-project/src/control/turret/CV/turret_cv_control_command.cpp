@@ -60,6 +60,7 @@ void TurretCVControlCommand::initialize()
     prevTime = tap::arch::clock::getTimeMilliseconds();
     drivers->leds.set(tap::gpio::Leds::Green, true);
 }
+
 void TurretCVControlCommand::execute()
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
@@ -75,12 +76,14 @@ void TurretCVControlCommand::execute()
         yawController->runController(dt, yawSetpoint);
 
         withinAimingTolerance =
-            (abs(visionComms.getLastAimData(turretID).yaw -
-                 yawController->getMeasurement().getUnwrappedValue()) <
-                 visionComms.getLastAimData(turretID).maxErrorYaw &&
-             abs(visionComms.getLastAimData(turretID).pitch -
-                 pitchController->getMeasurement().getUnwrappedValue()) <
-                 visionComms.getLastAimData(turretID).maxErrorPitch);
+            abs(Angle(
+                    visionComms.getLastAimData(turretID).yaw -
+                    yawController->getMeasurement().getWrappedValue())
+                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorYaw &&
+            abs(Angle(
+                    visionComms.getLastAimData(turretID).pitch -
+                    pitchController->getMeasurement().getWrappedValue())
+                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorPitch;
     }
     else
     {
