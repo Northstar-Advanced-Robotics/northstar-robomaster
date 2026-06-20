@@ -60,6 +60,7 @@ void TurretCVControlCommand::initialize()
     prevTime = tap::arch::clock::getTimeMilliseconds();
     drivers->leds.set(tap::gpio::Leds::Green, true);
 }
+
 void TurretCVControlCommand::execute()
 {
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
@@ -74,24 +75,26 @@ void TurretCVControlCommand::execute()
         const WrappedFloat yawSetpoint = Angle(visionComms.getLastAimData(turretID).yaw);
         yawController->runController(dt, yawSetpoint);
 
-        withinAimingTolerance =  // TODO calculate off the distance
-            (abs(visionComms.getLastAimData(turretID).yaw -
-                 yawController->getMeasurement().getUnwrappedValue()) <
-                 visionComms.getLastAimData(turretID).maxErrorYaw &&
-             abs(visionComms.getLastAimData(turretID).pitch -
-                 pitchController->getMeasurement().getUnwrappedValue()) <
-                 visionComms.getLastAimData(turretID).maxErrorPitch);
+        withinAimingTolerance =
+            abs(Angle(
+                    visionComms.getLastAimData(turretID).yaw -
+                    yawController->getMeasurement().getWrappedValue())
+                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorYaw &&
+            abs(Angle(
+                    visionComms.getLastAimData(turretID).pitch -
+                    pitchController->getMeasurement().getWrappedValue())
+                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorPitch;
     }
     else
     {
         const WrappedFloat pitchSetpoint =
             pitchController->getSetpoint() +
-            userPitchInputScalar * controlOperatorInterface.getTurretPitchInput(turretID);
+            userPitchInputScalar * controlOperatorInterface.getTurretPitchInput();
         pitchController->runController(dt, pitchSetpoint);
 
         const WrappedFloat yawSetpoint =
             yawController->getSetpoint() +
-            userYawInputScalar * controlOperatorInterface.getTurretYawInput(turretID);
+            userYawInputScalar * controlOperatorInterface.getTurretYawInput();
         yawController->runController(dt, yawSetpoint);
 
         withinAimingTolerance = false;

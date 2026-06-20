@@ -8,14 +8,10 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-#include "control/agitator/multi_shot_cv_command_mapping.hpp"
-#include "control/cycle_state_command_mapping.hpp"
-
 // imu
 #include "control/imu/imu_calibrate_command.hpp"
 
 // safe disconnect
-#include "communication/RevMotorTesterSingleMotor.hpp"
 #include "control/safe_disconnect.hpp"
 
 // governor
@@ -38,6 +34,7 @@
 #include "using_agitator.hpp"
 #include "using_chassis.hpp"
 #include "using_flywheel.hpp"
+#include "using_hero_agitator.hpp"
 #include "using_hud.hpp"
 #include "using_turret.hpp"
 
@@ -49,32 +46,16 @@ src::control::RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers(
 
 #endif  // USING_FLYWHEEL
 
-ChassisPowerIndicator chassisPower(refSerialTransmitter, drivers()->refSerial, chassisSubsystem);
-
-TextHudIndicators textHudIndicators(
-    *drivers(),
-    agitator,
-    // imuCalibrateCommand,
-    {&chassisBeyBladeCommand},
-    refSerialTransmitter);
-
-std::vector<HudIndicator *> hudIndicators = {
-    &ammoIndicator,
-    &circleCrosshair,
-    &textHudIndicators,
-    &chassisPower
-    // &visionIndicator,
-    // &flyWheelIndicator,
-    //&shootingModeIndicator,
-    /*&cvAimingIndicator*/};
-
-ClientDisplayCommand clientDisplayCommand(*drivers(), clientDisplay, hudIndicators);
-
 void initializeSubsystems(src::testbed::Drivers *drivers)
 {
     dummySubsystem.initialize();
 #ifdef USING_AGITATOR
     agitator.initialize();
+#endif
+#ifdef USING_HERO_AGITATOR
+    agitator.initialize();
+    flywheel.initialize();
+    kicker.initialize();
 #endif
 #ifdef USING_FLYWHEEL
     flywheel.initialize();
@@ -98,6 +79,11 @@ void registerTestSubsystems(src::testbed::Drivers *drivers)
 
 #ifdef USING_AGITATOR
     drivers->commandScheduler.registerSubsystem(&agitator);
+#endif
+#ifdef USING_HERO_AGITATOR
+    drivers->commandScheduler.registerSubsystem(&agitator);
+    drivers->commandScheduler.registerSubsystem(&flywheel);
+    drivers->commandScheduler.registerSubsystem(&kicker);
 #endif
 #ifdef USING_FLYWHEEL
     drivers->commandScheduler.registerSubsystem(&flywheel);
@@ -143,12 +129,14 @@ void startTestCommands(src::testbed::Drivers *drivers)
 void registerTestIoMappings(src::testbed::Drivers *drivers)
 {
 #ifdef USING_AGITATOR
-    drivers->commandMapper.addMap(&leftMousePressedShoot);
-    drivers->commandMapper.addMap(&leftSwitchDownPressedShoot);
-    drivers->commandMapper.addMap(&qPressed10RPS);
-    // drivers->commandMapper.addMap(&ePressed20RPS);
-    // drivers->commandMapper.addMap(&rPressedFullAuto);
-
+    // rightSwitchUp10RPS
+    // rightSwitchMid20RPS
+    // rightSwitchDownFullAuto
+    // leftSwitchDownPressedShoot
+#endif
+#ifdef USING_HERO_AGITATOR
+    // leftSwitchDownRotateAndUnjamAgitatorWithKicker
+    // leftSwitchUpRunFlywheel
 #endif
 #ifdef USING_FLYWHEEL
     drivers->commandMapper.addMap(&fPressed);

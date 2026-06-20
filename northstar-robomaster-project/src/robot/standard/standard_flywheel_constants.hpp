@@ -3,7 +3,6 @@
 #include <modm/container/pair.hpp>
 
 #include "tap/motor/dji_motor.hpp"
-#include "tap/motor/sparkmax/rev_motor.hpp"
 
 #include "modm/math/filter/pid.hpp"
 
@@ -15,14 +14,6 @@ static constexpr tap::motor::MotorId LEFT_MOTOR_ID = tap::motor::MOTOR1;
 static constexpr tap::motor::MotorId RIGHT_MOTOR_ID = tap::motor::MOTOR2;
 
 static constexpr tap::can::CanBus CAN_BUS = tap::can::CanBus::CAN_BUS2;
-
-// rev constants
-static constexpr float FLYWHEEL_PID_KP_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KI_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KD_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KF_REV = 0.00009f;
-static constexpr float FLYWHEEL_PID_K_MIN_OUT_REV = -1.0f;
-static constexpr float FLYWHEEL_PID_K_MAX_OUT_REV = 1.0f;
 
 // dji constants
 static constexpr float FLYWHEEL_PID_KP_DJI = 30.0f;
@@ -51,9 +42,9 @@ enum Spin : u_int8_t
 
 static constexpr modm::Pair<float, float> MPS_TO_RPM[] = {
     {0.0f, 0.0f},
-    {15.0f, 4714.0f},
-    {18.0f, 5621.0f},
-    {24.5f, 7700.0f}};
+    {15.0f, 4514.0f},
+    {18.0f, 5421.0f},
+    {24.5f, 7500.0f}};
 // SPIN_TO_INTERPOLATABLE_MPS_TO_RPM = {
 //     {{{{0.0f, 0.0f},
 //        {15.0f, 4'500.0f},

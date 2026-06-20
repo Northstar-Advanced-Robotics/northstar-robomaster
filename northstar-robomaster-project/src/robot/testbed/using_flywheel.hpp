@@ -1,9 +1,6 @@
 #ifndef USING_FLYWHEEL_HPP_
 #define USING_FLYWHEEL_HPP_
 
-#include "tap/control/remote_map_state.hpp"
-#include "tap/control/toggle_command_mapping.hpp"
-
 #include "robot/testbed/test_def.hpp"
 
 using namespace tap::control;

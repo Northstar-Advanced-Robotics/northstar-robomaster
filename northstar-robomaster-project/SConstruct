@@ -1,61 +1,36 @@
-# Copyright (c) 2020-2021 NorthStart
+# Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
 #
-# This file is part of NorthStarFleet2025.
+# This file is part of aruw-mcb.
 #
-# NorthStarFleet2025 is free software: you can redistribute it and/or modify
+# aruw-mcb is free software: you can redistribute it and/or modify
 # it under the terms of the GNU General Public License as published by
 # the Free Software Foundation, either version 3 of the License, or
 # (at your option) any later version.
 #
-# NorthStarFleet2025 is distributed in the hope that it will be useful,
+# aruw-mcb is distributed in the hope that it will be useful,
 # but WITHOUT ANY WARRANTY; without even the implied warranty of
 # MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
 # GNU General Public License for more details.
 #
 # You should have received a copy of the GNU General Public License
-# along with NorthStarFleet2025.  If not, see <https://www.gnu.org/licenses/>.
+# along with aruw-mcb.  If not, see <https://www.gnu.org/licenses/>.
 
 import os
-from os.path import join, abspath
-
-from SCons.Script import *
+from os.path import abspath, join
 
 from build_tools import parse_args
+from SCons.Script import *
 
 # Define project settings and build paths
-PROJECT_NAME         = "northstar-robomaster-project"
-BUILD_PATH           = "build"
-TAPROOT_PATH         = "taproot"
-SRC_PATH             = "src"
-TEST_PATH            = "test"
-
-
+PROJECT_NAME = "northstar-robomaster-project"
+BUILD_PATH = "build"
+TAPROOT_PATH = "taproot"
+SRC_PATH = "src"
+TEST_PATH = "test"
 TAPROOT_SCRIPTS_TOOLPATH = abspath("../taproot-scripts/scons-tools")
-
-# Don't compile this stuff
-ignored_dirs         = [".lbuild_cache", BUILD_PATH, TAPROOT_PATH]
-ignored_files        = []
-# Don't compile this stuff when testing
-IGNORED_FILES_WHILE_TESTING = ["src/main.cpp"]
-
 
 # Parse and validate arguments
 args = parse_args.parse_args()
-
-
-def _get_hosted_target_name_for_current_platform():
-    os_type = platform.system()
-    try:
-        return {
-            "Windows": "hosted-windows",
-            "Darwin": "hosted-darwin",
-            "Linux": "hosted-linux",
-        }[os_type]
-    except KeyError:
-        raise ValueError(f"Unknown host OS {os_type}")
-
-def _get_sim_modm_instance_path():
-    return f"taproot/sim-modm/{_get_hosted_target_name_for_current_platform()}/modm"
 
 
 # Define a new SCons environment and set up basic build variables
@@ -65,32 +40,64 @@ env["CONFIG_PROJECT_NAME"] = PROJECT_NAME
 env["CONFIG_ARTIFACT_PATH"] = join(env["CONFIG_BUILD_BASE"], "artifact")
 env["CONFIG_PROFILE"] = args["BUILD_PROFILE"]
 
-env.AppendUnique(CPPPATH=[
-    abspath(r"src"),
-    abspath(r"test"),
-])
+
+env.AppendUnique(
+    CPPPATH=[
+        abspath(r"src"),
+        abspath(r"test"),
+    ]
+)
 
 
 sources = []
 # Building all libraries (read from sconscript files located in provided dirs)
 # Ensure that modm is first, since Taproot depends on modm
 # Append include path to environment so both src/test environments have access to them
-env.SConscript(dirs=[TAPROOT_PATH, SRC_PATH, TEST_PATH], exports=["env", "args", "sources"])
+env.SConscript(dirs=[TAPROOT_PATH], exports=["env", "args", "sources"])
+# env.SConscript(dirs=["./ext"], exports=["env"])
 
+# Setup SCons to use directory based caching, not global
+from SCons.SConsign import File
+File(None)
 
-# Tests must be included as sources (rather than built as a separate library) in order for
-# googletest to identify any tests that need to be run. Not an issue for us since we don't
-# normally run tests in taproot from this project, but in general this is an issue.
+# We include the tests as library to improve build times for CI.
 if args["TARGET_ENV"] == "tests":
-    sources.extend(env.FindSourceFiles("taproot/test"))
+    source_files = env.FindSourceFiles("taproot/test")
+    files = [env.Object(file) for file in source_files]
+
+    # Construct a static library
+    library = env.StaticLibrary(target="taproot-test", source=files)
+    env.AppendUnique(LIBS=[library])
+    env.AppendUnique(LIBPATH=[abspath(str(library[0].get_dir()))])
+
+# Now we can add the src and test.
+# We modify the "BUILDPATH" environment variable to have the code for each robot have its own directory.
+env["BUILDPATH"] = join(
+    env["CONFIG_BUILD_BASE"],
+    "scons-" + ARGUMENTS.get("profile", "release"),
+    args["ROBOT_TYPE"],
+)
+env.SConscript(dirs=[SRC_PATH, TEST_PATH], exports=["env", "args", "sources"])
+env.Append(
+    toolpath=[
+        abspath(r"build_tools"),
+    ]
+)
+# env.Tool("generate_ozone_projects")
+
+print(
+    "Configured {0} parallel build jobs (-j{0}), {1}".format(
+        GetOption("num_jobs"), args["ROBOT_TYPE"]
+    )
+)
 
 
-print("Configured {0} parallel build jobs (-j{0}), {1}"
-    .format(GetOption("num_jobs"), args["ROBOT_TYPE"]))
-
-
+# Only add aliases when we are compiling source. When we don't add alias, the default
+# build environment will only build the static libraries (modm and Taproot)
 if args["TARGET_ENV"] == "hardware":
-    program = env.Program(target=env["CONFIG_PROJECT_NAME"]+".elf", source=sources)
+    program = env.Program(
+        target=env["CONFIG_PROJECT_NAME"] + ".elf", source=sources
+    )
 
     # The executable depends on the linkerscript
     env.Depends(target=program, dependency=env["LINKERSCRIPT_FILE"])
@@ -103,26 +110,36 @@ if args["TARGET_ENV"] == "hardware":
     env.Alias("run", [env.ProgramOpenOcd(program)])
     env.Alias("all", ["build", "size"])
     env.Default("all")  # For the hardware target env, "all" runs if you don't
-                        # specify anything (i.e. just type "scons")
-elif args["TARGET_ENV"] == "tests":
-    # Add scons-tools directory to toolpath so we can use the various tools inside it,
-    # then add various tools
-    env.Append(toolpath=[TAPROOT_SCRIPTS_TOOLPATH])
-    
-    env.Tool("run_gcov")
+    # specify anything (i.e. just type "scons")
+    if args["TARGET_ENV"] == "tests":
+        # Add scons-tools directory to toolpath so we can use the various tools inside it,
+        # then add various tools
+        env.Append(toolpath=[TAPROOT_SCRIPTS_TOOLPATH])
+        env.Tool("run_gcov")
 
-    program = env.Program(target=env["CONFIG_PROJECT_NAME"]+"-tests.elf", source=sources)
+        program = env.Program(
+            target=env["CONFIG_PROJECT_NAME"] + "-tests.elf", source=sources
+        )
 
-    # Add target environment-specific SCons aliases
-    # WARNING: all aliases must be checked during argument validation
-    env.Alias("build-tests", program)
-    env.Alias("run-tests", env.Run(program))
-    env.Alias("run-tests-gcov", [env.RunGCOV(program, False, [])])
+        # Add target environment-specific SCons aliases
+        # WARNING: all aliases must be checked during argument validation
+        env.Alias("build-tests", program)
+        env.Alias(
+            "run-tests",
+            env.Command(
+                "thisfileshouldnotexist",
+                program,
+                '@"%s"' % program[0].abspath
+                + (f" --gtest_filter={args['TEST']}" if "TEST" in args else ""),
+            ),
+        )
+        env.Alias("run-tests-gcov", [env.RunGCOV(program, False, [])])
+    else:
+        program = env.Program(
+            target=env["CONFIG_PROJECT_NAME"] + ".elf", source=sources
+        )
 
-else:
-    program = env.Program(target=env["CONFIG_PROJECT_NAME"]+".elf", source=sources)
-
-    # Add target environment-specific SCons aliases
-    # WARNING: all aliases must be checked during argument validation
-    env.Alias("build-sim", program)
-    env.Alias("run-sim", env.Run(program))
+        # Add target environment-specific SCons aliases
+        # WARNING: all aliases must be checked during argument validation
+        env.Alias("build-sim", program)
+        env.Alias("run-sim", env.Run(program))

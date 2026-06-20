@@ -1,6 +1,7 @@
 [submodule "taproot-scripts"]
 	path = taproot-scripts
 	url = https://gitlab.com/aruw/controls/taproot-scripts.git
-[submodule "LateralRoot"]
+[submodule "taproot"]
 	path = taproot
-	url = https://github.com/GOFIRST-Robotics/LateralRoot.git
+	url = https://gitlab.com/aruw/controls/taproot.git
+	branch = develop

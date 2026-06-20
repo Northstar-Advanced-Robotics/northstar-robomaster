@@ -1,12 +1,6 @@
 #ifndef USING_AGITATOR_HPP_
 #define USING_AGITATOR_HPP_
 
-#include "tap/control/governor/governor_limited_command.hpp"
-#include "tap/control/hold_command_mapping.hpp"
-#include "tap/control/hold_repeat_command_mapping.hpp"
-#include "tap/control/remote_map_state.hpp"
-#include "tap/control/toggle_command_mapping.hpp"
-
 #include "control/governor/fire_rate_limit_governor.hpp"
 #include "control/governor/fired_recently_governor.hpp"
 #include "control/governor/plate_hit_governor.hpp"
@@ -42,36 +36,43 @@ MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
 // agitator governors
 ManualFireRateReselectionManager manualFireRateReselectionManager;
 
-SetFireRateCommand setFireRateCommandFullAuto(
+SetFireRateCommand setFireRateCommand1RPS(
     &dummySubsystem,
     manualFireRateReselectionManager,
-    40,
+    1,
     &rotateAgitator);
+
 SetFireRateCommand setFireRateCommand10RPS(
     &dummySubsystem,
     manualFireRateReselectionManager,
     10,
     &rotateAgitator);
-SetFireRateCommand setFireRateCommand30RPS(
+SetFireRateCommand setFireRateCommand20RPS(
     &dummySubsystem,
     manualFireRateReselectionManager,
-    30,
+    20,
+    &rotateAgitator);
+SetFireRateCommand setFireRateCommandFullAuto(
+    &dummySubsystem,
+    manualFireRateReselectionManager,
+    40,
     &rotateAgitator);
 
-ToggleCommandMapping qPressed10RPS(
-    drivers(),
-    {&setFireRateCommand10RPS},
-    RemoteMapState(RemoteMapState({Remote::Key::Q})));
+Trigger leftSwitchDown1RPS =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP)
+        .onTrue(&setFireRateCommand1RPS);
 
-ToggleCommandMapping wPressed30RPS(
-    drivers(),
-    {&setFireRateCommand30RPS},
-    RemoteMapState(RemoteMapState({Remote::Key::Q})));
+Trigger rightSwitchUp10RPS =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)
+        .onTrue(&setFireRateCommand10RPS);
 
-ToggleCommandMapping ePressedFullAuto(
-    drivers(),
-    {&setFireRateCommandFullAuto},
-    RemoteMapState(RemoteMapState({Remote::Key::W})));
+Trigger rightSwitchMid20RPS =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID)
+        .onTrue(&setFireRateCommand20RPS);
+
+Trigger rightSwitchDownFullAuto =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
+        .onTrue(&setFireRateCommandFullAuto);
 
 FireRateLimitGovernor fireRateLimitGovernor(manualFireRateReselectionManager);
 
@@ -80,17 +81,9 @@ GovernorLimitedCommand<1> rotateAndUnjamAgitatorLimited(
     rotateAndUnjamAgitator,
     {&fireRateLimitGovernor});
 
-HoldRepeatCommandMapping leftMousePressedShoot(
-    drivers(),
-    {&rotateAndUnjamAgitatorLimited},
-    RemoteMapState(RemoteMapState::MouseButton::LEFT),
-    false);
-
-HoldRepeatCommandMapping leftSwitchDownPressedShoot(
-    drivers(),
-    {&rotateAndUnjamAgitatorLimited},
-    RemoteMapState(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP),
-    false);
+Trigger leftSwitchDownPressedShoot =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN)
+        .whileTrue(&rotateAndUnjamAgitatorLimited);
 
 #endif
 

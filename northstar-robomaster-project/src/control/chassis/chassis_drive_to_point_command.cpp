@@ -27,7 +27,6 @@ void ChassisDriveToPointCommand::initialize() {}
 
 void ChassisDriveToPointCommand::execute()
 {
-    auto scale = [](float raw) -> float { return limitVal(raw, -1.0f, 1.0f) * 0.5f; };
     modm::Vector<float, 2> dirToTarget = (targetPosition - chassisOdometry->getPositionGlobal());
 
     float distanceToTarget = dirToTarget.getLength();

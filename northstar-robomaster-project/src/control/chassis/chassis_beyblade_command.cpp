@@ -38,14 +38,11 @@ void ChassisBeybladeCommand::execute()
     uint32_t dt = currTime - prevTime;
     prevTime = currTime;
 
-    auto scale = [](float raw) -> float {
-        return limitVal(raw, -1.0f, 1.0f) * MAX_CHASSIS_SPEED_MPS;
-    };
     modm::Pair<float, float> normInput = getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
-    float verticalSpeed = scale(normInput.first);
-    float horizontalSpeed = scale(normInput.second);
+    float verticalSpeed = normInput.first;
+    float horizontalSpeed = normInput.second;
     calcedRot = calculateBeyBladeRotationSpeed(
         chassis->calculateMaxRotationSpeed(verticalSpeed, horizontalSpeed),
         dt);

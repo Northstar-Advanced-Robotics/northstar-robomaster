@@ -79,7 +79,7 @@ public:
     MultiShotCvCommandMapping(
         tap::Drivers &drivers,
         tap::control::Command &launchCommand,
-        const tap::control::RemoteMapState &rms,
+        const tap::control::GenericRemoteMapState &rms,
         std::optional<ManualFireRateReselectionManager *> fireRateReselectionManager,
         governor::CvOnTargetGovernor &cvOnTargetGovernor,
         std::optional<ConstantVelocityAgitatorCommand *> command = std::nullopt);
@@ -94,7 +94,7 @@ public:
 
     LaunchMode getLaunchMode() const { return launchMode; }
 
-    void executeCommandMapping(const tap::control::RemoteMapState &currState);
+    void executeCommandMapping(const tap::control::GenericRemoteMapState &currState);
 
 private:
     std::optional<ManualFireRateReselectionManager *> fireRateReselectionManager;
@@ -106,7 +106,7 @@ private:
     int getCurrentBarrelCoolingRate() const
     {
         int coolingRate = drivers->refSerial.getRobotData().turret.coolingRate;
-#if defined(TARRGET_HERO)
+#if defined(TARGET_HERO)
         return coolingRate / 100.0f;
 #else
         return coolingRate / 10.0f;

@@ -35,7 +35,7 @@ DjiMotorEncoder::DjiMotorEncoder(bool isInverted, float gearRatio, uint32_t enco
 {
     encoderDisconnectTimeout.stop();
 }
-
+uint16_t debugEncoderActual = 0;
 void DjiMotorEncoder::processMessage(const modm::can::Message& message)
 {
     encoderDisconnectTimeout.restart(MOTOR_DISCONNECT_TIME);
@@ -45,6 +45,7 @@ void DjiMotorEncoder::processMessage(const modm::can::Message& message)
     uint16_t encoderActual =
         static_cast<uint16_t>(message.data[0] << 8 | message.data[1]);  // encoder value
 
+    debugEncoderActual = encoderActual;  // USE FOR FINDING PITCH START ENCODER VALUE
     updateEncoderValue(encoderActual);
 }
 

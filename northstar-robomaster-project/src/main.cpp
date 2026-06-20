@@ -1,3 +1,5 @@
+// #define FLYSKY
+
 /*
  * Copyright (c) 2020-2021 NorthStart
  *
@@ -34,8 +36,6 @@
 #include "tap/architecture/profiler.hpp"
 
 /* communication includes ---------------------------------------------------*/
-#include "communication/serial/fly_sky.hpp"
-
 #include "drivers_singleton.hpp"
 
 /* error handling includes --------------------------------------------------*/
@@ -47,6 +47,7 @@
 #include "robot/robot_control.hpp"
 
 /* robot includes ---------------------------------------------------------*/
+#include "tap/communication/gpio/pwm.hpp"
 
 /* define timers here -------------------------------------------------------*/
 tap::arch::PeriodicMilliTimer sendMotorTimeout(tap::Drivers::DT);
@@ -138,7 +139,7 @@ int main()
         //         {
         //             PROFILE(drivers->profiler, drivers->revMotorTxHandler.heartBeat, ());
         //         }
-        //         PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
+        PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
 
         // #endif
         modm::delay_us(10);
@@ -152,6 +153,7 @@ static void initializeIo(Drivers *drivers)
     drivers->analog.init();
     drivers->digital.init();
     drivers->leds.init();
+    drivers->pwm.init();
 
     // if controller is on when the robot turns on, wait for it to be off.
     // This is to prevent the shredding of wires
@@ -162,15 +164,22 @@ static void initializeIo(Drivers *drivers)
     {
         drivers->remote.read();
         if (drivers->remote.isConnected())
+        {
             i = 0;
+            drivers->pwm.write(0.5f, tap::gpio::Pwm::Buzzer);
+            drivers->pwm.setTimerFrequency(tap::gpio::Pwm::TIMER4, 1500);
+        }
         else
+        {
             i++;
+            drivers->pwm.write(0.0f, tap::gpio::Pwm::Buzzer);
+        }
+
         modm::delay_us(10);
     }
 
     drivers->leds.set(tap::gpio::Leds::Blue, true);
 
-    drivers->pwm.init();
     drivers->can.initialize();
     drivers->errorController.init();
 
@@ -179,14 +188,15 @@ static void initializeIo(Drivers *drivers)
 
     drivers->refSerial.initialize();
 
-    drivers->bmi088.initialize(500, -0.005f, 0.000f);
+    drivers->bmi088.initialize(500, 0.05f, 0.000f);
     drivers->bmi088.setTargetTemperature(35.0f);
-    drivers->bmi088.setCalibrationSamples(4000);
+    drivers->bmi088.setCalibrationSamples(2000);
 
-#ifndef FLY_SKY
     drivers->visionComms.initializeCV();
-#endif
 }
+float debugXAccel = 0.0f;
+float debugYAccel = 0.0f;
+float debugZAccel = 0.0f;
 float debugYaw = 0.0f;
 float debugPitch = 0.0f;
 float debugRoll = 0.0f;
@@ -198,7 +208,6 @@ float debugLastAimDataYaw = 0.0f;
 float debugLastAimDataPitch = 0.0f;
 float dddddgfregr = 0;
 bool uartOnline = false;
-
 bool cal = false;
 bool calibrated = false;
 static void updateIo(Drivers *drivers)
@@ -219,7 +228,7 @@ static void updateIo(Drivers *drivers)
 
 #ifndef TURRET
     drivers->refSerial.updateSerial();
-#ifndef FLY_SKY
+#ifndef FLYSKY
     drivers->visionComms.updateSerial();
 #endif
 
@@ -230,6 +239,9 @@ static void updateIo(Drivers *drivers)
         cal = false;
         drivers->bmi088.requestCalibration();
     }
+    debugXAccel = drivers->bmi088.getAx();
+    debugYAccel = drivers->bmi088.getAy();
+    debugZAccel = drivers->bmi088.getAz();
     debugYawV = drivers->bmi088.getGz();
     debugYaw = modm::toDegree(drivers->bmi088.getYaw());
     debugPitchV = drivers->bmi088.getGy();
@@ -239,6 +251,5 @@ static void updateIo(Drivers *drivers)
     conneccc = drivers->remote.isConnected();
     dddddgfregr = drivers->encoder.getPosition().getUnwrappedValue();
     uartOnline = drivers->refSerial.getRefSerialReceivingData();
-
 #endif
 }

@@ -19,23 +19,22 @@ namespace src::control::agitator::constants
 {
 static constexpr uint16_t HEAT_LIMIT_BUFFER = 25;
 // position PID terms
-// PID terms for standard
+// PID terms for STANDARD
 static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
-    .kp = 2'500.0f,
-    .ki = 0.0f,
+    .kp = 5'000.0f,
+    .ki = 10.0f,
     .kd = 0.0f,
-    .maxICumulative = 0.0f,
+    .maxICumulative = 2000.0f,
     .maxOutput = DjiMotor::MAX_OUTPUT_C610,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
 };
-
-static constexpr int AGITATOR_NUM_POCKETS = 8;        // number of balls in one rotation
-static constexpr float AGITATOR_MAX_ROF = 40.0f;      // balls per second
-static constexpr float OVERSHOOT_FUDGE_FACTOR = .40;  // how much agitator overshoots
+static constexpr int AGITATOR_NUM_POCKETS = 11;        // number of balls in one rotation
+static constexpr float AGITATOR_MAX_ROF = 30.0f;       // balls per second
+static constexpr float OVERSHOOT_FUDGE_FACTOR = 0.10;  // how much agitator overshoots
 
 static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
-    .gearRatio = 1 / 36.0f,
+    .gearRatio = 1 / (36.0f) * (20.0f / 21.0f),
     .agitatorMotorId = tap::motor::MOTOR5,
     .agitatorCanBusId = tap::can::CanBus::CAN_BUS1,
     .isAgitatorInverted = false,
@@ -55,8 +54,8 @@ static constexpr tap::control::setpoint::MoveIntegralCommand::Config AGITATOR_RO
     .integralSetpointTolerance = (M_TWOPI / AGITATOR_NUM_POCKETS) * 0.1f,
 };
 
-constexpr float UNJAM_VELOCITY = 0.35 * AGITATOR_MAX_ROF * (M_TWOPI / AGITATOR_NUM_POCKETS);
-constexpr float UNJAM_DISTANCE = 0.6f * (M_TWOPI / AGITATOR_NUM_POCKETS);
+constexpr float UNJAM_VELOCITY = 0.6f * AGITATOR_MAX_ROF * (M_TWOPI / AGITATOR_NUM_POCKETS);
+constexpr float UNJAM_DISTANCE = 1.0f * (M_TWOPI / AGITATOR_NUM_POCKETS);
 static constexpr src::control::agitator::UnjamSpokeAgitatorCommand::Config AGITATOR_UNJAM_CONFIG = {
     .targetUnjamIntegralChange = UNJAM_DISTANCE,
     .unjamSetpoint = UNJAM_VELOCITY,
@@ -67,4 +66,4 @@ static constexpr src::control::agitator::UnjamSpokeAgitatorCommand::Config AGITA
 };
 }  // namespace src::control::agitator::constants
 
-#endif  // STANDARD_AGITATOR_CONSTANTS_HPP_
+#endif  // TESTBED_AGITATOR_CONSTANTS_HPP_

@@ -21,8 +21,10 @@ ChassisDriveDistanceCommand::ChassisDriveDistanceCommand(
 {
     addSubsystemRequirement(chassis);
 
-    targetPosition = chassisOdometry->getPositionGlobal() +
-                     chassisOdometry->convertLocalToGlobal(modm::Vector<float, 2>(xDist, yDist));
+    targetPosition =
+        chassisOdometry->getPositionGlobal() + chassisOdometry->convertLocalToGlobal(
+                                                   modm::Vector<float, 2>(xDist, yDist),
+                                                   chassisOdometry->getRotation());
 }
 
 void ChassisDriveDistanceCommand::initialize() {}

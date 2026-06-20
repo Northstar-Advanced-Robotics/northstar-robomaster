@@ -57,7 +57,10 @@
     <module>modm:platform:timer:1</module>
     <module>modm:platform:timer:4</module>
     <module>modm:platform:timer:10</module>
+    <module>modm:platform:spi:2</module>
     <module>modm:platform:adc:3</module>
+    <module>modm:ui:display</module>
+    <module>modm:ui:menu</module>
     <module>modm:platform:timer:12</module>
 
   </modules>

@@ -34,7 +34,9 @@ public:
         // REF_DATA = 6
         HEALTH = 6,
         REF_TURRET_DATA = 7,
-        VISION_LOCALIZATION = 8
+        VISION_LOCALIZATION = 8,
+        FLY_SKY_DATA = 9,
+        VT13_DATA = 10
     };
 
     struct RefData
@@ -107,7 +109,7 @@ public:
         float roll;
 
         // float pitch_vel;
-        // float yaw_vel;
+        float yaw_vel;
         // float roll_vel;
 
     } modm_packed;
@@ -135,11 +137,20 @@ public:
     {
         float posX;
         float posY;
+        float heading;
+        uint32_t timestamp;
     } modm_packed;
 
     src::chassis::ChassisOdometry* chassisOdometry;
 
     src::chassis::ChassisAutoDrive* chassisAutoDrive;
+
+    tap::communication::serial::Remote* remote;
+
+    uint32_t lastReadVT13 = 0;
+    uint32_t lastReadFlySky = 0;
+
+    uint16_t REMOTE_TIMEOUT = 1000;
 
     tap::motor::DjiMotor* pitchMotor;
 
@@ -177,17 +188,17 @@ public:
 
     mockable bool isCvOnline() const;
 
-    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 1) const
+    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 0) const
     {
         return lastAimData[turretID];
     }
 
-    mockable inline bool isAimDataUpdated(uint8_t turretID = 1) const
+    mockable inline bool isAimDataUpdated(uint8_t turretID = 0) const
     {
         return aimDataUpdated[turretID];
     }
 
-    mockable inline bool getSomeTurretHasTarget(uint8_t turretID = 1) const
+    mockable inline bool getSomeTurretHasTarget(uint8_t turretID = 0) const
     {
         return isAimDataUpdated();
     }
@@ -200,6 +211,11 @@ public:
     mockable inline void attachAutoDrive(src::chassis::ChassisAutoDrive* chassisAutoDrive)
     {
         this->chassisAutoDrive = chassisAutoDrive;
+    }
+
+    mockable inline void attachRemote(tap::communication::serial::Remote* remote)
+    {
+        this->remote = remote;
     }
 
     mockable inline void attachPitchMotor(tap::motor::DjiMotor* pitchMotor)
@@ -233,6 +249,10 @@ private:
     bool decodeToAutoPathData(const ReceivedSerialMessage& message);
 
     bool decodeToVisionAprilTagLocalization(const ReceivedSerialMessage& message);
+
+    bool decodeToFlySkyRemote(const ReceivedSerialMessage& message);
+
+    bool decodeToVT13Remote(const ReceivedSerialMessage& message);
 };
 }  // namespace src::serial
 

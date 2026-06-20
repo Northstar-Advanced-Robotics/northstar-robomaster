@@ -38,12 +38,10 @@ TurretSubsystem::TurretSubsystem(
     MotorInterface *pitchMotor,
     MotorInterface *yawMotor,
     const TurretMotorConfig &pitchMotorConfig,
-    const TurretMotorConfig &yawMotorConfig,
-    const src::can::TurretMCBCanComm *turretMCB)
+    const TurretMotorConfig &yawMotorConfig)
     : tap::control::Subsystem(drivers),
       pitchMotor(pitchMotor, pitchMotorConfig),
-      yawMotor(yawMotor, yawMotorConfig),
-      turretMCB(turretMCB)
+      yawMotor(yawMotor, yawMotorConfig)
 {
     assert(drivers != nullptr);
     assert(pitchMotor != nullptr);
@@ -61,6 +59,6 @@ void TurretSubsystem::refresh()
     yawMotor.updateMotorAngle();
     pitchMotor.updateMotorAngle();
 
-    motorAngle = yawMotor.getChassisFrameMeasuredAngle().getUnwrappedValue();
+    motorAngle = pitchMotor.getChassisFrameMeasuredAngle().getUnwrappedValue();
 }
 }  // namespace src::control::turret

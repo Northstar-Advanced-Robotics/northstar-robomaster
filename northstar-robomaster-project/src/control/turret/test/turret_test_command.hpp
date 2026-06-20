@@ -60,7 +60,7 @@ public:
 
     bool isReady() override;
 
-    const char *getName() const override { return "neo turret test command"; }
+    const char *getName() const override { return "turret test command"; }
 
     void initialize() override;
 

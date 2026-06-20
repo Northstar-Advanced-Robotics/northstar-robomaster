@@ -18,21 +18,21 @@ static constexpr uint16_t HEAT_LIMIT_BUFFER = 25;
 // position PID terms
 // PID terms for hero
 static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
-    .kp = 12.0f,
-    .ki = 0.0f,
+    .kp = 1500.0f,
+    .ki = 100.0f,
     .kd = 0.0f,
-    .maxICumulative = 0.0f,
+    .maxICumulative = 10000.0f,
     .maxOutput = tap::motor::DjiMotor::MAX_OUTPUT_GM6020,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
 };
 
-static constexpr int AGITATOR_NUM_POCKETS = 13;       // number of balls in one rotation
-static constexpr float AGITATOR_MAX_ROF = 0.8f;       // balls per second
-static constexpr float OVERSHOOT_FUDGE_FACTOR = .40;  // how much agitator overshoots
+static constexpr int AGITATOR_NUM_POCKETS = 13;        // number of balls in one rotation
+static constexpr float AGITATOR_MAX_ROF = 10.0f;       // balls per second
+static constexpr float OVERSHOOT_FUDGE_FACTOR = 0.0f;  // how much agitator overshoots
 
 static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
-    .gearRatio = 1,
+    .gearRatio = 25.0f / 80.0f,
     .agitatorMotorId = tap::motor::MOTOR5,
     .agitatorCanBusId = tap::can::CanBus::CAN_BUS1,
     .isAgitatorInverted = false,
@@ -40,10 +40,10 @@ static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG 
      * The jamming constants. Agitator is considered jammed if difference between the velocity
      * setpoint and actual velocity is > jammingVelocityDifference for > jammingTime.
      */
-    .jammingVelocityDifference = M_TWOPI,
-    .jammingTime = 100,
+    .jammingVelocityDifference = M_PI,
+    .jammingTime = 600,
     .jamLogicEnabled = true,
-    .velocityPIDFeedForwardGain = 700.0f / M_TWOPI,
+    .velocityPIDFeedForwardGain = 3000.0f,
 };
 
 static constexpr tap::control::setpoint::MoveIntegralCommand::Config AGITATOR_ROTATE_CONFIG = {

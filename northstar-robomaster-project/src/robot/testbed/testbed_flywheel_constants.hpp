@@ -3,7 +3,6 @@
 #include <modm/container/pair.hpp>
 
 #include "tap/motor/dji_motor.hpp"
-#include "tap/motor/sparkmax/rev_motor.hpp"
 
 #include "modm/math/filter/pid.hpp"
 
@@ -11,21 +10,10 @@ namespace src::control::flywheel
 {
 static constexpr float FRICTION_WHEEL_RAMP_SPEED = 3.0f;
 
-static constexpr tap::motor::REVMotorId LEFT_MOTOR_ID = tap::motor::REV_MOTOR1;
-static constexpr tap::motor::REVMotorId RIGHT_MOTOR_ID = tap::motor::REV_MOTOR3;
-static constexpr tap::motor::REVMotorId UP_MOTOR_ID = tap::motor::REV_MOTOR2;
-
 static constexpr tap::motor::MotorId LEFT_MOTOR_ID_DJI = tap::motor::MOTOR1;
 static constexpr tap::motor::MotorId RIGHT_MOTOR_ID_DJI = tap::motor::MOTOR2;
 
 static constexpr tap::can::CanBus CAN_BUS = tap::can::CanBus::CAN_BUS1;
-// rev constants
-static constexpr float FLYWHEEL_PID_KP_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KI_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KD_REV = 0.0f;
-static constexpr float FLYWHEEL_PID_KF_REV = 0.00009f;
-static constexpr float FLYWHEEL_PID_K_MIN_OUT_REV = -1.0f;
-static constexpr float FLYWHEEL_PID_K_MAX_OUT_REV = 1.0f;
 
 // dji constants
 static constexpr float FLYWHEEL_PID_KP_DJI = 30.0f;

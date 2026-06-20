@@ -16,16 +16,17 @@ using tap::algorithms::limitVal;
 
 namespace src::chassis
 {
-modm::Pair<int, float> lastComputedMaxWheelSpeed = CHASSIS_POWER_TO_MAX_SPEED_LUT[0];
+modm::Pair<int, float> ChassisSubsystem::lastComputedMaxWheelSpeed =
+    CHASSIS_POWER_TO_MAX_SPEED_LUT[0];
 
 ChassisSubsystem::ChassisSubsystem(
     tap::Drivers* drivers,
     const ChassisConfig& config,
-    src::can::TurretMCBCanComm* turretMcbCanComm,
     src::control::turret::TurretMotor* yawMotor,
     ChassisOdometry* chassisOdometry_)
     : Subsystem(drivers),
       desiredOutput{},
+      rampControllers{},
       pidControllers{
           modm::Pid<float>(
               VELOCITY_PID_KP,
@@ -64,7 +65,6 @@ ChassisSubsystem::ChassisSubsystem(
               CHASSIS_GEAR_RATIO),
           Motor(drivers, config.rightBackId, config.canBus, false, "RB", false, CHASSIS_GEAR_RATIO),
       },
-      turretMcbCanComm(turretMcbCanComm),
       yawMotor(yawMotor),
       chassisOdometry(chassisOdometry_)
 {
@@ -106,11 +106,13 @@ float ChassisSubsystem::getChassisRotationSpeed()
 
 float ChassisSubsystem::calculateMaxRotationSpeed(float vert, float hor)
 {
-    float maxWheelSpeed =
-        getMaxWheelSpeed(drivers->refSerial.getRefSerialReceivingData(), getChassisPowerLimit());
+    float maxWheelSpeed = getMaxWheelSpeed(
+        drivers->refSerial.getRefSerialReceivingData(),
+        ChassisSubsystem::getChassisPowerLimit(drivers));
     float allowedwheelSpeed =
-        (maxWheelSpeed -
-         ((abs(vert / MAX_CHASSIS_SPEED_MPS) + abs(hor / MAX_CHASSIS_SPEED_MPS)) * maxWheelSpeed));
+        (maxWheelSpeed - (sqrt(
+                             pow(mpsToRpm(rampControllers[0].getValue()), 2) +
+                             pow(mpsToRpm(rampControllers[1].getValue()), 2))));
     if (allowedwheelSpeed < 0.0f)
     {
         allowedwheelSpeed = 0.0f;
@@ -127,14 +129,14 @@ void ChassisSubsystem::setVelocityTurretDrive(float forward, float sideways, flo
 
 void ChassisSubsystem::setVelocityFieldDrive(float forward, float sideways, float rotational)
 {
-    float robotHeading = fmod(drivers->bmi088.getYaw() + getTurretYaw(), 2 * M_PI);
+    float robotHeading = fmod(getTurretYaw() - drivers->bmi088.getYaw(), 2 * M_PI);
     driveBasedOnHeading(forward, sideways, rotational, robotHeading);
 }
 
 float ChassisSubsystem::chassisSpeedRotationPID(float angleOffset)
 {
     // Deadzone logic, make deadzone area a constant eventaully.
-    if (abs(angleOffset) < modm::toRadian(1.0f))
+    if (abs(angleOffset) < modm::toRadian(3.0f))
     {
         return 0.0f;
     }
@@ -168,37 +170,17 @@ float ChassisSubsystem::chassisSpeedRotationAutoDrivePID(float angleOffset)
     return chassisRotationSpeed;
 }
 
-float ChassisSubsystem::getMaxWheelSpeed(bool refSerialOnline, float chassisPowerLimit)
-{
-    if (!refSerialOnline)
-    {
-        chassisPowerLimit = 80;
-    }
-
-    // only re-interpolate when needed (since this function is called a lot and the chassis
-    // power limit rarely changes, this helps cut down on unnecessary array
-    // searching/interpolation)
-    if (lastComputedMaxWheelSpeed.first != (int)chassisPowerLimit)
-    {
-        lastComputedMaxWheelSpeed.first = (int)chassisPowerLimit;
-        lastComputedMaxWheelSpeed.second =
-            CHASSIS_POWER_TO_SPEED_INTERPOLATOR.interpolate(chassisPowerLimit);
-    }
-
-    return lastComputedMaxWheelSpeed.second;
-}
-
 float ChassisSubsystem::getChassisPowerDraw()
 {
     float powerSum = 0.0f;
     for (size_t motor_idx = 0; motor_idx < motors.size(); motor_idx++)
     {
-        powerSum +=
+        powerSum += abs(
             (((float)motors[motor_idx].getOutputDesired() / DjiMotor::MAX_OUTPUT_C620) * 20.0f) *
             (((motors[motor_idx].getEncoder()->getVelocity() * 60.0f / M_TWOPI /
                CHASSIS_GEAR_RATIO) /
               MAX_M3508_RPM_CHASSIS) *
-             24.0f);
+             24.0f));
     }
     return powerSum;
 }
@@ -210,11 +192,33 @@ void ChassisSubsystem::driveBasedOnHeading(
     float heading)
 {
     rampControllers[0].setTarget(forward);
-    rampControllers[0].update(CHASSIS_ACCEL_VALUE);
-    float rampedForward = rampControllers[0].getValue();
+
+    ChassisSubsystem::applyAccelerationToRamp(
+        rampControllers[0],
+        CHASSIS_ACCEL_VALUE,
+        CHASSIS_DECCEL_VALUE,
+        static_cast<float>(tap::Drivers::DT) / 1E3F);
+
     rampControllers[1].setTarget(sideways);
-    rampControllers[1].update(CHASSIS_ACCEL_VALUE);
+
+    ChassisSubsystem::applyAccelerationToRamp(
+        rampControllers[1],
+        CHASSIS_ACCEL_VALUE,
+        CHASSIS_DECCEL_VALUE,
+        static_cast<float>(tap::Drivers::DT) / 1E3F);
+
+    rampControllers[2].setTarget(rotational);
+
+    ChassisSubsystem::applyAccelerationToRamp(
+        rampControllers[2],
+        ROTATION_ACCEL_VALUE,
+        ROTATION_ACCEL_VALUE,
+        static_cast<float>(tap::Drivers::DT) / 1E3F);
+
+    float rampedForward = rampControllers[0].getValue();
     float rampedSideways = rampControllers[1].getValue();
+    float rampedRotational = rampControllers[2].getValue();
+
     float cos_theta = cos(heading);
     float sin_theta = sin(heading);
 
@@ -226,22 +230,24 @@ void ChassisSubsystem::driveBasedOnHeading(
 
     LFSpeed = mpsToRpm(
         (vx_local - vy_local) / M_SQRT2 +
-        (rotational)*DIST_TO_CENTER * M_SQRT2);  // Front-left wheel
+        (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-left wheel
     RFSpeed = mpsToRpm(
         (-vx_local - vy_local) / M_SQRT2 +
-        (rotational)*DIST_TO_CENTER * M_SQRT2);  // Front-right wheel
+        (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-right wheel
     RBSpeed = mpsToRpm(
         (-vx_local + vy_local) / M_SQRT2 +
-        (rotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-right wheel
+        (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-right wheel
     LBSpeed = mpsToRpm(
         (vx_local + vy_local) / M_SQRT2 +
-        (rotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-left wheel
+        (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-left wheel
     int LF = static_cast<int>(MotorId::LF);
     int LB = static_cast<int>(MotorId::LB);
     int RF = static_cast<int>(MotorId::RF);
     int RB = static_cast<int>(MotorId::RB);
     float calculatedMaxRPMPower = limitVal<float>(
-        getMaxWheelSpeed(drivers->refSerial.getRefSerialReceivingData(), getChassisPowerLimit()),
+        getMaxWheelSpeed(
+            drivers->refSerial.getRefSerialReceivingData(),
+            ChassisSubsystem::getChassisPowerLimit(drivers)),
         -MAX_M3508_RPM_CHASSIS,
         MAX_M3508_RPM_CHASSIS);
     desiredOutput[LF] = limitVal<float>(LFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
@@ -249,10 +255,6 @@ void ChassisSubsystem::driveBasedOnHeading(
     desiredOutput[RF] = limitVal<float>(RFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
     desiredOutput[RB] = limitVal<float>(RBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
 }
-
-float odomX = 0;
-float odomY = 0;
-float odomRot = 0;
 
 void ChassisSubsystem::refresh()
 {
@@ -268,14 +270,13 @@ void ChassisSubsystem::refresh()
         runPid(pidControllers[ii], motors[ii], desiredOutput[ii]);
     }
 
-    chassisOdometry->updateOdometry(
-        motors[static_cast<int>(MotorId::LF)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::LB)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
-        motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
-
-    odomX = chassisOdometry->getPositionGlobal().x;
-    odomY = chassisOdometry->getPositionGlobal().y;
-    odomRot = chassisOdometry->getRotation();
+    if (chassisOdometry != nullptr)
+    {
+        chassisOdometry->updateOdometry(
+            motors[static_cast<int>(MotorId::LF)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::LB)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
+            motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
+    }
 }
 }  // namespace src::chassis

@@ -14,7 +14,7 @@
 #elif TURRET
 #include "robot/standard/standard_flywheel_constants.hpp"
 #else
-#include "robot/testbed/testbed_flywheel_constants.hpp"
+#include "robot/hero/hero_flywheel_constants.hpp"
 #endif
 
 namespace src::flywheel

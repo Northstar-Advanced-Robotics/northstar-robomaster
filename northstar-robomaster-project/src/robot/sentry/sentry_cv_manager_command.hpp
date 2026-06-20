@@ -18,16 +18,18 @@ class SentryCvManagerCommand : public tap::control::ComprisedCommand
 public:
     SentryCvManagerCommand(
         tap::Drivers *drivers,
-        src::control::ControlOperatorInterface &controlOperatorInterface,
         src::serial::VisionComms &visionComms,
         src::control::turret::TurretSubsystem *sentryTurretSubsystem,
+        src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand,
         src::control::turret::algorithms::TurretYawControllerInterface *yawController,
         src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
+        src::chassis::ChassisOdometry *chassisOdometry,
         float userYawInputScalar,
         float userPitchInputScalar,
-        float DELTA_MAX,
-        float MAX_ERROR,
-        float ROT_SPEED);
+        float MIN_PITCH_ANGLE,
+        float MAX_PITCH_ANGLE,
+        float PITCH_SPEED,
+        float YAW_SPEED);
 
     bool isReady() override;
 
@@ -42,7 +44,7 @@ public:
     const char *getName() const override { return "Sentry CV"; }
 
 private:
-    src::control::turret::cv::TurretCVControlCommand turretCVControlCommand;
+    src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand;
     src::control::turret::cv::SentryScanCommand turretScanCommand;
     src::serial::VisionComms &visionComms;
 };  // class SentryCvManagerCommand

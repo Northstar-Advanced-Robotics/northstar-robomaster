@@ -65,10 +65,9 @@ class CanRxListener;
  * pollCanData function be called at a very high frequency,
  * so call this in a high frequency thread.
  *
- * @note The CAN handler can handle 64 CAN ids between [`0x1E4`, `0x224`). In the middle of this
- *      range, CAN ids [`0x201`, `0x20B`] are used by the `DjiMotor` objects to receive data from
- *      DJI branded motors. If you would like to define your own protocol, it is recommended to
- *      avoid avoid using CAN ids in this range.
+ * @note CAN ids [`0x201`, `0x20B`] are used by the `DjiMotor` objects to receive
+ *      data from DJI branded motors. If you would like to define your own protocol, it
+ *      is recommended to avoid avoid using CAN ids in this range.
  * @note the DjiMotor driver reserves `0x1FF` and `0x200` for commanding motors,
  *      and thus you should not attach listeners for these ids.
  *
@@ -92,17 +91,6 @@ public:
     DISALLOW_COPY_AND_ASSIGN(CanRxHandler)
 
     /**
-     * @return true if canId lies in either the DJI or REV CAN ID ranges.
-     */
-    static inline bool isValidCanId(uint16_t canId)
-    {
-        return isDjiCanId(canId) || isRevCanId(canId);
-    }
-
-    static bool isDjiCanId(uint16_t canId) { return (canId >= 0X201 && canId <= 0x208); }
-    static bool isRevCanId(uint16_t canId) { return (canId >= 0x001 && canId <= 0x008); }
-
-    /**
      * Given a CAN identifier, returns the bin index between [0, NUM_CAN_IDS) for the identifier.
      */
     static inline uint16_t binIndexForCanId(uint16_t canId) { return canId % CAN_BINS; }
@@ -116,12 +104,11 @@ public:
      *      store listeners may or not be properly allocated if you do and
      *      undefined behavior will follow.
      * @note if you attempt to add a listener with an identifier identical to
-     *      something already in the `CanRxHandler`, an error is thrown and
-     *      the handler does not add the listener.
+     *      something already in the `CanRxHandler`, an error will be added to the
+     *      `ErrorController` and the handler does not add the listener.
      * @see `CanRxListener`
      *
      * @param[in] listener the listener to be attached ot the handler.
-     * @return `true` if listener successfully added, `false` otherwise.
      */
     mockable void attachReceiveHandler(CanRxListener* const listener);
 
@@ -152,15 +139,13 @@ protected:
      * Stores pointers to the `CanRxListeners` for CAN 1, referenced when
      * a new message is received.
      */
-    CanRxListener* messageHandlerStoreDjiCan1[CAN_BINS];
-    CanRxListener* messageHandlerStoreRevCan1[CAN_BINS];
+    CanRxListener* messageHandlerStoreCan1[CAN_BINS];
 
     /**
      * Stores pointers to the `CanRxListeners` for CAN 2, referenced when
      * a new message is received.
      */
-    CanRxListener* messageHandlerStoreDjiCan2[CAN_BINS];
-    CanRxListener* messageHandlerStoreRevCan2[CAN_BINS];
+    CanRxListener* messageHandlerStoreCan2[CAN_BINS];
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 public:
@@ -180,7 +165,7 @@ public:
 
     inline CanRxListener** getHandlerStore(CanBus bus)
     {
-        return bus == CanBus::CAN_BUS1 ? messageHandlerStoreDjiCan1 : messageHandlerStoreDjiCan2;
+        return bus == CanBus::CAN_BUS1 ? messageHandlerStoreCan1 : messageHandlerStoreCan2;
     }
 };  // class CanRxHandler
 

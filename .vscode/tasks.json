@@ -22,7 +22,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=release robot=TARGET_STANDARD",
+            "command": "pipenv run scons build profile=release robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -35,7 +35,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=release robot=TARGET_SENTRY",
+            "command": "pipenv run scons build profile=release robot=SENTRY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -48,7 +48,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=release robot=TARGET_HERO",
+            "command": "pipenv run scons build profile=release robot=HERO",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -61,7 +61,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=release robot=TARGET_TEST_BED",
+            "command": "pipenv run scons build profile=release robot=TEST_BED",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -139,7 +139,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_STANDARD",
+            "command": "pipenv run scons build profile=debug profiling=true robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -152,7 +152,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_SENTRY",
+            "command": "pipenv run scons build profile=debug profiling=true robot=SENTRY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -165,7 +165,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_HERO",
+            "command": "pipenv run scons build profile=debug profiling=true robot=HERO",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -178,7 +178,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_TEST_BED",
+            "command": "pipenv run scons build profile=debug profiling=true robot=TEST_BED",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -191,7 +191,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_STANDARD remote=FLY_SKY",
+            "command": "pipenv run scons build profile=debug profiling=true robot=STANDARD remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -204,7 +204,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_SENTRY remote=FLY_SKY",
+            "command": "pipenv run scons build profile=debug profiling=true robot=SENTRY remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -217,7 +217,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_HERO remote=FLY_SKY",
+            "command": "pipenv run scons build profile=debug profiling=true robot=HERO remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -230,7 +230,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build profile=debug profiling=true robot=TARGET_TEST_BED remote=FLY_SKY",
+            "command": "pipenv run scons build profile=debug profiling=true robot=TEST_BED remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -256,7 +256,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_STANDARD",
+            "command": "pipenv run scons run profile=debug robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -269,7 +269,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_SENTRY",
+            "command": "pipenv run scons run profile=debug robot=SENTRY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -282,7 +282,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_HERO",
+            "command": "pipenv run scons run profile=debug robot=HERO",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -295,7 +295,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_TEST_BED",
+            "command": "pipenv run scons run profile=debug robot=TEST_BED",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -308,7 +308,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_STANDARD remote=FLY_SKY",
+            "command": "pipenv run scons run profile=debug robot=STANDARD remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -321,7 +321,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_SENTRY remote=FLY_SKY",
+            "command": "pipenv run scons run profile=debug robot=SENTRY remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -334,7 +334,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_HERO remote=FLY_SKY",
+            "command": "pipenv run scons run profile=debug robot=HERO remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -347,7 +347,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run profile=debug robot=TARGET_TEST_BED remote=FLY_SKY",
+            "command": "pipenv run scons run profile=debug robot=TEST_BED remote=FLY_SKY",
             "group": "build",
             "problemMatcher": [],
             "options": {

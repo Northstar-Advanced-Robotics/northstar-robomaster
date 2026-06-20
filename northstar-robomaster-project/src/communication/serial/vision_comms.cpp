@@ -7,7 +7,8 @@ VisionComms::VisionComms(tap::Drivers* drivers)
       lastAimData(),
       chassisOdometry(nullptr),
       chassisAutoDrive(nullptr),
-      pitchMotor(nullptr)
+      pitchMotor(nullptr),
+      remote(nullptr)
 {
 }
 
@@ -25,10 +26,24 @@ void VisionComms::initializeUartDelays()
     sendRefTurretDataMsgTimeout.stop();
     sendRobotIDMsgTimeout.stop();
     sendOdometryMsgTimeout.stop();
+    messageOffsetInitializationTimeout.restart(TIME_BEFORE_UART_START);
 }
 
 void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMessage)
 {
+    uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
+    cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
+    if (remote != nullptr)
+    {
+        if (remote->flySkyConnected && currTime - lastReadFlySky > REMOTE_TIMEOUT)
+        {
+            remote->flySkyConnected = false;
+        }
+        if (remote->VT13Connected && currTime - lastReadVT13 > REMOTE_TIMEOUT)
+        {
+            remote->VT13Connected = false;
+        }
+    }
     switch (completeMessage.messageType)
     {
         case MessageType::TURRET_AIM_DATA:
@@ -61,6 +76,22 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
         case MessageType::VISION_LOCALIZATION:
         {
             decodeToVisionAprilTagLocalization(completeMessage);
+            return;
+        }
+        case MessageType::FLY_SKY_DATA:
+        {
+            if (remote != nullptr && !remote->VT13Connected)
+            {
+                decodeToFlySkyRemote(completeMessage);
+            }
+            return;
+        }
+        case MessageType::VT13_DATA:
+        {
+            if (remote != nullptr && !remote->flySkyConnected)
+            {
+                decodeToVT13Remote(completeMessage);
+            }
             return;
         }
 
@@ -118,6 +149,11 @@ bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
 {
+    if (chassisOdometry == nullptr)
+    {
+        return false;
+    }
+
     if (sizeof(OdometryData) > message.header.dataLength)
     {
         return false;
@@ -135,7 +171,10 @@ bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 {
-    assert(chassisAutoDrive != nullptr);
+    if (chassisAutoDrive == nullptr)
+    {
+        return false;
+    }
 
     if (sizeof(CubicBezier::CurveData) > message.header.dataLength)
     {
@@ -153,10 +192,13 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 
     return true;
 }
-
+uint32_t latency = 0;
 bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage& message)
 {
-    assert(chassisOdometry != nullptr);
+    if (chassisOdometry == nullptr)
+    {
+        return false;
+    }
 
     if (sizeof(VisionComms::AprilTagLocalizationData) > message.header.dataLength)
     {
@@ -165,7 +207,57 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
 
     VisionComms::AprilTagLocalizationData localizationData;
     std::memcpy(&localizationData, message.data, sizeof(VisionComms::AprilTagLocalizationData));
-    chassisOdometry->setGlobalPosition({localizationData.posX, localizationData.posY});
+    uint32_t currentTime = tap::arch::clock::getTimeMicroseconds();
+
+    latency = currentTime - localizationData.timestamp;
+
+    chassisOdometry->updateOdometryWithVisionData(
+        localizationData.timestamp,
+        localizationData.posX,
+        localizationData.posY,
+        localizationData.heading);
+
+    return true;
+}
+
+bool VisionComms::decodeToFlySkyRemote(const ReceivedSerialMessage& message)
+{
+    if (remote == nullptr)
+    {
+        return false;
+    }
+    remote->flySkyConnected = true;
+    lastReadFlySky = tap::arch::clock::getTimeMilliseconds();
+    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_FLY_SKY];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
+    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
+    remote->parseBufferFlySky(rxBuffer);
+
+    return true;
+}
+
+bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
+{
+    if (remote == nullptr)
+    {
+        return false;
+    }
+    remote->VT13Connected = true;
+    lastReadVT13 = tap::arch::clock::getTimeMilliseconds();
+    uint8_t rxBuffer[tap::communication::serial::Remote::REMOTE_BUF_LEN_VT13];
+
+    if (sizeof(rxBuffer) > message.header.dataLength)
+    {
+        return false;
+    }
+
+    std::memcpy(&rxBuffer, message.data, sizeof(rxBuffer));
+    remote->parseBufferVT13(rxBuffer);
 
     return true;
 }
@@ -175,10 +267,12 @@ void VisionComms::sendMessage()
    // need
     if (messageOffsetInitializationTimeout.isExpired())
     {
-        sendRobotOdometry();
-        sendRobotIdMessage();
+#ifdef TARGET_SENTRY
         sendHealthData();
         sendTurretRefData();
+#endif
+        sendRobotOdometry();
+        sendRobotIdMessage();
     }
     else
     {
@@ -238,7 +332,7 @@ void VisionComms::sendRobotOdometry()
         OdometryData* data = reinterpret_cast<OdometryData*>(odometryMessage.data);
 
         modm::Vector2f global_pos = chassisOdometry->getPositionGlobal();
-        modm::Vector2f global_vel = chassisOdometry->getVelocityGlobal();
+        modm::Vector2f global_vel = chassisOdometry->getVelocityGlobalVision();
 
         data->timestamp = tap::arch::clock::getTimeMicroseconds();
 
@@ -253,12 +347,13 @@ void VisionComms::sendRobotOdometry()
         // data->chassis_data.vel_z = 0;             // TODO: see z on position (it doesn't exist)
 
         // Turret Data
-        data->turret_data.pitch = pitchMotor->getPositionWrapped();  // radians
-        data->turret_data.yaw = drivers->bmi088.getYaw();            // radians
-        data->turret_data.roll = drivers->bmi088.getRoll();          // radians
+        data->turret_data.pitch =
+            pitchMotor->getPositionWrapped();  // drivers->bmi088.getPitch();  // radians
+        data->turret_data.yaw = drivers->bmi088.getYaw();    // radians
+        data->turret_data.roll = drivers->bmi088.getRoll();  // radians
 
         // data->turret_data.pitch_vel = pitchMotor->getShaftRPM() / 60 * M_TWOPI;
-        // data->turret_data.yaw_vel = drivers->bmi088.getGz();
+        data->turret_data.yaw_vel = drivers->bmi088.getGz();
         // data->turret_data.roll_vel = drivers->bmi088.getGx();
 
         odometryMessage.setCRC16();

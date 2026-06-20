@@ -29,11 +29,16 @@ static constexpr float AUTO_ROTATION_ALPHA = 0.01f;
 
 static constexpr float CHASSIS_GEAR_RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508;
 
-static const float DIST_TO_CENTER = .265f;  // from wheel to center
-static const float WHEEL_DIAMETER_M = 0.118f;
-static const float RAMP_UP_RPM_INCREMENT_MPS = 0.01f;
+static const float DIST_TO_CENTER = .2201774561f;  // from wheel to center
+static const float WHEEL_DIAMETER_M = 0.191;
 
-static constexpr float MAX_CHASSIS_SPEED_MPS = 8.0f;
+static constexpr float CHASSIS_WALK_SPEED_MPS = 1.5f;
+
+// m/s/s
+static constexpr float CHASSIS_ACCEL_VALUE = 3.5f;
+static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
+// rad/s/s
+static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
 
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
 
@@ -45,13 +50,11 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     Sentry - 100W
     1v1 Standard - 120W
     */
-    {50, 3'000},
-    {80, 4'400},
-    {100, 5'200},
-    {125, 6'000}};
+    {50, 2'500},
+    {80, 3'900},
+    {100, 4'700},
+    {125, 5'500}};
 // At 9000 rpm the beyblade was around 130, Its over
-
-static constexpr float CHASSIS_ACCEL_VALUE = 0.015f;
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
     CHASSIS_POWER_TO_MAX_SPEED_LUT,
