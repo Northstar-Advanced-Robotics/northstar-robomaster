@@ -401,6 +401,10 @@ auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     &rightMousePressed,
     true);
 
+Trigger rightSwitchUpCvControl =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)
+        .whileTrue(&turretCVControlCommand);
+
 src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
     &drivers()->bmi088,
     &turret.yawMotor,
