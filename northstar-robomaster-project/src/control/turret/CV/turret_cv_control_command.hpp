@@ -58,6 +58,10 @@ public:
         return withinAimingTolerance;
     }
 
+    void setPitchOnlyMode(bool pitchOnly) { pitchOnlyMode = pitchOnly; }
+
+    bool getPitchOnlyMode() const { return pitchOnlyMode; }
+
 private:
     tap::Drivers *drivers;
     ControlOperatorInterface &controlOperatorInterface;
@@ -78,6 +82,8 @@ private:
     float AIMING_TOLERANCE_PITCH = .05;
 
     bool withinAimingTolerance = false;
+
+    bool pitchOnlyMode = false;
 };
 }  // namespace src::control::turret::cv
 

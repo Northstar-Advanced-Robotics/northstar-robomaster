@@ -2,6 +2,7 @@
 
 #include "tap/control/command.hpp"
 
+#include "control/clientDisplay/graphics/graphics_objects/indicators/agitator_jammed_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/all_robot_health_numbers.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_orientation_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/chassis_power_indicator.hpp"
@@ -22,6 +23,7 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/supercap_charge_indicator.hpp"
 
 #include "drivers.hpp"
+
 
 namespace src::control::client_display::graphics
 {
@@ -72,6 +74,7 @@ public:
         addGraphicsObject(&imuCalIndicator);
         addGraphicsObject(&dotCrosshair);
         addGraphicsObject(&cvIndicator);
+        addGraphicsObject(&agitatorJammed);
     };
 
     void initialize() override { ui->setTopLevelContainer(this); };
@@ -95,6 +98,7 @@ public:
         // flywheelReady.update();
         imuCalIndicator.update();
         cvIndicator.update();
+        agitatorJammed.update();
     };
 
     // ui subsystem won't do anything until its top level container is set, so we are ok to add
@@ -137,5 +141,7 @@ private:
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
     DotCrosshair dotCrosshair{drivers};
     CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};
-};
+    AgitatorJammedIndicator agitatorJammed{drivers, agitator};
+};  // namespace src::control::client_display::graphics
+
 }  // namespace src::control::client_display::graphics

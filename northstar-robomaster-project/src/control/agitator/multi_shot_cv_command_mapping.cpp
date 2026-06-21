@@ -68,7 +68,7 @@ void MultiShotCvCommandMapping::executeCommandMapping(
             enableConstantRotation = true;
             break;
         case BURST:
-            timesToReschedule = 10;
+            timesToReschedule = getMaxBurst();
             fireRate = ManualFireRateReselectionManager::MAX_FIRERATE_RPS;
             enableConstantRotation = true;
             break;

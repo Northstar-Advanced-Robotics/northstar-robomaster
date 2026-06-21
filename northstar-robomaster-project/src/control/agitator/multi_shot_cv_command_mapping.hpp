@@ -113,6 +113,22 @@ private:
         return coolingRate / 10.0f;
 #endif
     }
+
+    int getMaxBurst(int targetBurstSize = 10)
+    {
+#if defined(TARGET_HERO)
+        // Allow for overheating but not to the point of disable. allow for 2 shot burst. We can
+        // likely just do return 2 i think.
+        return 2;
+#else
+/* With the 17 shots, get the max heat allowed and our current heat and calculate how many shots we
+   can take. Ideally we do not oveheat. If we cannot reach the passed in target burst size return
+   how many shots we can take without overheating. If we can reach the target burst size, return the
+   target burst size.
+*/
+#endif
+        return 10;
+    }
 };
 
 }  // namespace src::control::agitator
