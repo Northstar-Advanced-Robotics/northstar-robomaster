@@ -213,6 +213,7 @@ public:
     void parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13]);
     void parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY]);
 
+    bool DT7Conected = false;
     bool flySkyConnected = false;
     bool VT13Connected = false;
 

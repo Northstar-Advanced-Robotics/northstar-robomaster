@@ -81,7 +81,7 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
                                  ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
+                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
 
     if (prevUpdateCounterY != updateCounter)
     {
@@ -133,7 +133,7 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
     float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
                                  ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
+                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
 
     if (prevUpdateCounterX != updateCounter)
     {

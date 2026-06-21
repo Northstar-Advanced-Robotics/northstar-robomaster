@@ -40,6 +40,9 @@ static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
 // rad/s/s
 static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
 
+static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
+static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
+
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
 
 static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {

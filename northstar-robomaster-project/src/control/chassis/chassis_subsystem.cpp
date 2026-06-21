@@ -109,15 +109,21 @@ float ChassisSubsystem::calculateMaxRotationSpeed(float vert, float hor)
     float maxWheelSpeed = getMaxWheelSpeed(
         drivers->refSerial.getRefSerialReceivingData(),
         ChassisSubsystem::getChassisPowerLimit(drivers));
-    float allowedwheelSpeed =
-        (maxWheelSpeed - (sqrt(
-                             pow(mpsToRpm(rampControllers[0].getValue()), 2) +
-                             pow(mpsToRpm(rampControllers[1].getValue()), 2))));
-    if (allowedwheelSpeed < 0.0f)
+
+    float linearSpeedRPM =
+        (chassisOdometry != nullptr)
+            ? mpsToRpm(chassisOdometry->getVelocityLocal().getLength())
+            : mpsToRpm(sqrtf(
+                  rampControllers[0].getValue() * rampControllers[0].getValue() +
+                  rampControllers[1].getValue() * rampControllers[1].getValue()));
+
+    float allowedWheelSpeed = maxWheelSpeed - linearSpeedRPM / 1.4142;
+
+    if (allowedWheelSpeed < 0.0f)
     {
-        allowedwheelSpeed = 0.0f;
+        allowedWheelSpeed = 0.0f;
     }
-    return (allowedwheelSpeed * (CHASSIS_GEAR_RATIO) * (M_TWOPI / 60.0f) * (WHEEL_DIAMETER_M / 2)) /
+    return (allowedWheelSpeed * (CHASSIS_GEAR_RATIO) * (M_TWOPI / 60.0f) * (WHEEL_DIAMETER_M / 2)) /
            DIST_TO_CENTER;
 }
 
@@ -191,11 +197,32 @@ void ChassisSubsystem::driveBasedOnHeading(
     float rotational,
     float heading)
 {
+    float maxWheelSpeed = getMaxWheelSpeed(
+        drivers->refSerial.getRefSerialReceivingData(),
+        getChassisPowerLimit(drivers));
+
+    float dynamicAccel = CHASSIS_ACCEL_VALUE;
+    if (chassisOdometry != nullptr)
+    {
+        auto vel = chassisOdometry->getVelocityLocal();
+        float currentSpeed = sqrtf(vel.x * vel.x + vel.y * vel.y);
+        float maxSpeedMPS = maxWheelSpeed * (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
+        float speedFraction = limitVal<float>(currentSpeed / maxSpeedMPS, 0.0f, 1.0f);
+        dynamicAccel = CHASSIS_ACCEL_VALUE * (1.0f - ACCEL_TAPER_FACTOR * speedFraction);
+    }
+
+    float maxRotSpeed =
+        (maxWheelSpeed * CHASSIS_GEAR_RATIO * M_TWOPI / 60.0f * (WHEEL_DIAMETER_M / 2.0f)) /
+        DIST_TO_CENTER;
+    float rotFraction = limitVal<float>(abs(getChassisRotationSpeed()) / maxRotSpeed, 0.0f, 1.0f);
+    float dynamicRotAccel =
+        ROTATION_ACCEL_VALUE * (1.0f - ROTATION_ACCEL_TAPER_FACTOR * rotFraction);
+
     rampControllers[0].setTarget(forward);
 
     ChassisSubsystem::applyAccelerationToRamp(
         rampControllers[0],
-        CHASSIS_ACCEL_VALUE,
+        dynamicAccel,
         CHASSIS_DECCEL_VALUE,
         static_cast<float>(tap::Drivers::DT) / 1E3F);
 
@@ -203,7 +230,7 @@ void ChassisSubsystem::driveBasedOnHeading(
 
     ChassisSubsystem::applyAccelerationToRamp(
         rampControllers[1],
-        CHASSIS_ACCEL_VALUE,
+        dynamicAccel,
         CHASSIS_DECCEL_VALUE,
         static_cast<float>(tap::Drivers::DT) / 1E3F);
 
@@ -211,7 +238,7 @@ void ChassisSubsystem::driveBasedOnHeading(
 
     ChassisSubsystem::applyAccelerationToRamp(
         rampControllers[2],
-        ROTATION_ACCEL_VALUE,
+        dynamicRotAccel,
         ROTATION_ACCEL_VALUE,
         static_cast<float>(tap::Drivers::DT) / 1E3F);
 
@@ -250,10 +277,19 @@ void ChassisSubsystem::driveBasedOnHeading(
             ChassisSubsystem::getChassisPowerLimit(drivers)),
         -MAX_M3508_RPM_CHASSIS,
         MAX_M3508_RPM_CHASSIS);
-    desiredOutput[LF] = limitVal<float>(LFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    desiredOutput[LB] = limitVal<float>(LBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    desiredOutput[RF] = limitVal<float>(RFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    desiredOutput[RB] = limitVal<float>(RBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
+
+    float sumSpeed = std::abs(LFSpeed) + std::abs(LBSpeed) + std::abs(RFSpeed) + std::abs(RBSpeed);
+    float powerBudget = calculatedMaxRPMPower * 4.0f;
+    float scale = (sumSpeed > powerBudget && sumSpeed > 0.0f) ? powerBudget / sumSpeed : 1.0f;
+    desiredOutput[LF] = LFSpeed * scale;
+    desiredOutput[LB] = LBSpeed * scale;
+    desiredOutput[RF] = RFSpeed * scale;
+    desiredOutput[RB] = RBSpeed * scale;
+
+    // desiredOutput[LF] = limitVal<float>(LFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
+    // desiredOutput[LB] = limitVal<float>(LBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
+    // desiredOutput[RF] = limitVal<float>(RFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
+    // desiredOutput[RB] = limitVal<float>(RBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
 }
 
 void ChassisSubsystem::refresh()

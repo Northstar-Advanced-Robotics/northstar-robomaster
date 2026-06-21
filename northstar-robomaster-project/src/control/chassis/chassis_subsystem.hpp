@@ -151,7 +151,7 @@ public:
     {
         if (!refSerialOnline)
         {
-            chassisPowerLimit = 80;
+            chassisPowerLimit = 75;
         }
 
         // only re-interpolate when needed (since this function is called a lot and the chassis
@@ -218,6 +218,15 @@ public:
     }
 
     void setIsSprinting(bool sprinting) { isSprinting = sprinting; }
+
+    float getWheelRpm()
+    {
+        float wheelSum = abs(motors.at(0).getEncoder()->getVelocity()) +
+                         abs(motors.at(1).getEncoder()->getVelocity()) +
+                         abs(motors.at(2).getEncoder()->getVelocity()) +
+                         abs(motors.at(3).getEncoder()->getVelocity());
+        return wheelSum / 4.0f * 60.0f / M_TWOPI / CHASSIS_GEAR_RATIO;
+    }
 
     bool isBeyblading{false};
     bool isPeeking{false};

@@ -26,7 +26,7 @@ public:
 
     void update()
     {
-        float rawPower = chassis->getChassisPowerDraw();
+        float rawPower = chassis->getWheelRpm();  // chassis->getChassisPowerDraw();
 
         powerBuffer[bufferIndex] = rawPower;
         bufferIndex = (bufferIndex + 1) % BUFFER_SIZE;

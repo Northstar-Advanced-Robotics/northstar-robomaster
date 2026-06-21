@@ -60,11 +60,8 @@ void Remote::readDJI()
     if (tap::arch::clock::getTimeMilliseconds() - lastRead > REMOTE_DISCONNECT_TIMEOUT)
     {
         connected = false;  // Remote no longer connected
-        reset();            // Reset current remote values
-    }
-    if (flySkyConnected || VT13Connected)
-    {
-        return;
+        DT7Conected = false;
+        reset();  // Reset current remote values
     }
 
     uint8_t data;  // Next byte to be read
@@ -75,6 +72,11 @@ void Remote::readDJI()
         rxBuffer[currentBufferIndex] = data;
         currentBufferIndex++;
         lastRead = tap::arch::clock::getTimeMilliseconds();
+    }
+
+    if (!DT7Conected && currentBufferIndex > 0)
+    {
+        DT7Conected = true;
     }
     // Check read timeout
     if (tap::arch::clock::getTimeMilliseconds() - lastRead > REMOTE_READ_TIMEOUT)
@@ -92,6 +94,10 @@ void Remote::readDJI()
 
 void Remote::readFLYSKY()
 {
+    if (DT7Conected)
+    {
+        return;
+    }
     static int syncState = 0;  // 0 = waiting for 0x20, 1 = waiting for 0x40, 2 = reading data
     // Check disconnect timeout
     if (tap::arch::clock::getTimeMilliseconds() - lastRead > REMOTE_DISCONNECT_TIMEOUT)
@@ -244,6 +250,10 @@ void Remote::parseBufferDT7(uint8_t rxBuffer[REMOTE_BUF_LEN_DT7])
 
 void Remote::parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13])
 {
+    if (DT7Conected)
+    {
+        return;
+    }
     lastRead = tap::arch::clock::getTimeMilliseconds();
     // remote joystick information
     remote.rightHorizontal = (rxBuffer[2] | rxBuffer[3] << 8) & 0x07FF;
@@ -308,6 +318,11 @@ void Remote::parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13])
 uint16_t Conected_raw = 0;
 void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
 {
+    if (DT7Conected)
+    {
+        return;
+    }
+
     lastRead = tap::arch::clock::getTimeMilliseconds();
 
     for (int i = 0; i < 14; i++)
@@ -365,6 +380,8 @@ void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
     Conected_raw = rxBuffer[16] | (rxBuffer[17] << 8);
     connected =
         parse_2_way_switch(rxBuffer[16], rxBuffer[17]) == Remote::SwitchState::DOWN;  // CH10 SWD
+
+    flySkyConnected = connected;
 
     // mouse input
     remote.mouse.x = 0;
