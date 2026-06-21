@@ -42,7 +42,7 @@ float ControlOperatorInterface::getTurretYawInput()
 {
     float input;
 
-    input = drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL) +
+    input = drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL) * REMOTE_TURRET_SCALAR +
             static_cast<float>(limitVal<int16_t>(
                 drivers->remote.getMouseX(),
                 -USER_MOUSE_YAW_MAX,
@@ -59,7 +59,7 @@ float ControlOperatorInterface::getTurretPitchInput()
 {
     float input;
 
-    input = drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL) +
+    input = drivers->remote.getChannel(Remote::Channel::RIGHT_VERTICAL) * REMOTE_TURRET_SCALAR +
             static_cast<float>(limitVal<int16_t>(
                 drivers->remote.getMouseY(),
                 -USER_MOUSE_PITCH_MAX,

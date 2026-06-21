@@ -47,6 +47,8 @@ public:
     static constexpr float USER_MOUSE_YAW_SCALAR = (1.0f / USER_MOUSE_YAW_MAX);
     static constexpr float USER_MOUSE_PITCH_SCALAR = (1.0f / USER_MOUSE_PITCH_MAX);
 
+    static constexpr float REMOTE_TURRET_SCALAR = 0.6f;
+
     ControlOperatorInterface(tap::Drivers *drivers) : drivers(drivers) {}
 
     /**

@@ -140,7 +140,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 // flywheel
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS, true);
 
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 12);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 14);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
@@ -178,7 +178,8 @@ MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
     rotateAgitator,
     unjamAgitator);
 
-GovernorLimitedCommand<1> runKickerWhenFlywheelsOn{{&kicker}, rotateKicker, {&flywheelOnGovernor}};
+// GovernorLimitedCommand<1> runKickerWhenFlywheelsOn{{&kicker}, rotateKicker,
+// {&flywheelOnGovernor}};
 
 // ConcurrentCommand<2> rotateAndUnjamAgitatorWithKicker(
 //     {&rotateAndUnjamAgitator, &rotateKicker},
@@ -246,6 +247,16 @@ auto ePressed5RPS = std::make_unique<ToggleCommandMapping>(
     std::vector<Command *>{&setFireRateCommand5SPR},
     &ePressed);
 
+// Trigger rightSwitchMid1Rps =
+//     (TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH,
+//     Remote::SwitchState::MID))
+//         .onTrue(&setFireRateCommand1RPS);
+
+// Trigger rightSwitchUp5Rps =
+//     (TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH,
+//     Remote::SwitchState::UP))
+//         .onTrue(&setFireRateCommand5SPR);
+
 RemoteMapState leftMousePressed = RemoteMapState(RemoteMapState::MouseButton::LEFT);
 auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
@@ -264,11 +275,11 @@ auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     cvOnTargetGovernor,
     &rotateAgitator);
 
-RemoteMapState rightSwitchUp(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP);
-auto rightSwitchUpRunKicker = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&rotateKicker},
-    &rightSwitchUp);
+// RemoteMapState rightSwitchUp(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP);
+// auto rightSwitchUpRunKicker = std::make_unique<ToggleCommandMapping>(
+//     drivers(),
+//     std::vector<Command *>{&rotateKicker},
+//     &rightSwitchUp);
 
 // turret subsystem
 tap::motor::DjiMotor pitchMotor(
@@ -390,6 +401,12 @@ auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     &rightMousePressed,
     true);
 
+src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
+    &drivers()->bmi088,
+    &turret.yawMotor,
+    src::chassis::DIST_TO_CENTER,
+    src::chassis::WHEEL_DIAMETER_M);
+
 // chassis subsystem
 src::chassis::ChassisSubsystem chassisSubsystem(
     drivers(),
@@ -405,7 +422,8 @@ src::chassis::ChassisSubsystem chassisSubsystem(
             src::chassis::VELOCITY_PID_KD,
             src::chassis::VELOCITY_PID_MAX_ERROR_SUM),
     },
-    &turret.yawMotor);
+    &turret.yawMotor,
+    chassisOdometry);
 
 src::chassis::ChassisDriveCommand chassisDriveCommand(
     &chassisSubsystem,
@@ -532,7 +550,7 @@ void registerHeroSubsystems(Drivers *drivers)
 
 void setDefaultHeroCommands(Drivers *drivers)
 {
-    chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
+    chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
     ui.setDefaultCommand(&heroDrawCommand);
 }
@@ -540,6 +558,7 @@ void setDefaultHeroCommands(Drivers *drivers)
 void startHeroCommands(Drivers *drivers)
 {
     drivers->visionComms.attachPitchMotor(&pitchMotor);
+    drivers->visionComms.attachOdometry(chassisOdometry);
     drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(
@@ -564,7 +583,7 @@ void registerHeroIoMappings(Drivers *drivers)
     drivers->commandMapper.addMap(std::move(rightSwitchDownBeyblade));
     drivers->commandMapper.addMap(std::move(leftSwitchDownPressedShoot));
     drivers->commandMapper.addMap(std::move(leftSwitchUpFlywheels));
-    drivers->commandMapper.addMap(std::move(rightSwitchUpRunKicker));
+    // drivers->commandMapper.addMap(std::move(rightSwitchUpRunKicker));
 
     /// TRIGGERS
     /// Triggers don't need to be added to the command mapper since they register themselves
