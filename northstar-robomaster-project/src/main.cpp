@@ -188,9 +188,15 @@ static void initializeIo(Drivers *drivers)
 
     drivers->refSerial.initialize();
 
+#ifdef TARGET_HERO
+    drivers->bmi088.initialize(500, 0.1f, 0.000f);
+    drivers->bmi088.setTargetTemperature(35.0f);
+    drivers->bmi088.setCalibrationSamples(2000);
+#else
     drivers->bmi088.initialize(500, 0.05f, 0.000f);
     drivers->bmi088.setTargetTemperature(35.0f);
     drivers->bmi088.setCalibrationSamples(2000);
+#endif
 
     drivers->visionComms.initializeCV();
 }

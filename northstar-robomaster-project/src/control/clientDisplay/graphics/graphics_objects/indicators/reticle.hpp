@@ -129,7 +129,7 @@ public:
 
     void update()
     {
-        float pitch = turret->yawMotor.getChassisFrameMeasuredAngle().getWrappedValue();
+        float pitch = turret->pitchMotor.getChassisFrameMeasuredAngle().getWrappedValue();
 
         ReticleSidedMode adjustedSidedMode =
             drawMode == ReticleDrawMode::TRAPEZOIDS ? ReticleSidedMode::BOTH : sidedMode;
@@ -327,7 +327,7 @@ private:
     {
         if (solveMode == ReticleSolveMode::FOR_HEIGHT_OFF_GROUND)
         {
-            Vector3d temp{0, 15.0f, 0};
+            Vector3d temp{0, 14.5f, 0};
             Vector3d initialVelo = temp.rotatePitch(-*pitch);
             Vector3d initialPos{0, 0, 0};  // shot starts in barrel space
             temp = Projections::barrelSpaceToPivotSpace(initialPos);
