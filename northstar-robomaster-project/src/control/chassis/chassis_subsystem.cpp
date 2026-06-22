@@ -279,7 +279,15 @@ void ChassisSubsystem::driveBasedOnHeading(
         MAX_M3508_RPM_CHASSIS);
 
     float sumSpeed = std::abs(LFSpeed) + std::abs(LBSpeed) + std::abs(RFSpeed) + std::abs(RBSpeed);
-    float powerBudget = calculatedMaxRPMPower * 4.0f;
+    float powerBudget;
+    if (isBeyblading)
+    {
+        powerBudget = calculatedMaxRPMPower * 4.0f * BEYBLADE_SPEEDUP_FACTOR;
+    }
+    else
+    {
+        powerBudget = calculatedMaxRPMPower * 4.0f;
+    }
     float scale = (sumSpeed > powerBudget && sumSpeed > 0.0f) ? powerBudget / sumSpeed : 1.0f;
     desiredOutput[LF] = LFSpeed * scale;
     desiredOutput[LB] = LBSpeed * scale;
