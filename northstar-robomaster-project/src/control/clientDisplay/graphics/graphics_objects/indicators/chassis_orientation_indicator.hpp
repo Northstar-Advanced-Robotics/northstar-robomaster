@@ -82,8 +82,8 @@ public:
 
         if (showPlsSpin)
         {
-            plsSpinText.setHidden(chassis->isPeeking || chassis->isBeyblading);
-            // plsSpinBox.setHidden(!chassis->isPeeking && !chassis->isBeyblading);
+            plsSpinText.setHidden(chassis->isPeeking || chassis->isBeybladingOnly);
+            // plsSpinBox.setHidden(!chassis->isPeeking && !chassis->isBeybladingOnly);
 
             plsSpinText.x = UISubsystem::HALF_SCREEN_WIDTH - plsSpinText.width / 2;
             // plsSpinBox.x1 = plsSpinText.x-TEXT_THICKNESS;

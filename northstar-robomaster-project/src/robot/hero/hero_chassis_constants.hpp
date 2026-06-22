@@ -56,6 +56,7 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     */
     {75, 3'500},
     {90, 4'000},
+    {100, 4'250},
     (120, 5'000)};
 // At 9000 rpm the beyblade was around 130, Its over
 

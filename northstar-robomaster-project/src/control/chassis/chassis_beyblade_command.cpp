@@ -27,7 +27,6 @@ void ChassisBeybladeCommand::initialize()
 {
     prevTime = tap::arch::clock::getTimeMilliseconds();
     calcSpeed = 1.0f * direction;
-    chassis->isBeyblading = true;
 }
 
 float calcedRot;
@@ -46,9 +45,15 @@ void ChassisBeybladeCommand::execute()
     calcedRot = calculateBeyBladeRotationSpeed(
         chassis->calculateMaxRotationSpeed(verticalSpeed, horizontalSpeed),
         dt);
-    if (powf(verticalSpeed, 2) + powf(horizontalSpeed, 2) < beyBladeFastSpinSpeedThreshold)
+    if (chassis->getChassisOdometry()->getVelocityLocal().getLength() <
+        beyBladeFastSpinSpeedThreshold)
     {
+        chassis->isBeybladingOnly = true;
         calcedRot *= BEYBLADE_SPEEDUP_FACTOR;
+    }
+    else
+    {
+        chassis->isBeybladingOnly = false;
     }
     chassis->setVelocityTurretDrive(verticalSpeed, -horizontalSpeed, calcedRot);
 }
@@ -56,7 +61,7 @@ void ChassisBeybladeCommand::execute()
 void ChassisBeybladeCommand::end([[maybe_unused]] bool interrupted)
 {
     chassis->setVelocityTurretDrive(0, 0, 0);
-    chassis->isBeyblading = false;
+    chassis->isBeybladingOnly = false;
 }
 
 float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt)

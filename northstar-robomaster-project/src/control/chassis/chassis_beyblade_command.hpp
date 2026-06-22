@@ -54,7 +54,7 @@ private:
 
     float calcSpeed;
 
-    float beyBladeFastSpinSpeedThreshold = 0.1f;
+    float beyBladeFastSpinSpeedThreshold = 0.3f;
 
     float calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt);
 };

@@ -30,7 +30,7 @@ static constexpr float CHASSIS_VOLTAGE = 24.0f;
 static constexpr float MAX_M3508_RPM_CHASSIS =
     482.0 / tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508;
 
-static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.1f;
+static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.3f;
 
 [[maybe_unused]] static modm::Pair<float, float> getNormalizedInput(float vert, float hor)
 {
