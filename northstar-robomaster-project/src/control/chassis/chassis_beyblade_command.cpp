@@ -48,7 +48,7 @@ void ChassisBeybladeCommand::execute()
         dt);
     if (powf(verticalSpeed, 2) + powf(horizontalSpeed, 2) < beyBladeFastSpinSpeedThreshold)
     {
-        calcedRot *= beyBladeSpeedUpFactor;
+        calcedRot *= BEYBLADE_SPEEDUP_FACTOR;
     }
     chassis->setVelocityTurretDrive(verticalSpeed, -horizontalSpeed, calcedRot);
 }
