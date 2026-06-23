@@ -44,6 +44,8 @@ static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
 static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
 static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
 
+static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.3f;
+
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
 
 static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
