@@ -24,7 +24,6 @@ void VisionComms::initializeUartDelays()
 {
     sendHealthMsgTimeout.stop();
     sendRefTurretDataMsgTimeout.stop();
-    sendRobotIDMsgTimeout.stop();
     sendOdometryMsgTimeout.stop();
     messageOffsetInitializationTimeout.restart(TIME_BEFORE_UART_START);
 }
@@ -272,7 +271,6 @@ void VisionComms::sendMessage()
         sendTurretRefData();
 #endif
         sendRobotOdometry();
-        sendRobotIdMessage();
     }
     else
     {
@@ -280,12 +278,6 @@ void VisionComms::sendMessage()
             messageOffsetInitializationTimeout.timeRemaining() < TIME_BEFORE_SENDING_ODOMETRY_MSG)
         {
             sendOdometryMsgTimeout.restart();
-        }
-
-        if (sendRobotIDMsgTimeout.isStopped() &&
-            messageOffsetInitializationTimeout.timeRemaining() < TIME_BEFORE_SENDING_ROBOT_ID_MSG)
-        {
-            sendRobotIDMsgTimeout.restart();
         }
 
         if (sendHealthMsgTimeout.isStopped() &&
@@ -305,17 +297,14 @@ void VisionComms::sendMessage()
 
 void VisionComms::sendRobotIdMessage()
 {
-    if (sendRobotIDMsgTimeout.execute())
-    {
-        DJISerial::SerialMessage<1> robotTypeMessage;
-        robotTypeMessage.messageType = MessageType::ROBOT_ID;
-        robotTypeMessage.data[0] = static_cast<uint8_t>(drivers->refSerial.getRobotData().robotId);
-        robotTypeMessage.setCRC16();
-        drivers->uart.write(
-            VISION_COMMS_TX_UART_PORT,
-            reinterpret_cast<uint8_t*>(&robotTypeMessage),
-            sizeof(robotTypeMessage));
-    }
+    DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
+    robotTypeMessage.messageType = MessageType::ROBOT_ID;
+    robotTypeMessage.data[0] = static_cast<uint8_t>(drivers->refSerial.getRobotData().robotId);
+    robotTypeMessage.setCRC16();
+    drivers->uart.write(
+        VISION_COMMS_TX_UART_PORT,
+        reinterpret_cast<uint8_t*>(&robotTypeMessage),
+        sizeof(robotTypeMessage));
 }
 
 void VisionComms::sendRobotOdometry()
@@ -347,10 +336,9 @@ void VisionComms::sendRobotOdometry()
         // data->chassis_data.vel_z = 0;             // TODO: see z on position (it doesn't exist)
 
         // Turret Data
-        data->turret_data.pitch =
-            pitchMotor->getPositionWrapped();  // drivers->bmi088.getPitch();  // radians
-        data->turret_data.yaw = drivers->bmi088.getYaw();    // radians
-        data->turret_data.roll = drivers->bmi088.getRoll();  // radians
+        data->turret_data.pitch = drivers->bmi088.getPitch();  // radians
+        data->turret_data.yaw = drivers->bmi088.getYaw();      // radians
+        data->turret_data.roll = drivers->bmi088.getRoll();    // radians
 
         // data->turret_data.pitch_vel = pitchMotor->getShaftRPM() / 60 * M_TWOPI;
         data->turret_data.yaw_vel = drivers->bmi088.getGz();

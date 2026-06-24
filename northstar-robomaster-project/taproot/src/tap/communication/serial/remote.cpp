@@ -340,8 +340,8 @@ void Remote::parseBufferFlySky(uint8_t rxBuffer[REMOTE_BUF_LEN_FLY_SKY])
     // Helper lambda to unpack, center, and scale the joystick values
     auto parse_and_scale = [](uint8_t low_byte, uint8_t high_byte) -> int16_t {
         int32_t raw = low_byte | (high_byte << 8);
-        // Center at 0 (raw - 1500) +- 500
-        return static_cast<int16_t>(raw - 1500);
+        // Center at 0 (raw - 1500) * 1.32 = +- 660
+        return static_cast<int16_t>((raw - 1500) * 1.32f);
     };
 
     // 1. Remote Joysticks (Channels 1-4)

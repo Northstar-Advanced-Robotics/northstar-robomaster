@@ -348,6 +348,10 @@ auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
     &rightMousePressed,
     true);
 
+Trigger rightSwitchUpCvControl =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)
+        .whileTrue(&turretCVControlCommand);
+
 src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
     &drivers()->bmi088,
     &turret.yawMotor,
@@ -446,9 +450,9 @@ Trigger ctrlZPressedImuCal = (TriggerHelpers::button(drivers(), Remote::Key::Z) 
                               TriggerHelpers::button(drivers(), Remote::Key::CTRL))
                                  .onTrue(&imuCalibrateCommand);
 
-// Trigger imuCalWhenWheelRight =
-//     TriggerHelpers::channelLessThan(drivers(), Remote::Channel::WHEEL, -0.8)
-//         .onTrue(&imuCalibrateCommand);
+Trigger imuCalWhenWheelRight =
+    TriggerHelpers::channelLessThan(drivers(), Remote::Channel::WHEEL, -0.8)
+        .onTrue(&imuCalibrateCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
