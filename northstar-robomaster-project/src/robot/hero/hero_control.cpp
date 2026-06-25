@@ -292,6 +292,8 @@ tap::motor::DjiMotor pitchMotor(
     1,
     PITCH_MOTOR_CONFIG.startEncoderValue);
 
+const float YawRation = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 * (64.0f / 94.0f);
+
 tap::motor::DjiMotor yawMotor(
     drivers(),
     YAW_MOTOR_ID_2,
@@ -299,7 +301,7 @@ tap::motor::DjiMotor yawMotor(
     true,
     "YawMotor",
     false,
-    1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(1.0f / 3.6f),
+    1,
     YAW_MOTOR_CONFIG.startEncoderValue,
     &drivers()->encoder);
 

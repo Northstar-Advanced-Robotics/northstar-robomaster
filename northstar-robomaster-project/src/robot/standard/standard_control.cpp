@@ -59,6 +59,7 @@
 // cv
 #include "control/agitator/multi_shot_cv_command_mapping.hpp"
 #include "control/governor/cv_on_target_governor.hpp"
+#include "control/turret/CV/turret_cv_targeting_toggle_command.hpp"
 #include "control/turret/cv/turret_cv_control_command.hpp"
 
 // flywheel
@@ -197,6 +198,13 @@ GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProject
 
 extern cv::TurretCVControlCommand turretCVControlCommand;
 CvOnTargetGovernor cvOnTargetGovernor(drivers(), drivers()->visionComms, turretCVControlCommand);
+
+cv::TurretCVTargetingToggleCommand turretCvTargetingToggleCommand(
+    &dummySubsystem,
+    &turretCVControlCommand);
+
+Trigger vPressedTurretCvTargetingToggleCommand =
+    TriggerHelpers::button(drivers(), Remote::Key::V).onTrue(&turretCvTargetingToggleCommand);
 
 RemoteMapState cPressedNotCtrl({Remote::Key::C}, {Remote::Key::CTRL});
 auto cPressedNotCtrlCVGovernorToggle =
@@ -497,7 +505,7 @@ void registerStandardSubsystems(Drivers *drivers)
 
 void setDefaultStandardCommands([[maybe_unused]] Drivers *drivers)
 {
-    chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
+    chassisSubsystem.setDefaultCommand(&chassisDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);
     ui.setDefaultCommand(&infantryDrawCommand);
 }
