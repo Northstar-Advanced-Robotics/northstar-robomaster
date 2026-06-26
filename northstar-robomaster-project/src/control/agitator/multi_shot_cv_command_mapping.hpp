@@ -121,11 +121,14 @@ private:
         // likely just do return 2 i think.
         return 2;
 #else
-/* With the 17 shots, get the max heat allowed and our current heat and calculate how many shots we
-   can take. Ideally we do not oveheat. If we cannot reach the passed in target burst size return
-   how many shots we can take without overheating. If we can reach the target burst size, return the
-   target burst size.
-*/
+        /* With the 17 shots, get the max heat allowed and our current heat and calculate how many
+           shots we can take. Ideally we do not oveheat. If we cannot reach the passed in target
+           burst size return how many shots we can take without overheating. If we can reach the
+           target burst size, return the target burst size.
+        */
+        int heat = drivers->refSerial.getRobotData().turret.heat17ID1;
+        int heatLimit = drivers->refSerial.getRobotData().turret.heatLimit;
+        return std::min(targetBurstSize, (heatLimit - heat) / 10);
 #endif
         return 10;
     }
