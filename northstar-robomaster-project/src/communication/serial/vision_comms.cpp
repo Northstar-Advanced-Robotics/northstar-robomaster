@@ -407,11 +407,11 @@ void VisionComms::sendTurretRefData()
         std::memcpy(&message.data[10], &firingFreq, 2);
 
         // Offset 12
-        uint16_t heat17_1 = static_cast<uint16_t>(refTurretData.heat17ID1);
+        uint16_t heat17_1 = static_cast<uint16_t>(refTurretData.heat17);
         std::memcpy(&message.data[12], &heat17_1, 2);
 
         // Offset 14
-        uint16_t heat17_2 = static_cast<uint16_t>(refTurretData.heat17ID2);
+        uint16_t heat17_2 = static_cast<uint16_t>(uint16_t{0});
         std::memcpy(&message.data[14], &heat17_2, 2);
 
         // Offset 16
