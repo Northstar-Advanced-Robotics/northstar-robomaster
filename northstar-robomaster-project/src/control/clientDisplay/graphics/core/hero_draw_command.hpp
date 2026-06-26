@@ -20,7 +20,6 @@
 
 #include "drivers.hpp"
 
-
 namespace src::control::client_display::graphics
 {
 class HeroDrawCommand : public tap::control::Command, GraphicsContainer
@@ -62,28 +61,41 @@ public:
         addGraphicsObject(&countdown);
         // addGraphicsObject(&velo);
         // addGraphicsObject(&recal);
+        addGraphicsObject(&firemode);
         addGraphicsObject(&chassisPower);
-        addGraphicsObject(&velo);
+        addGraphicsObject(&imuCalIndicator);
+        // addGraphicsObject(&velo);
+        addGraphicsObject(&cvIndicator);
         addGraphicsObject(&agitatorJammed);
     };
 
-    void initialize() override { ui->setTopLevelContainer(this); };
+    void initialize() override
+    {
+        ui->setTopLevelContainer(this);
+        for (int i = 0; i < reticle.NUM_THINGS; i++)
+        {
+            reticle.update();
+        }
+    };
 
     void execute() override
     {
         lane.update();
         // supercap.update();
         orient.update();
-        reticle.update();
         ring.update();
         // remain.update();
         numbers.update();
         countdown.update();
-        velo.update();
+        // velo.update();
         // recal.update();
         chassisPower.update();
+        firemode.update();
+
         // logo doesn't need updating
-        velo.update();
+        // velo.update();
+        imuCalIndicator.update();
+        cvIndicator.update();
         agitatorJammed.update();
     };
 
@@ -121,7 +133,7 @@ private:
     // LinearVelocityIndicator velo{chassis};
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
-    LinearVelocityIndicator velo{chassis};
+    // LinearVelocityIndicator velo{chassis};
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};
     FiremodeIndicator firemode{drivers, multiShotCvCommandMapping, flywheelGovernor};
     CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};

@@ -64,7 +64,7 @@ public:
         // addGraphicsObject(&remain);
         addGraphicsObject(&numbers);
         addGraphicsObject(&countdown);
-        addGraphicsObject(&velo);
+        // addGraphicsObject(&velo);
         // addGraphicsObject(&recal);
         addGraphicsObject(&chassisPower);
         addGraphicsObject(&firemode);
@@ -133,7 +133,7 @@ private:
     // LinearVelocityIndicator velo{chassis};
     // ImuRecalibrationIndicator recal{drivers};
     ChassisPowerIndicator chassisPower{drivers, chassis};
-    LinearVelocityIndicator velo{chassis};
+    // LinearVelocityIndicator velo{chassis};
     FiremodeIndicator firemode{drivers, multiShotCvCommandMapping, flywheelGovernor};
     // FlywheelReadyIndicator flywheelReady{drivers, flywheelGovernor};
     ImuCalIndicator imuCalIndicator{drivers, imuCalibrateCommand};

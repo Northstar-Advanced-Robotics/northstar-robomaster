@@ -66,7 +66,7 @@ static constexpr TurretMotorConfig YAW_MOTOR_CONFIG = {
 
 static constexpr TurretMotorConfig PITCH_MOTOR_CONFIG = {
     .startAngle = modm::toRadian(0),  // 7.45
-    .startEncoderValue = 4300,
+    .startEncoderValue = 4170,
     .minAngle = modm::toRadian(-30),
     .maxAngle = modm::toRadian(37),
     .limitMotorAngles = true,
@@ -79,7 +79,7 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = -6000.0f;  // 2400.0f;  // 
 namespace world_rel_turret_imu
 {
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 15.0f,
+    .kp = 21.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -118,7 +118,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 2000.0f,
+    .kp = 2100.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1'000.0f,

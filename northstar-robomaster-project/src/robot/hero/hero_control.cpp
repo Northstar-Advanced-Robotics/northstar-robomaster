@@ -60,6 +60,7 @@
 // cv
 #include "control/agitator/multi_shot_cv_command_mapping.hpp"
 #include "control/governor/cv_on_target_governor.hpp"
+#include "control/turret/CV/turret_cv_targeting_toggle_command.hpp"
 #include "control/turret/cv/turret_cv_control_command.hpp"
 
 // flywheel
@@ -395,6 +396,13 @@ cv::TurretCVControlCommand turretCVControlCommand(
     &worldFramePitchTurretImuController,
     USER_YAW_INPUT_SCALAR,
     USER_PITCH_INPUT_SCALAR);
+
+cv::TurretCVTargetingToggleCommand turretCvTargetingToggleCommand(
+    &dummySubsystem,
+    &turretCVControlCommand);
+
+Trigger vPressedTurretCvTargetingToggleCommand =
+    TriggerHelpers::button(drivers(), Remote::Key::V).onTrue(&turretCvTargetingToggleCommand);
 
 RemoteMapState rightMousePressed(RemoteMapState::MouseButton::RIGHT);
 auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(

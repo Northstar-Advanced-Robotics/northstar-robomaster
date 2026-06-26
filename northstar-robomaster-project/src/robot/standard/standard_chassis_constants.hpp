@@ -29,7 +29,7 @@ static constexpr float AUTO_ROTATION_ALPHA = 0.01f;
 static constexpr float CHASSIS_GEAR_RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508;
 
 static const float DIST_TO_CENTER = .2201774561f;  // from wheel to center
-static const float WHEEL_DIAMETER_M = 0.1816861f;
+static const float WHEEL_DIAMETER_M = 0.191;
 
 static constexpr float CHASSIS_WALK_SPEED_MPS = 1.5f;
 
@@ -40,7 +40,7 @@ static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
 static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
 static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
 
-static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.45f;
+static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.33f;
 
 // rad/s/s
 static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
