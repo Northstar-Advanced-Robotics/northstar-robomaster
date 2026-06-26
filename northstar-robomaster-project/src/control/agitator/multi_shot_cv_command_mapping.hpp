@@ -126,7 +126,7 @@ private:
            burst size return how many shots we can take without overheating. If we can reach the
            target burst size, return the target burst size.
         */
-        int heat = drivers->refSerial.getRobotData().turret.heat17ID1;
+        int heat = drivers->refSerial.getRobotData().turret.heat17;
         int heatLimit = drivers->refSerial.getRobotData().turret.heatLimit;
         return std::min(targetBurstSize, (heatLimit - heat) / 10);
 #endif
