@@ -159,7 +159,7 @@ public:
     /**
      * @brief Resets the offline flag.
      */
-    void resetHasBeenOffline()const;
+    void resetHasBeenOffline() const;
 
     /**
      * Serializes send data and deposits it in a message to be sent.

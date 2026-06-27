@@ -50,6 +50,7 @@ void MultiShotCvCommandMapping::executeCommandMapping(
             timesToReschedule = 1;
             fireRate = ManualFireRateReselectionManager::MAX_FIRERATE_RPS;
             break;
+#ifndef TARGET_HERO
         case NO_HEATING:
             timesToReschedule = -1;
             fireRate = getCurrentBarrelCoolingRate();
@@ -67,6 +68,7 @@ void MultiShotCvCommandMapping::executeCommandMapping(
             fireRate = ManualFireRateReselectionManager::MAX_FIRERATE_RPS;
             enableConstantRotation = true;
             break;
+#endif
         case BURST:
             timesToReschedule = getMaxBurst();
             fireRate = ManualFireRateReselectionManager::MAX_FIRERATE_RPS;

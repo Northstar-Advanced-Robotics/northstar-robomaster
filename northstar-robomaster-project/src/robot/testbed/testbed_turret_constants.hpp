@@ -84,6 +84,8 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = 0.0f;  //-3300.0f;  // 1200
 
 namespace world_rel_turret_imu
 {
+static constexpr float BEYBLADE_FF_GAIN = 80.0f;
+
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
     .kp = 15.0f,
     .ki = 0.0f,

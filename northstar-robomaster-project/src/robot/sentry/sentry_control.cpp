@@ -151,7 +151,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
 
 // flywheel commands
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.0f);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 21.0f);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});

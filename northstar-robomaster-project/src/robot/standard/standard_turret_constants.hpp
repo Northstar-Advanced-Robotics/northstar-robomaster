@@ -84,6 +84,8 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = 0.0f;  //-3300.0f;  // 1200
 
 namespace world_rel_turret_imu
 {
+static constexpr float BEYBLADE_FF_GAIN = 80.0f;
+
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
     .kp = 28.0f,
     .ki = 0.0f,
@@ -98,19 +100,19 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
     .errorDerivativeFloor = 0.0f,
 };
 
-static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = {
-    .kp = 50.0f,
-    .ki = 0.0f,
-    .kd = 0.3f,
-    .maxICumulative = 0.0f,
-    .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,
-    .tQDerivativeKalman = 1.0f,
-    .tRDerivativeKalman = 0.0f,
-    .tQProportionalKalman = 1.0f,
-    .tRProportionalKalman = 0.0f,
-    .errDeadzone = 0.0f,
-    .errorDerivativeFloor = 0.0f,
-};
+// static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = {
+//     .kp = 50.0f,
+//     .ki = 0.0f,
+//     .kd = 0.3f,
+//     .maxICumulative = 0.0f,
+//     .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,
+//     .tQDerivativeKalman = 1.0f,
+//     .tRDerivativeKalman = 0.0f,
+//     .tQProportionalKalman = 1.0f,
+//     .tRProportionalKalman = 0.0f,
+//     .errDeadzone = 0.0f,
+//     .errorDerivativeFloor = 0.0f,
+// };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
     .kp = 1300.0f,

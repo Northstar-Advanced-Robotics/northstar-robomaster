@@ -236,28 +236,6 @@ ConcurrentRaceCommand<2> rotateAndUnjamAgitatorWithKicker(
     "Rotate and Unjam Agitator with Kicker");
 
 // agitator mappings
-RemoteMapState qPressed({tap::communication::serial::Remote::Key::Q});
-auto qPressed1RPS = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&setFireRateCommand1RPS},
-    &qPressed);
-
-RemoteMapState ePressed({tap::communication::serial::Remote::Key::E});
-auto ePressed5RPS = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&setFireRateCommand5SPR},
-    &ePressed);
-
-// Trigger rightSwitchMid1Rps =
-//     (TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH,
-//     Remote::SwitchState::MID))
-//         .onTrue(&setFireRateCommand1RPS);
-
-// Trigger rightSwitchUp5Rps =
-//     (TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH,
-//     Remote::SwitchState::UP))
-//         .onTrue(&setFireRateCommand5SPR);
-
 RemoteMapState leftMousePressed = RemoteMapState(RemoteMapState::MouseButton::LEFT);
 auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
@@ -275,6 +253,19 @@ auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     &manualFireRateReselectionManager,
     cvOnTargetGovernor,
     &rotateAgitator);
+
+RemoteMapState qPressed({Remote::Key::Q});
+RemoteMapState ePressed({Remote::Key::E});
+auto qOrEPressedCycleShotSpeed = std::make_unique<CycleStateCommandMapping<
+    MultiShotCvCommandMapping::LaunchMode,
+    MultiShotCvCommandMapping::NUM_SHOOTER_STATES,
+    MultiShotCvCommandMapping>>(
+    drivers(),
+    &qPressed,
+    MultiShotCvCommandMapping::SINGLE,
+    leftMousePressedShoot.get(),
+    &MultiShotCvCommandMapping::setShooterState,
+    ePressed);
 
 // RemoteMapState rightSwitchUp(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP);
 // auto rightSwitchUpRunKicker = std::make_unique<ToggleCommandMapping>(
@@ -588,8 +579,7 @@ void registerHeroIoMappings(Drivers *drivers)
     drivers->commandMapper.addMap(std::move(fPressedBeyblade));
     drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
     drivers->commandMapper.addMap(std::move(cPressedNotCtrlCVGovernorToggle));
-    drivers->commandMapper.addMap(std::move(qPressed1RPS));
-    drivers->commandMapper.addMap(std::move(ePressed5RPS));
+    drivers->commandMapper.addMap(std::move(qOrEPressedCycleShotSpeed));
     drivers->commandMapper.addMap(std::move(gPressedWiggle));
     drivers->commandMapper.addMap(std::move(rPressedOrientDrive));
     drivers->commandMapper.addMap(std::move(bPressedNormDrive));
