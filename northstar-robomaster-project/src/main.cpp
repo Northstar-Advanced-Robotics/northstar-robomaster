@@ -216,6 +216,9 @@ float dddddgfregr = 0;
 bool uartOnline = false;
 bool cal = false;
 bool calibrated = false;
+RefSerialData::Rx::RobotData robotData;
+uint16_t heat17;
+uint32_t rfidStat;
 static void updateIo(Drivers *drivers)
 {
     // #ifndef TARGET_TEST_BED
@@ -257,5 +260,8 @@ static void updateIo(Drivers *drivers)
     conneccc = drivers->remote.isConnected();
     dddddgfregr = drivers->encoder.getPosition().getUnwrappedValue();
     uartOnline = drivers->refSerial.getRefSerialReceivingData();
+    robotData = drivers->refSerial.getRobotData();
+    heat17 = drivers->refSerial.getRobotData().turret.heat17;
+    rfidStat = drivers->refSerial.getRobotData().rfidStatus.value;
 #endif
 }
