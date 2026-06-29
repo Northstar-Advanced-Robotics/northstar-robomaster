@@ -547,7 +547,11 @@ RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
 // STATE MACHINE
 src::stateMachine::StateMachineSubsystem stateMachineSubsystem =
-    src::stateMachine::StateMachineSubsystem(drivers(), &chassisSubsystem, chassisAutoDrive);
+    src::stateMachine::StateMachineSubsystem(
+        drivers(),
+        &chassisSubsystem,
+        chassisAutoDrive,
+        &chassisBeyBladeCommand);
 
 src::control::client_display::graphics::UISubsystem ui(drivers());
 src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
@@ -627,7 +631,7 @@ void registerSentryIoMappings(Drivers *drivers)
     /// Triggers don't need to be added to the command mapper since they register themselves with
     /// the command scheduler when they are constructed, but just listing them here for clarity
     /*
-    sentryScanTrigger
+    vPressedTurretCvTargetingToggleCommand
     scanWhenWheelLeft
     ctrlZPressedImuCal
     imuCalWhenWheelRight

@@ -178,6 +178,14 @@ public:
         velocityLocal.y = localVelY;
 
         mcbGlobalPose.theta = calculateRobotHeading();
+        // float prevTheta = mcbGlobalPose.theta;
+        // mcbGlobalPose.theta = calculateRobotHeading();
+        // // Use midpoint heading to reduce lateral drift when spinning + translating.
+        // // Encoder velocities represent average over [t-dt, t]; heading at midpoint
+        // // (t - dt/2) is more accurate than the current heading at t.
+        // float midTheta =
+        //     prevTheta +
+        //     tap::algorithms::Angle(mcbGlobalPose.theta - prevTheta).getWrappedValue() * 0.5f;
 
         velocityGlobal = convertLocalToGlobal(velocityLocal, mcbGlobalPose.theta);
 

@@ -37,6 +37,8 @@ public:
 
     bool isFinished() const { return false; }
 
+    float calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt);
+
 private:
     src::chassis::ChassisSubsystem *chassis;
 
@@ -55,7 +57,5 @@ private:
     float calcSpeed;
 
     float beyBladeFastSpinSpeedThreshold = 0.3f;
-
-    float calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt);
 };
 }  // namespace src::chassis

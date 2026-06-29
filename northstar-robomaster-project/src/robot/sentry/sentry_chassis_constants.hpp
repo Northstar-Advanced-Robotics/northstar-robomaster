@@ -35,10 +35,10 @@ static const float WHEEL_DIAMETER_M = 0.191;
 static constexpr float CHASSIS_WALK_SPEED_MPS = 1.5f;
 
 // m/s/s
-static constexpr float CHASSIS_ACCEL_VALUE = 3.5f;
+static constexpr float CHASSIS_ACCEL_VALUE = 2.5f;
 static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
 // rad/s/s
-static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
+static constexpr float ROTATION_ACCEL_VALUE = 20.0f;
 
 static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
 static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
@@ -57,6 +57,7 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     */
     {75, 3'500},
     {90, 4'000},
+    {100, 4'250},
     (120, 5'000)};
 // At 9000 rpm the beyblade was around 130, Its over
 
