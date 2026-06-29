@@ -361,7 +361,8 @@ void VisionComms::sendHealthData()
         message.messageType = MessageType::HEALTH;
 
         // save into the message
-        message.data[0] = static_cast<uint16_t>(drivers->refSerial.getRobotData().currentHp);
+        uint16_t hp = static_cast<uint16_t>(drivers->refSerial.getRobotData().currentHp);
+        std::memcpy(&message.data[0], &hp, sizeof(hp));
 
         message.setCRC16();
         drivers->uart.write(

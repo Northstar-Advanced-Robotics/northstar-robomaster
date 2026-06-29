@@ -58,10 +58,12 @@ public:
     enum LaunchMode : uint8_t
     {
         SINGLE = 0,
+#ifndef TARGET_HERO
         NO_HEATING,
         LIMITED_10HZ,
         LIMITED_20HZ,
         FULL_AUTO,
+#endif
         BURST,
         NUM_SHOOTER_STATES,
     };
@@ -100,8 +102,11 @@ public:
 private:
     std::optional<ManualFireRateReselectionManager *> fireRateReselectionManager;
     governor::CvOnTargetGovernor &cvOnTargetGovernor;
-
+#ifdef TARGET_SENTRY
     LaunchMode launchMode = LIMITED_10HZ;
+#else
+    LaunchMode launchMode = SINGLE;
+#endif
     std::optional<ConstantVelocityAgitatorCommand *> command;
 
     int getCurrentBarrelCoolingRate() const
@@ -129,8 +134,16 @@ private:
         int heat = drivers->refSerial.getRobotData().turret.heat17ID1;
         int heatLimit = drivers->refSerial.getRobotData().turret.heatLimit;
         return std::min(targetBurstSize, (heatLimit - heat) / 10);
+        /* With the 17 shots, get the max heat allowed and our current heat and calculate how many
+           shots we can take. Ideally we do not oveheat. If we cannot reach the passed in target
+           burst size return how many shots we can take without overheating. If we can reach the
+           target burst size, return the target burst size.
+        */
+        int remainingAmmo = (drivers->refSerial.getRobotData().turret.heatLimit -
+                             drivers->refSerial.getRobotData().turret.heat17ID1) /
+                            10;
+        return targetBurstSize < remainingAmmo ? targetBurstSize : remainingAmmo;
 #endif
-        return 10;
     }
 };
 

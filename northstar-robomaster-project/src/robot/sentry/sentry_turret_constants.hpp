@@ -84,12 +84,14 @@ static constexpr float GRAVITY_COMPENSATION_SCALAR = -3300.0f;  // 12000 // 7'00
 
 namespace world_rel_turret_imu
 {
+static constexpr float BEYBLADE_FF_GAIN = 80.0f;
+
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 12.0f,
+    .kp = 21.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
-    .maxOutput = 40,
+    .maxOutput = 35,
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 0.0f,
     .tQProportionalKalman = 1.0f,
@@ -130,7 +132,7 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.5f,
-    .maxOutput = DjiMotorConstants::MAX_OUTPUT_GM6020,  // 0.0f
+    .maxOutput = 100,  // 0.0f
     .tQDerivativeKalman = 1.0f,
     .tRDerivativeKalman = 0.0f,
     .tQProportionalKalman = 1.0f,
@@ -165,7 +167,7 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_POS_PID_AUTO_AIM_CONFIG 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig PITCH_VEL_PID_CONFIG = {
-    .kp = 10'000.0f,
+    .kp = 12'000.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
@@ -323,7 +325,7 @@ namespace cv
 static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(10 - 7);
 static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(10 + 7);
 static constexpr float SCAN_PITCH_SPEED = 0.6f;
-static constexpr float SCAN_YAW_SPEED = 2.0f;
+static constexpr float SCAN_YAW_SPEED = -2.0f;
 }  // namespace cv
 
 }  // namespace src::control::turret

@@ -2,6 +2,7 @@
 #define TURRET_MOTOR_GM6020_HPP_
 
 #include "tap/algorithms/wrapped_float.hpp"
+#include "tap/motor/dji_motor.hpp"
 #include "tap/motor/motor_interface.hpp"
 #include "tap/util_macros.hpp"
 
@@ -81,6 +82,21 @@ public:
     inline const WrappedFloat &getChassisFrameMeasuredAngle() const override
     {
         return chassisFrameMeasuredAngle;
+    }
+
+/**
+ * @return angular velocity of the turret, in SUS rad/sec, positive rotation is defined by the
+ * motor.
+ */
+#ifdef TARGET_HERO
+    static constexpr float RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 * (64.0f / 94.0f);
+#else
+    static constexpr float RATIO = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 * (54.0f / 81.0f);
+#endif
+    inline float getChassisFrameVelocitySUS() const
+    {
+        return static_cast<tap::motor::DjiMotor *>(motor)->getInternalEncoder().getVelocity() *
+               RATIO;
     }
 
     /**

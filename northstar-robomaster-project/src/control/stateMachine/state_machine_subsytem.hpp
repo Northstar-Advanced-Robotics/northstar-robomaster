@@ -6,6 +6,7 @@
 #include "tap/util_macros.hpp"
 
 #include "control/chassis/chassis_auto_drive.hpp"
+#include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 
 namespace src::stateMachine
@@ -16,7 +17,8 @@ public:
     StateMachineSubsystem(
         tap::Drivers* drivers,
         src::chassis::ChassisSubsystem* chassisSubsystem,
-        src::chassis::ChassisAutoDrive* chassisAutoDrive);
+        src::chassis::ChassisAutoDrive* chassisAutoDrive,
+        src::chassis::ChassisBeybladeCommand* beybladeCommand);
 
     void initialize() override;
 
@@ -29,8 +31,10 @@ public:
 private:
     src::chassis::ChassisSubsystem* chassisSubsystem;
     src::chassis::ChassisAutoDrive* chassisAutoDrive;
+    src::chassis::ChassisBeybladeCommand* beybladeCommand;
 
     tap::Drivers* drivers;
+    uint32_t prevTime = 0;
 };
 
 }  // namespace src::stateMachine

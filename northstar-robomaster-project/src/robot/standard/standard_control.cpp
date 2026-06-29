@@ -541,6 +541,8 @@ void registerStandardIoMappings(Drivers *drivers)
     /// with the command scheduler when they are constructed, but just listing them here for
     /// clarity
     /*
+    vPressedTurretCvTargetingToggleCommand
+    rightSwitchUpCvControl
     ctrlZPressedImuCal
     imuCalWhenWheelRight
     ctrlCPressedUI

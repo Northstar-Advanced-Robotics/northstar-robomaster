@@ -34,6 +34,7 @@ public:
             case control::agitator::MultiShotCvCommandMapping::LaunchMode::SINGLE:
                 firemode.setString("FireMode: Single");
                 break;
+#ifndef TARGET_HERO
             case control::agitator::MultiShotCvCommandMapping::LaunchMode::NO_HEATING:
                 firemode.setString("FireMode: No Heating");
                 break;
@@ -45,6 +46,10 @@ public:
                 break;
             case control::agitator::MultiShotCvCommandMapping::LaunchMode::FULL_AUTO:
                 firemode.setString("FireMode: FULL AUTO");
+                break;
+#endif
+            case control::agitator::MultiShotCvCommandMapping::LaunchMode::BURST:
+                firemode.setString("FireMode: BURST");
                 break;
             default:
                 firemode.setString("FireMode: ");
