@@ -125,11 +125,12 @@ private:
         // Allow for overheating but not to the point of disable. allow for 2 shot burst. We can
         // likely just do return 2 i think.
         int heat = drivers->refSerial.getRobotData().turret.heat42;
-        if (heat < 100)
+        int heatLimit = drivers->refSerial.getRobotData().turret.heatLimit;
+        if (heat < heatLimit - 100)
         {
             return 2;
         }
-        else if (heat < 200)
+        else if (heat < heatLimit)
         {
             return 1;
         }
