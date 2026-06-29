@@ -186,14 +186,14 @@ MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
 // agitator governors
 HeatLimitGovernor heatLimitGovernor(
     *drivers(),
-    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1,
+    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM,
     constants::HEAT_LIMIT_BUFFER);
 
 FlywheelOnGovernor flywheelOnGovernor(flywheel);
 
 RefSystemProjectileLaunchedGovernor refSystemProjectileLaunchedGovernor(
     drivers()->refSerial,
-    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM_1);
+    tap::communication::serial::RefSerialData::Rx::MechanismID::TURRET_17MM);
 
 ManualFireRateReselectionManager manualFireRateReselectionManager;
 
