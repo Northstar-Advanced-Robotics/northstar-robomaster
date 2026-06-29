@@ -21,11 +21,6 @@ void StateMachineSubsystem::initialize() {}
 
 bool beyblade = false;
 
-// #include "control/algorithms/CubicBezier.hpp"
-// CubicBezier* leftSide = new CubicBezier({0, 0}, {0, 2}, {-1.5f, 0}, {-1.5f, 2});
-// CubicBezier* rightSide = new CubicBezier({0, 2}, {0, 0}, {1.5f, 2}, {1.5f, 0});
-// bool l = true;
-
 void StateMachineSubsystem::refresh()
 {
     if (drivers->remote.getSwitch(tap::communication::serial::Remote::Switch::RIGHT_SWITCH) !=
@@ -37,17 +32,6 @@ void StateMachineSubsystem::refresh()
     if (!chassisAutoDrive->hasValidPath())
     {
         chassisSubsystem->setVelocityFieldDrive(0, 0, 0);
-        // if (l)
-        // {
-        //     chassisAutoDrive->setCurve(leftSide);
-        //     l = false;
-        // }
-        // else
-        // {
-        //     chassisAutoDrive->setCurve(rightSide);
-        //     l = true;
-        // }
-
         return;
     }
 
