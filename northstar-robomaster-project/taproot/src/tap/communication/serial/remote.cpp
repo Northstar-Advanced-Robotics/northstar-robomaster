@@ -298,15 +298,25 @@ void Remote::parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13])
     remote.wheel = (rxBuffer[8] >> 1 | rxBuffer[9] << 7) & 0x07FF;
     remote.wheel -= 1024;
 
-    // Trigger (bit 76): not pressed=0, pressed=1 — toggles connected on rising edge
+    // Trigger (bit 76): not pressed=0, pressed=1 — toggles connected after held 500ms
     static bool prevTrigger = false;
-    static uint32_t lastToggleMs = 0;
+    static uint32_t holdStartMs = 0;
+    static bool toggleFired = false;
     bool trigger = static_cast<bool>((rxBuffer[9] >> 4) & 0x01);
     uint32_t now = tap::arch::clock::getTimeMilliseconds();
-    if (trigger && !prevTrigger && (now - lastToggleMs) > 200)
+    if (trigger && !prevTrigger)
+    {
+        holdStartMs = now;
+        toggleFired = false;
+    }
+    if (trigger && !toggleFired && (now - holdStartMs) >= 500)
     {
         connected = !connected;
-        lastToggleMs = now;
+        toggleFired = true;
+    }
+    if (!trigger)
+    {
+        toggleFired = false;
     }
     prevTrigger = trigger;
 
