@@ -124,7 +124,20 @@ private:
 #if defined(TARGET_HERO)
         // Allow for overheating but not to the point of disable. allow for 2 shot burst. We can
         // likely just do return 2 i think.
-        return 2;
+        int heat = drivers->refSerial.getRobotData().turret.heat42;
+        int heatLimit = drivers->refSerial.getRobotData().turret.heatLimit;
+        if (heat < heatLimit - 100)
+        {
+            return 2;
+        }
+        else if (heat < heatLimit)
+        {
+            return 1;
+        }
+        else
+        {
+            return 0;
+        }
 #else
         /* With the 17 shots, get the max heat allowed and our current heat and calculate how many
            shots we can take. Ideally we do not oveheat. If we cannot reach the passed in target
