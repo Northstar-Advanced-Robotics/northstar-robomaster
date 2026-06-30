@@ -255,46 +255,79 @@ void Remote::parseBufferVT13(uint8_t rxBuffer[REMOTE_BUF_LEN_VT13])
         return;
     }
     lastRead = tap::arch::clock::getTimeMilliseconds();
-    // remote joystick information
-    remote.rightHorizontal = (rxBuffer[2] | rxBuffer[3] << 8) & 0x07FF;
+
+    // Channels 0-3 (bits 16-59): joystick axes, 11-bit unsigned, center=1024, range 364-1684
+    remote.rightHorizontal =
+        (rxBuffer[2] | rxBuffer[3] << 8) & 0x07FF;  // CH0 bits 16-26: right stick horizontal
     remote.rightHorizontal -= 1024;
-    remote.rightVertical = (rxBuffer[3] >> 3 | rxBuffer[4] << 5) & 0x07FF;
+    remote.rightVertical =
+        (rxBuffer[3] >> 3 | rxBuffer[4] << 5) & 0x07FF;  // CH1 bits 27-37: right stick vertical
     remote.rightVertical -= 1024;
-    remote.leftVertical = (rxBuffer[4] >> 6 | rxBuffer[5] << 2 | rxBuffer[6] << 10) & 0x07FF;
+    remote.leftVertical = (rxBuffer[4] >> 6 | rxBuffer[5] << 2 | rxBuffer[6] << 10) &
+                          0x07FF;  // CH2 bits 38-48: left stick vertical
     remote.leftVertical -= 1024;
-    remote.leftHorizontal = (rxBuffer[6] >> 1 | rxBuffer[7] << 7) & 0x07FF;
+    remote.leftHorizontal =
+        (rxBuffer[6] >> 1 | rxBuffer[7] << 7) & 0x07FF;  // CH3 bits 49-59: left stick horizontal
     remote.leftHorizontal -= 1024;
 
-    // switches / buttons
-    remote.leftSwitch = static_cast<Remote::SwitchState>((rxBuffer[7] >> 4) & 0x03);
-    // Cursed right switch logic
-    remote.rightSwitch = static_cast<bool>((rxBuffer[7] >> 6) & 0x01)
-                             ? Remote::SwitchState::DOWN
-                             : remote.rightSwitch;  // pause
-    remote.rightSwitch = static_cast<bool>((rxBuffer[7] >> 7) & 0x01)
-                             ? Remote::SwitchState::MID
-                             : remote.rightSwitch;  // leftButton
-    remote.rightSwitch = static_cast<bool>(rxBuffer[8] & 0x01) ? Remote::SwitchState::UP
-                                                               : remote.rightSwitch;  // rightButton
+    // Mode switch (bits 60-61): C=0→DOWN, N=1→MID, S=2→UP
+    {
+        static constexpr Remote::SwitchState modeMap[3] = {
+            Remote::SwitchState::DOWN,
+            Remote::SwitchState::MID,
+            Remote::SwitchState::UP,
+        };
+        uint8_t rawRightSwitch = (rxBuffer[7] >> 4) & 0x03;
+        remote.rightSwitch =
+            (rawRightSwitch < 3) ? modeMap[rawRightSwitch] : Remote::SwitchState::UNKNOWN;
+    }
 
-    // remote dial
+    // Pause button (bit 62), customizable left (bit 63), customizable left (bit 64)
+    // mapped onto leftSwitch: pause→MID, customizable left→DOWN, customizable left→UP
+    remote.leftSwitch = static_cast<bool>((rxBuffer[7] >> 6) & 0x01)
+                            ? Remote::SwitchState::MID
+                            : remote.leftSwitch;  // pause button
+    remote.leftSwitch = static_cast<bool>((rxBuffer[7] >> 7) & 0x01)
+                            ? Remote::SwitchState::DOWN
+                            : remote.leftSwitch;  // customizable button (left)
+    remote.leftSwitch = static_cast<bool>(rxBuffer[8] & 0x01)
+                            ? Remote::SwitchState::UP
+                            : remote.leftSwitch;  // customizable button (left)
+
+    // Dial (bits 65-75): 11-bit unsigned, center=1024, range 364-1684
     remote.wheel = (rxBuffer[8] >> 1 | rxBuffer[9] << 7) & 0x07FF;
     remote.wheel -= 1024;
 
-    // = static_cast<bool>((rxBuffer[7] >> 4) & 0x01); trigger not used?
+    // Trigger (bit 76): not pressed=0, pressed=1 — toggles connected on rising edge
+    static bool prevTrigger = false;
+    static uint32_t lastToggleMs = 0;
+    bool trigger = static_cast<bool>((rxBuffer[9] >> 4) & 0x01);
+    uint32_t now = tap::arch::clock::getTimeMilliseconds();
+    if (trigger && !prevTrigger && (now - lastToggleMs) > 200)
+    {
+        connected = !connected;
+        lastToggleMs = now;
+    }
+    prevTrigger = trigger;
 
-    // mouse input
-    remote.mouse.x = rxBuffer[10] | (rxBuffer[11] << 8);  // x axis
-    remote.mouse.y = rxBuffer[12] | (rxBuffer[13] << 8);  // y axis
-    remote.mouse.z = rxBuffer[14] | (rxBuffer[15] << 8);  // z axis (scroll)
-    remote.mouse.l = rxBuffer[16] & 0x03;                 // left button
-    remote.mouse.r = (rxBuffer[16] >> 2) & 0x03;          // right button
-    remote.mouse.m = (rxBuffer[16] >> 4) & 0x03;          // middle button
+    // bits 77-79: padding (unused)
 
-    // keyboard capture
+    // Mouse axes (bits 80-127): 16-bit signed
+    remote.mouse.x = rxBuffer[10] | (rxBuffer[11] << 8);  // X-axis (bits 80-95)
+    remote.mouse.y = rxBuffer[12] | (rxBuffer[13] << 8);  // Y-axis (bits 96-111)
+    remote.mouse.z = rxBuffer[14] | (rxBuffer[15] << 8);  // Z-axis / scroll (bits 112-127)
+
+    // Mouse buttons (bits 128-133): 2 bits each
+    remote.mouse.l = rxBuffer[16] & 0x03;         // left button (bits 128-129)
+    remote.mouse.r = (rxBuffer[16] >> 2) & 0x03;  // right button (bits 130-131)
+    remote.mouse.m = (rxBuffer[16] >> 4) & 0x03;  // middle button (bits 132-133)
+
+    // bits 134-135: padding (unused)
+
+    // Keyboard (bits 136-151): 16-bit bitmask (W,S,A,D,Shift,Ctrl,Q,E,R,F,G,Z,X,C,V,B)
     remote.key = rxBuffer[17] | (rxBuffer[18] << 8);
 
-    // crc validation capture
+    // CRC (bits 152-167): CRC-16/CCITT-FALSE, init=0xFFFF, poly=0x1021
     // remote.crc = rxBuffer[19] | (rxBuffer[20] << 8);
 
     // the remote joystick and dial values must be <= abs(660)
