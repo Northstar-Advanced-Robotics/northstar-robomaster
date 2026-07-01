@@ -44,7 +44,7 @@ namespace src::control::turret
 static constexpr uint8_t NUM_TURRETS = 1;
 
 static constexpr float USER_YAW_INPUT_SCALAR = 0.02f;
-static constexpr float USER_PITCH_INPUT_SCALAR = 0.02f;
+static constexpr float USER_PITCH_INPUT_SCALAR = -0.02f;
 
 static constexpr tap::can::CanBus CAN_BUS_YAW = tap::can::CanBus::CAN_BUS1;
 static constexpr tap::can::CanBus CAN_BUS_PITCH = tap::can::CanBus::CAN_BUS2;
@@ -322,10 +322,10 @@ static constexpr tap::algorithms::SmoothPidConfig PITCH_IMU_CAL_PID_CONFIG = {
 
 namespace cv
 {
-static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(10 - 7);
-static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(10 + 7);
-static constexpr float SCAN_PITCH_SPEED = 0.6f;
-static constexpr float SCAN_YAW_SPEED = -2.0f;
+static constexpr float SCAN_MIN_PITCH_ANGLE = modm::toRadian(20 - 17);
+static constexpr float SCAN_MAX_PITCH_ANGLE = modm::toRadian(20 + 17);
+static constexpr float SCAN_PITCH_SPEED = 0.9f;
+static constexpr float SCAN_YAW_SPEED = -1.5f;
 }  // namespace cv
 
 }  // namespace src::control::turret

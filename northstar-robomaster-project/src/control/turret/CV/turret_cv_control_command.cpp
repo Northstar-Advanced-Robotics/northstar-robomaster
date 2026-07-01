@@ -124,6 +124,7 @@ void TurretCVControlCommand::end(bool interrupted)
         turretSubsystem->pitchMotor.setMotorOutput(0);
     }
     drivers->leds.set(tap::gpio::Leds::Green, false);
+    withinAimingTolerance = false;
 }
 
 }  // namespace src::control::turret::cv

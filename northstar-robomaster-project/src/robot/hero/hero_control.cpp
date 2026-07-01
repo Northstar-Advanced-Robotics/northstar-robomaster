@@ -201,9 +201,6 @@ RefSystemProjectileLaunchedGovernor refSystemProjectileLaunchedGovernor(
 
 ManualFireRateReselectionManager manualFireRateReselectionManager;
 
-SetFireRateCommand setFireRateCommand1RPS(&dummySubsystem, manualFireRateReselectionManager, 1);
-SetFireRateCommand setFireRateCommand5SPR(&dummySubsystem, manualFireRateReselectionManager, 5);
-
 FireRateLimitGovernor fireRateLimitGovernor(manualFireRateReselectionManager);
 
 GovernorLimitedCommand<3> rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched(

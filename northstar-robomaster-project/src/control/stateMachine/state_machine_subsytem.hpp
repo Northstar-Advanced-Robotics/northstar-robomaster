@@ -18,7 +18,8 @@ public:
         tap::Drivers* drivers,
         src::chassis::ChassisSubsystem* chassisSubsystem,
         src::chassis::ChassisAutoDrive* chassisAutoDrive,
-        src::chassis::ChassisBeybladeCommand* beybladeCommand);
+        src::chassis::ChassisBeybladeCommand* beybladeCommand,
+        src::control::governor::MatchRunningGovernor* matchRunningGovernor);
 
     void initialize() override;
 
@@ -32,6 +33,7 @@ private:
     src::chassis::ChassisSubsystem* chassisSubsystem;
     src::chassis::ChassisAutoDrive* chassisAutoDrive;
     src::chassis::ChassisBeybladeCommand* beybladeCommand;
+    src::control::governor::MatchRunningGovernor* matchRunningGovernor;
 
     tap::Drivers* drivers;
     uint32_t prevTime = 0;
