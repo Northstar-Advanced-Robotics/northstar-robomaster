@@ -45,7 +45,7 @@ namespace src::control::turret
 static constexpr uint8_t NUM_TURRETS = 1;
 
 static constexpr float USER_YAW_INPUT_SCALAR = 0.02f;
-static constexpr float USER_PITCH_INPUT_SCALAR = 0.02f;
+static constexpr float USER_PITCH_INPUT_SCALAR = -0.02f;
 
 static constexpr tap::can::CanBus CAN_BUS_YAW = tap::can::CanBus::CAN_BUS1;
 static constexpr tap::can::CanBus CAN_BUS_PITCH = tap::can::CanBus::CAN_BUS2;
@@ -81,7 +81,7 @@ namespace world_rel_turret_imu
 static constexpr float BEYBLADE_FF_GAIN = 80.0f;
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 21.0f,
+    .kp = 16.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,

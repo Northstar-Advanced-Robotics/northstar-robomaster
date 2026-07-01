@@ -151,7 +151,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
 
 // flywheel commands
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 21.0f);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.7f);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
@@ -221,12 +221,17 @@ auto cPressedNotCtrlCVGovernorToggle =
         &cvOnTargetGovernor,
         &CvOnTargetGovernor::setGovernorEnabled);
 
-GovernorLimitedCommand<2> rotateAndUnjamAgitatorWithHeatAndCVLimiting(
+GovernorLimitedCommand<1> rotateAndUnjamAgitatorWithHeatLimiting(
     {&agitator},
     rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched,
-    {&heatLimitGovernor, &cvOnTargetGovernor});
+    {&heatLimitGovernor});
 
-RemoteMapState leftMousePressed(RemoteMapState::MouseButton::LEFT);
+GovernorLimitedCommand<1> rotateAndUnjamAgitatorWithHeatAndCVLimiting(
+    {&agitator},
+    rotateAndUnjamAgitatorWhenFrictionWheelsOnUntilProjectileLaunched,
+    {&cvOnTargetGovernor});
+
+RemoteMapState leftMousePressed;
 auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
     rotateAndUnjamAgitatorWithHeatAndCVLimiting,
@@ -238,7 +243,7 @@ auto leftMousePressedShoot = std::make_unique<MultiShotCvCommandMapping>(
 RemoteMapState leftSwitchDown(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::DOWN);
 auto leftSwitchDownPressedShoot = std::make_unique<MultiShotCvCommandMapping>(
     *drivers(),
-    rotateAndUnjamAgitatorWithHeatAndCVLimiting,
+    rotateAndUnjamAgitatorWithHeatLimiting,
     leftSwitchDown,
     &manualFireRateReselectionManager,
     cvOnTargetGovernor,
@@ -482,30 +487,19 @@ cv::SentryScanCommand sentryScanCommand(
     cv::SCAN_PITCH_SPEED,
     cv::SCAN_YAW_SPEED);
 
-cv::SentryCvManagerCommand cvManagerCommand(
-    drivers(),
-    drivers()->visionComms,
-    &turret,
-    turretCVControlCommand,
-    &worldFrameYawTurretImuController,
-    &worldFramePitchTurretImuController,
-    chassisOdometry,
-    USER_YAW_INPUT_SCALAR,
-    USER_PITCH_INPUT_SCALAR,
-    cv::SCAN_MIN_PITCH_ANGLE,
-    cv::SCAN_MAX_PITCH_ANGLE,
-    cv::SCAN_PITCH_SPEED,
-    cv::SCAN_YAW_SPEED);
-
 MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
-// Trigger sentryScanTrigger = (Trigger(drivers(), []() {
-//                                 return matchRunningGovernor.isReady();
-//                             })).whileTrue(&cvManagerCommand);
+Trigger cvGate =
+    (TriggerHelpers::switchState(
+         drivers(),
+         Remote::Switch::RIGHT_SWITCH,
+         Remote::SwitchState::UP) ||
+     Trigger(drivers(), []() { return matchRunningGovernor.isReady(); }));
+Trigger hasTarget =
+    Trigger(drivers(), []() { return drivers()->visionComms.getSomeTurretHasTarget(); });
 
-Trigger scanWhenWheelLeft =
-    TriggerHelpers::channelGreaterThan(drivers(), Remote::Channel::WHEEL, .8)
-        .toggleOnTrue(&cvManagerCommand);  //&turretCVControlCommand
+Trigger cvControl = (cvGate && hasTarget).whileTrue(&turretCVControlCommand);
+Trigger scan = (cvGate && !hasTarget).whileTrue(&sentryScanCommand);
 
 // imu commands
 imu::ImuCalibrateCommand imuCalibrateCommand(
@@ -534,14 +528,19 @@ GovernorLimitedCommand<1> orientDriveWhenImuCalibrated(
     chassisOrientDriveCommand,
     {&imuCalibratingGovernor});
 
-RemoteMapState rightSwitchMid(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::MID);
-Trigger rightSwitchMidOrientDriveWhenImuCalibrated = (TriggerHelpers::switchState(
-                                                          drivers(),
-                                                          Remote::Switch::RIGHT_SWITCH,
-                                                          Remote::SwitchState::MID) &&
-                                                      Trigger(drivers(), []() {
-                                                          return imuCalibratingGovernor.isReady();
-                                                      })).whileTrue(&chassisOrientDriveCommand);
+Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
+    ((TriggerHelpers::switchState(
+          drivers(),
+          Remote::Switch::RIGHT_SWITCH,
+          Remote::SwitchState::MID) ||
+      TriggerHelpers::switchState(
+          drivers(),
+          Remote::Switch::LEFT_SWITCH,
+          Remote::SwitchState::MID)) &&
+     Trigger(drivers(), []() { return imuCalibratingGovernor.isReady(); }) &&
+     Trigger(drivers(), []() {
+         return !matchRunningGovernor.isReady();
+     })).whileTrue(&chassisOrientDriveCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
@@ -551,7 +550,8 @@ src::stateMachine::StateMachineSubsystem stateMachineSubsystem =
         drivers(),
         &chassisSubsystem,
         chassisAutoDrive,
-        &chassisBeyBladeCommand);
+        &chassisBeyBladeCommand,
+        &matchRunningGovernor);
 
 src::control::client_display::graphics::UISubsystem ui(drivers());
 src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
