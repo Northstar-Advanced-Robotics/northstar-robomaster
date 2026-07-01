@@ -22,7 +22,9 @@ public:
         float MIN_PITCH_ANGLE,
         float MAX_PITCH_ANGLE,
         float PITCH_SPEED,
-        float YAW_SPEED);
+        float YAW_SPEED,
+        float YAW_CHUNK_SIZE,
+        float YAW_CHUNK_LINGER_TIME);
 
     bool isReady() override;
 
@@ -42,6 +44,9 @@ private:
 
     uint32_t prevTime = 0;
 
+    float currentYawChunkTimer = 0;
+    float currentYawSetpoint = 0;
+
     algorithms::TurretYawControllerInterface *yawController;
     algorithms::TurretPitchControllerInterface *pitchController;
 
@@ -51,6 +56,8 @@ private:
     float MAX_PITCH_ANGLE;
     float PITCH_SPEED;
     float YAW_SPEED;
+    float YAW_CHUNK_SIZE;
+    float YAW_CHUNK_LINGER_TIME;
 };
 }  // namespace src::control::turret::cv
 
