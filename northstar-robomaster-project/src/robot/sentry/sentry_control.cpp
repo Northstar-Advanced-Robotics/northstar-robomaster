@@ -485,7 +485,9 @@ cv::SentryScanCommand sentryScanCommand(
     cv::SCAN_MIN_PITCH_ANGLE,
     cv::SCAN_MAX_PITCH_ANGLE,
     cv::SCAN_PITCH_SPEED,
-    cv::SCAN_YAW_SPEED);
+    cv::SCAN_YAW_SPEED,
+    cv::SCAN_YAW_CHUNK_RAD,
+    cv::SCAN_YAW_CHUNK_LINGER_TIME);
 
 MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
@@ -523,11 +525,6 @@ Trigger imuCalWhenWheelRight =
 
 ImuCalibratingGovernor imuCalibratingGovernor(drivers());
 
-GovernorLimitedCommand<1> orientDriveWhenImuCalibrated(
-    {&chassisSubsystem},
-    chassisOrientDriveCommand,
-    {&imuCalibratingGovernor});
-
 Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
     ((TriggerHelpers::switchState(
           drivers(),
@@ -540,7 +537,7 @@ Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
      Trigger(drivers(), []() { return imuCalibratingGovernor.isReady(); }) &&
      Trigger(drivers(), []() {
          return !matchRunningGovernor.isReady();
-     })).whileTrue(&chassisOrientDriveCommand);
+     })).whileTrue(&chassisDriveCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
