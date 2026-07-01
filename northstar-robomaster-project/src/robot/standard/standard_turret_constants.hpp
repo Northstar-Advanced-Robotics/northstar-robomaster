@@ -87,7 +87,7 @@ namespace world_rel_turret_imu
 static constexpr float BEYBLADE_FF_GAIN = 80.0f;
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 28.0f,
+    .kp = 25.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
