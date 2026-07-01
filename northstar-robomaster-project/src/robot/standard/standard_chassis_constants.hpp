@@ -43,7 +43,7 @@ static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
 static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.30f;
 
 // rad/s/s
-static constexpr float ROTATION_ACCEL_VALUE = 30.0f;
+static constexpr float ROTATION_ACCEL_VALUE = 20.0f;
 
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
 
