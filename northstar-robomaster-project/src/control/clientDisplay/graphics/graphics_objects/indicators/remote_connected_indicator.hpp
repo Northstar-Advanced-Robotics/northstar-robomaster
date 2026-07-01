@@ -39,7 +39,7 @@ private:
 
     static constexpr uint16_t STATUS_X_POSITION =
         20;  // pixels, all numbers at the same y level on screen
-    static constexpr uint16_t STATUS_Y_POSITION = 500;  // pixels, all numbers at the same y level
+    static constexpr uint16_t STATUS_Y_POSITION = 600;  // pixels, all numbers at the same y level
                                                         // on scre
 
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number

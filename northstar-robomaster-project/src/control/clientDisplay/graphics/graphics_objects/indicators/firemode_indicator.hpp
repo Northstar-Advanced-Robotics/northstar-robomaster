@@ -77,7 +77,7 @@ private:
     control::governor::FlywheelOnGovernor* flywheelGovernor;
 
     static constexpr uint16_t X_POSITION = 20;  // pixels, all numbers at the same y level on screen
-    static constexpr uint16_t Y_POSITION = 610;   // pixels, all numbers at the same y level on
+    static constexpr uint16_t Y_POSITION = 650;   // pixels, all numbers at the same y level on
                                                   // screen
     static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
 
