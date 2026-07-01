@@ -24,7 +24,6 @@
 
 #include "drivers.hpp"
 
-
 namespace src::control::client_display::graphics
 {
 class SentryDrawCommand : public tap::control::Command, GraphicsContainer

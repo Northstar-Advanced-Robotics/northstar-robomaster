@@ -19,6 +19,7 @@
 #include "control/clientDisplay/graphics/graphics_objects/indicators/linear_velocity_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/peeking_lines.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/predicted_remaining_shots_indicator.hpp"
+#include "control/clientDisplay/graphics/graphics_objects/indicators/remote_connected_indicator.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/reticle.hpp"
 #include "control/clientDisplay/graphics/graphics_objects/indicators/supercap_charge_indicator.hpp"
 
@@ -73,6 +74,7 @@ public:
         addGraphicsObject(&dotCrosshair);
         addGraphicsObject(&cvIndicator);
         addGraphicsObject(&agitatorJammed);
+        addGraphicsObject(&remoteConnectedIndicator);
     };
 
     void initialize() override { ui->setTopLevelContainer(this); };
@@ -97,6 +99,7 @@ public:
         imuCalIndicator.update();
         cvIndicator.update();
         agitatorJammed.update();
+        remoteConnectedIndicator.update();
     };
 
     // ui subsystem won't do anything until its top level container is set, so we are ok to add
@@ -140,5 +143,6 @@ private:
     DotCrosshair dotCrosshair{drivers};
     CVIndicator cvIndicator{drivers, visionComms, cvOnTargetGovernor};
     AgitatorJammedIndicator agitatorJammed{drivers, agitator};
+    RemoteConnectedIndicator remoteConnectedIndicator{drivers};
 };
 }  // namespace src::control::client_display::graphics
