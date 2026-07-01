@@ -131,6 +131,7 @@ using namespace src::control::client_display::graphics;
 driversFunc drivers = DoNotUse_getDrivers;
 
 namespace hero_control
+
 {
 DummySubsystem dummySubsystem(drivers());
 
