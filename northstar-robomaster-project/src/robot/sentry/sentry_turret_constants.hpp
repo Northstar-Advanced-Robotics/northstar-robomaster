@@ -328,7 +328,7 @@ static constexpr float SCAN_PITCH_SPEED = 2.0f;
 static constexpr float SCAN_YAW_SPEED = -1.5f;
 
 static constexpr float SCAN_YAW_CHUNK_RAD = 0.52359877559;
-static constexpr float SCAN_YAW_CHUNK_LINGER_TIME = 0.35;
+static constexpr float SCAN_YAW_CHUNK_LINGER_TIME = 0.45;
 }  // namespace cv
 
 }  // namespace src::control::turret

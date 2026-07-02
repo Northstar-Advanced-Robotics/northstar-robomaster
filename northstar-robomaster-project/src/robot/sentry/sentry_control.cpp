@@ -537,7 +537,7 @@ Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
      Trigger(drivers(), []() { return imuCalibratingGovernor.isReady(); }) &&
      Trigger(drivers(), []() {
          return !matchRunningGovernor.isReady();
-     })).whileTrue(&chassisDriveCommand);
+     })).whileTrue(&chassisOrientDriveCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
