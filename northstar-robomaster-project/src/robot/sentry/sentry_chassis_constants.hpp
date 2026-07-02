@@ -55,10 +55,10 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     Sentry - 100W
     1v1 Standard - 120W
     */
-    {75, 3'500},
-    {90, 4'000},
-    {100, 4'250},
-    (120, 5'000)};
+    {75, 3'150},
+    {90, 3'600},
+    {100, 3'900},
+    {120, 4'500}};
 // At 9000 rpm the beyblade was around 130, Its over
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
