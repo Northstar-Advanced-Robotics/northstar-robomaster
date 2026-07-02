@@ -38,12 +38,12 @@ static constexpr float CHASSIS_WALK_SPEED_MPS = 1.5f;
 static constexpr float CHASSIS_ACCEL_VALUE = 2.5f;
 static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
 // rad/s/s
-static constexpr float ROTATION_ACCEL_VALUE = 20.0f;
+static constexpr float ROTATION_ACCEL_VALUE = 15.0f;
 
 static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
 static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
 
-static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.15f;
+static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.2f;
 
 static constexpr float MAX_CHASSIS_WHEEL_SPEED = 9000.0f;
 
@@ -55,10 +55,10 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     Sentry - 100W
     1v1 Standard - 120W
     */
-    {75, 3'150},
-    {90, 3'600},
-    {100, 3'900},
-    {120, 4'500}};
+    {75, 3'024},
+    {90, 3'450},
+    {100, 3'750},
+    {120, 4'320}};
 // At 9000 rpm the beyblade was around 130, Its over
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
