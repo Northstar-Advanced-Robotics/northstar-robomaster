@@ -11,9 +11,7 @@ SentryScanCommand::SentryScanCommand(
     float MIN_PITCH_ANGLE,
     float MAX_PITCH_ANGLE,
     float PITCH_SPEED,
-    float YAW_SPEED,
-    float YAW_CHUNK_SIZE,
-    float YAW_CHUNK_LINGER_TIME)
+    float YAW_SPEED)
     : drivers(drivers),
       turretSubsystem(turretSubsystem),
       yawController(yawController),
@@ -22,15 +20,11 @@ SentryScanCommand::SentryScanCommand(
       MIN_PITCH_ANGLE(MIN_PITCH_ANGLE),
       MAX_PITCH_ANGLE(MAX_PITCH_ANGLE),
       PITCH_SPEED(PITCH_SPEED * tap::Drivers::DT / 1000.0f),
-      YAW_SPEED(YAW_SPEED * tap::Drivers::DT / 1000.0f),
-      YAW_CHUNK_SIZE(YAW_CHUNK_SIZE),
-      YAW_CHUNK_LINGER_TIME(YAW_CHUNK_LINGER_TIME)
+      YAW_SPEED(YAW_SPEED * tap::Drivers::DT / 1000.0f)
 {
     assert(MIN_PITCH_ANGLE < MAX_PITCH_ANGLE);
     assert(MIN_PITCH_ANGLE >= turretSubsystem->pitchMotor.getConfig().minAngle);
     assert(MAX_PITCH_ANGLE <= turretSubsystem->pitchMotor.getConfig().maxAngle);
-    assert(YAW_CHUNK_SIZE > 0);
-    assert(YAW_CHUNK_LINGER_TIME > 0);
     addSubsystemRequirement(turretSubsystem);
 }
 
@@ -42,20 +36,12 @@ void SentryScanCommand::initialize()
     pitchController->initialize();
     pitchController->setSetpoint(Angle(turretSubsystem->pitchMotor.getConfig().startAngle));
     prevTime = tap::arch::clock::getTimeMilliseconds();
-
-    currentYawSetpoint = yawController->getSetpoint().getUnwrappedValue();
 }
 
 void SentryScanCommand::execute()
 {
-    currentYawChunkTimer += 0.002;
-    if (currentYawChunkTimer >= YAW_CHUNK_LINGER_TIME)
-    {
-        currentYawChunkTimer = 0;
-        currentYawSetpoint += YAW_CHUNK_SIZE;
-    }
-
-    yawController->runController(tap::Drivers::DT, Angle(currentYawSetpoint));
+    float yawSetPoint = yawController->getSetpoint().getUnwrappedValue();
+    yawController->runController(tap::Drivers::DT, Angle(yawSetPoint + YAW_SPEED));
 
     WrappedFloat pitchSetPoint = pitchController->getSetpoint();
     if (pitchSetPoint.minDifference(MAX_PITCH_ANGLE) < 0.05f && PITCH_SPEED > 0)

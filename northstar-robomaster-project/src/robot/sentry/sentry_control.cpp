@@ -485,9 +485,7 @@ cv::SentryScanCommand sentryScanCommand(
     cv::SCAN_MIN_PITCH_ANGLE,
     cv::SCAN_MAX_PITCH_ANGLE,
     cv::SCAN_PITCH_SPEED,
-    cv::SCAN_YAW_SPEED,
-    cv::SCAN_YAW_CHUNK_RAD,
-    cv::SCAN_YAW_CHUNK_LINGER_TIME);
+    cv::SCAN_YAW_SPEED);
 
 MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 

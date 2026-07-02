@@ -17,9 +17,7 @@ SentryCvManagerCommand::SentryCvManagerCommand(
     float MIN_PITCH_ANGLE,
     float MAX_PITCH_ANGLE,
     float PITCH_SPEED,
-    float YAW_SPEED,
-    float YAW_CHUNK_SIZE,
-    float YAW_CHUNK_LINGER_TIME)
+    float YAW_SPEED)
     : tap::control::ComprisedCommand(drivers),
       visionComms(visionComms),
       turretCVControlCommand(turretCVControlCommand),
@@ -32,9 +30,7 @@ SentryCvManagerCommand::SentryCvManagerCommand(
           MIN_PITCH_ANGLE,
           MAX_PITCH_ANGLE,
           PITCH_SPEED,
-          YAW_SPEED,
-          YAW_CHUNK_SIZE,
-          YAW_CHUNK_LINGER_TIME)
+          YAW_SPEED)
 
 {
     comprisedCommandScheduler.registerSubsystem(sentryTurretSubsystem);

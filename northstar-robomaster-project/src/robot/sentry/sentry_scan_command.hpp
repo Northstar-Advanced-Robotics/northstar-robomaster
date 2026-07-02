@@ -22,9 +22,7 @@ public:
         float MIN_PITCH_ANGLE,
         float MAX_PITCH_ANGLE,
         float PITCH_SPEED,
-        float YAW_SPEED,
-        float YAW_CHUNK_SIZE,
-        float YAW_CHUNK_LINGER_TIME);
+        float YAW_SPEED);
 
     bool isReady() override;
 
@@ -56,8 +54,6 @@ private:
     float MAX_PITCH_ANGLE;
     float PITCH_SPEED;
     float YAW_SPEED;
-    float YAW_CHUNK_SIZE;
-    float YAW_CHUNK_LINGER_TIME;
 };
 }  // namespace src::control::turret::cv
 
