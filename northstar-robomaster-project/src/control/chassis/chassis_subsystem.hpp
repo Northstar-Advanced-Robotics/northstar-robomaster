@@ -228,6 +228,7 @@ public:
         return wheelSum / 4.0f * 60.0f / M_TWOPI / CHASSIS_GEAR_RATIO;
     }
 
+    bool beyBladeCommandRunning{false};
     bool isBeybladingOnly{false};
     bool isPeeking{false};
     bool isPeekingLeft{false};

@@ -18,10 +18,20 @@ public:
 
     void update()
     {
+        if (cycles > 500)
+        {
+            hidden = !hidden;
+            status.setHidden(hidden);
+        }
+        else
+        {
+            cycles++;
+        }
+
         if (remote->isConnected())
         {
             status.color = UISubsystem::Color::GREEN;
-            status.setString("Remote: Connected");
+            status.setString("Remote: Connected if flash");
         }
         else
         {
@@ -51,6 +61,9 @@ private:
         STATUS_Y_POSITION,
         20,
         3};
+
+    int cycles = 0;
+    bool hidden = false;
 };
 
 }  // namespace src::control::client_display::graphics

@@ -197,20 +197,12 @@ void ChassisSubsystem::driveBasedOnHeading(
     float rotational,
     float heading)
 {
-    if (drivers->refSerial.getRefSerialReceivingData())
+    if (!motors[0].isMotorOnline() && !motors[1].isMotorOnline() && !motors[2].isMotorOnline() &&
+        !motors[3].isMotorOnline())
     {
-        auto powerStatus = drivers->refSerial.getRobotData().robotPower.value;
-        bool hasChassisPower =
-            (static_cast<uint8_t>(powerStatus) &
-             static_cast<uint8_t>(
-                 tap::communication::serial::RefSerialData::Rx::RobotPower::CHASSIS_HAS_POWER)) !=
-            0;
-        if (!hasChassisPower)
-        {
-            forward = 0;
-            sideways = 0;
-            rotational = 0;
-        }
+        forward = 0;
+        sideways = 0;
+        rotational = 0;
     }
 
     float maxWheelSpeed = getMaxWheelSpeed(
