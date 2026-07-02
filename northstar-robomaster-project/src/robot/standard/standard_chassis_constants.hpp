@@ -40,7 +40,7 @@ static constexpr float CHASSIS_DECCEL_VALUE = 7.5f;
 static constexpr float ACCEL_TAPER_FACTOR = 0.7f;
 static constexpr float ROTATION_ACCEL_TAPER_FACTOR = 0.8f;
 
-static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.150f;
+static constexpr float BEYBLADE_SPEEDUP_FACTOR = 1.240f;
 
 // rad/s/s
 static constexpr float ROTATION_ACCEL_VALUE = 20.0f;
@@ -57,7 +57,7 @@ static constexpr modm::Pair<int, float> CHASSIS_POWER_TO_MAX_SPEED_LUT[] = {
     */
     {75, 3'150},
     {90, 3'600},
-    (120, 4'500)};
+    (120, 4'700)};
 // At 9000 rpm the beyblade was around 130, Its over
 
 static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEED_INTERPOLATOR(
