@@ -240,7 +240,7 @@ private:
 
     mockable void sendHealthData();
 
-    mockable void sendTurretRefData();
+    // mockable void sendTurretRefData();
 
     bool decodeToTurretAimData(const ReceivedSerialMessage& message);
 

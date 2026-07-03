@@ -268,7 +268,7 @@ void VisionComms::sendMessage()
     {
 #ifdef TARGET_SENTRY
         sendHealthData();
-        sendTurretRefData();
+        // sendTurretRefData();
 #endif
         sendRobotOdometry();
     }
