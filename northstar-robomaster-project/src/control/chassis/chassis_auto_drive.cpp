@@ -27,30 +27,29 @@ void ChassisAutoDrive::setCurve(CubicBezier* newPoint)
 
 void ChassisAutoDrive::updateAutoDrive()
 {
-    if (currentT > 1)
-    {
-        currentT = 1;
-    }
-
-    if (!tryUpdatePath())
+    if (currentCurve == NULL)
     {
         desiredGlobalVelocity = modm::Vector<float, 2>(0, 0);
         desiredRotation = 0;
         return;
     }
 
+    if (currentT > 1)
+    {
+        currentT = 1;
+    }
+
     modm::Vector<float, 2> dirToTarget = getDirectionToCurve(currentT);
     float distanceToTarget = dirToTarget.getLength();
     float distanceToEnd = approximateDistanceToEndOfCurve();
 
-    if (distanceToTarget < T_CHECK && distanceToEnd > T_CHECK && currentT < 1)
+    if (distanceToTarget < T_CHECK && currentT < 1)
     {
         currentT += T_INCREASE;
         return;
     }
 
     float slowdownMult = 1;
-
     if (distanceToEnd < SLOWDOWN_DISTANCE)
     {
         slowdownMult = distanceToEnd / SLOWDOWN_DISTANCE;

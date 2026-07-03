@@ -95,23 +95,6 @@ public:
     }
 
 private:
-    bool tryUpdatePath()
-    {
-        if (currentCurve == NULL)
-        {
-            return false;
-        }
-        if (currentT > 1)
-        {
-            currentCurve = NULL;
-            currentT = 0;
-
-            return false;
-        }
-
-        return true;
-    }
-
     modm::Vector<float, 2> clampMagnitude(modm::Vector<float, 2> orig, float min, float max)
     {
         float length = orig.getLength();
