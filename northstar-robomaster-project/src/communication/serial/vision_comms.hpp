@@ -36,7 +36,8 @@ public:
         REF_TURRET_DATA = 7,
         VISION_LOCALIZATION = 8,
         FLY_SKY_DATA = 9,
-        VT13_DATA = 10
+        VT13_DATA = 10,
+        RESTART_DETECTOR = 11
     };
 
     struct RefData
@@ -233,6 +234,8 @@ private:
     TurretAimData lastAimData[control::turret::NUM_TURRETS] = {};
 
     bool aimDataUpdated[control::turret::NUM_TURRETS] = {};
+
+    mockable void sendCvRestartMessage();
 
     mockable void sendRobotIdMessage();
 

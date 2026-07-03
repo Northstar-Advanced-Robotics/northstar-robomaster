@@ -263,7 +263,12 @@ bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
 
 void VisionComms::sendMessage()
 {  // TODO: make these depend on which robot type is selected to make sure that we only send what we
-   // need
+    // need
+    if (drivers->remote.keyPressed(tap::communication::serial::Remote::Key::CTRL) &&
+        drivers->remote.keyPressed(tap::communication::serial::Remote::Key::X))
+    {
+        sendCvRestartMessage();
+    }
     if (messageOffsetInitializationTimeout.isExpired())
     {
 #ifdef TARGET_SENTRY
@@ -293,6 +298,17 @@ void VisionComms::sendMessage()
             sendRefTurretDataMsgTimeout.restart();
         }
     }
+}
+
+void VisionComms::sendCvRestartMessage()
+{
+    DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
+    robotTypeMessage.messageType = MessageType::RESTART_DETECTOR;
+    robotTypeMessage.setCRC16();
+    drivers->uart.write(
+        VISION_COMMS_TX_UART_PORT,
+        reinterpret_cast<uint8_t*>(&robotTypeMessage),
+        sizeof(robotTypeMessage));
 }
 
 void VisionComms::sendRobotIdMessage()

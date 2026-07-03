@@ -143,14 +143,16 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
 
 // flywheel commands
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.5f);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.7f);
 
 // flywheel mappings
-RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
-auto xPressedFlywheels = std::make_unique<ToggleCommandMapping>(
+RemoteMapState xNotCtrlPressed(
+    {tap::communication::serial::Remote::Key::X},
+    {tap::communication::serial::Remote::Key::CTRL});
+auto xNotCtrlPressedFlywheels = std::make_unique<ToggleCommandMapping>(
     drivers(),
     std::vector<Command *>{&flywheelRunCommand},
-    &xPressed);
+    &xNotCtrlPressed);
 
 RemoteMapState leftSwitchUp(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP);
 auto leftSwitchUpFlywheels = std::make_unique<ToggleCommandMapping>(
@@ -523,7 +525,7 @@ void startStandardCommands(Drivers *drivers)
 void registerStandardIoMappings(Drivers *drivers)
 {
     drivers->commandMapper.addMap(std::move(leftMousePressedShoot));
-    drivers->commandMapper.addMap(std::move(xPressedFlywheels));
+    drivers->commandMapper.addMap(std::move(xNotCtrlPressedFlywheels));
     drivers->commandMapper.addMap(std::move(fPressedBeyblade));
     drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
     drivers->commandMapper.addMap(std::move(cPressedNotCtrlCVGovernorToggle));
