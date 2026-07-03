@@ -459,8 +459,7 @@ RemoteMapState fPressed({Remote::Key::F});
 auto fPressedBeyblade = std::make_unique<ToggleCommandMapping>(
     drivers(),
     std::vector<Command *>{&chassisBeyBladeCommand},
-    &fPressed,
-    true);
+    &fPressed);
 
 RemoteMapState rPressed({Remote::Key::R});
 auto rPressedOrientDrive = std::make_unique<ToggleCommandMapping>(
