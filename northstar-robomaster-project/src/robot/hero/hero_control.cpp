@@ -456,7 +456,7 @@ PlateHitGovernor plateHitGovernor(drivers(), 5000);
 
 // chassis Mappings
 RemoteMapState fPressed({Remote::Key::F});
-auto fPressedBeyblade = std::make_unique<HoldRepeatCommandMapping>(
+auto fPressedBeyblade = std::make_unique<ToggleCommandMapping>(
     drivers(),
     std::vector<Command *>{&chassisBeyBladeCommand},
     &fPressed,

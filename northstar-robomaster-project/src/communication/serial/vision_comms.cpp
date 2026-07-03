@@ -372,77 +372,77 @@ void VisionComms::sendHealthData()
     }
 }
 
-void VisionComms::sendTurretRefData()
-{
-    if (sendRefTurretDataMsgTimeout.execute())
-    {
-        tap::communication::serial::RefSerialData::Rx::TurretData refTurretData =
-            drivers->refSerial.getRobotData().turret;
+// void VisionComms::sendTurretRefData()
+// {
+//     if (sendRefTurretDataMsgTimeout.execute())
+//     {
+//         tap::communication::serial::RefSerialData::Rx::TurretData refTurretData =
+//             drivers->refSerial.getRobotData().turret;
 
-        DJISerial::SerialMessage<sizeof(refTurretData)> message;
+//         DJISerial::SerialMessage<sizeof(refTurretData)> message;
 
-        message.messageType = MessageType::REF_TURRET_DATA;
+//         message.messageType = MessageType::REF_TURRET_DATA;
 
-        // Offset 0
-        uint16_t bulletSpeed = static_cast<uint16_t>(refTurretData.bulletSpeed);
-        std::memcpy(&message.data[0], &bulletSpeed, 2);
+//         // Offset 0
+//         uint16_t bulletSpeed = static_cast<uint16_t>(refTurretData.bulletSpeed);
+//         std::memcpy(&message.data[0], &bulletSpeed, 2);
 
-        // Offset 2
-        uint16_t bullets17 = static_cast<uint16_t>(refTurretData.bulletsRemaining17);
-        std::memcpy(&message.data[2], &bullets17, 2);
+//         // Offset 2
+//         uint16_t bullets17 = static_cast<uint16_t>(refTurretData.bulletsRemaining17);
+//         std::memcpy(&message.data[2], &bullets17, 2);
 
-        // Offset 4
-        uint16_t bullets42 = static_cast<uint16_t>(refTurretData.bulletsRemaining42);
-        std::memcpy(&message.data[4], &bullets42, 2);
+//         // Offset 4
+//         uint16_t bullets42 = static_cast<uint16_t>(refTurretData.bulletsRemaining42);
+//         std::memcpy(&message.data[4], &bullets42, 2);
 
-        // Offset 6
-        uint16_t bulletType = static_cast<uint16_t>(refTurretData.bulletType);
-        std::memcpy(&message.data[6], &bulletType, 2);
+//         // Offset 6
+//         uint16_t bulletType = static_cast<uint16_t>(refTurretData.bulletType);
+//         std::memcpy(&message.data[6], &bulletType, 2);
 
-        // Offset 8
-        uint16_t coolingRate = static_cast<uint16_t>(refTurretData.coolingRate);
-        std::memcpy(&message.data[8], &coolingRate, 2);
+//         // Offset 8
+//         uint16_t coolingRate = static_cast<uint16_t>(refTurretData.coolingRate);
+//         std::memcpy(&message.data[8], &coolingRate, 2);
 
-        // Offset 10
-        uint16_t firingFreq = static_cast<uint16_t>(refTurretData.firingFreq);
-        std::memcpy(&message.data[10], &firingFreq, 2);
+//         // Offset 10
+//         uint16_t firingFreq = static_cast<uint16_t>(refTurretData.firingFreq);
+//         std::memcpy(&message.data[10], &firingFreq, 2);
 
-        // Offset 12
-        uint16_t heat17_1 = static_cast<uint16_t>(refTurretData.heat17);
-        std::memcpy(&message.data[12], &heat17_1, 2);
+//         // Offset 12
+//         uint16_t heat17_1 = static_cast<uint16_t>(refTurretData.heat17);
+//         std::memcpy(&message.data[12], &heat17_1, 2);
 
-        // Offset 14
-        uint16_t heat17_2 = static_cast<uint16_t>(uint16_t{0});
-        std::memcpy(&message.data[14], &heat17_2, 2);
+//         // Offset 14
+//         uint16_t heat17_2 = static_cast<uint16_t>(uint16_t{0});
+//         std::memcpy(&message.data[14], &heat17_2, 2);
 
-        // Offset 16
-        uint16_t heat42 = static_cast<uint16_t>(refTurretData.heat42);
-        std::memcpy(&message.data[16], &heat42, 2);
+//         // Offset 16
+//         uint16_t heat42 = static_cast<uint16_t>(refTurretData.heat42);
+//         std::memcpy(&message.data[16], &heat42, 2);
 
-        // Offset 18
-        uint16_t heatLimit = static_cast<uint16_t>(refTurretData.heatLimit);
-        std::memcpy(&message.data[18], &heatLimit, 2);
+//         // Offset 18
+//         uint16_t heatLimit = static_cast<uint16_t>(refTurretData.heatLimit);
+//         std::memcpy(&message.data[18], &heatLimit, 2);
 
-        // Offset 20
-        uint16_t launchTime =
-            static_cast<uint16_t>(refTurretData.lastReceivedLaunchingInfoTimestamp);
-        std::memcpy(&message.data[20], &launchTime, 2);
+//         // Offset 20
+//         uint16_t launchTime =
+//             static_cast<uint16_t>(refTurretData.lastReceivedLaunchingInfoTimestamp);
+//         std::memcpy(&message.data[20], &launchTime, 2);
 
-        // Offset 22
-        uint16_t launchMech = static_cast<uint16_t>(refTurretData.launchMechanismID);
-        std::memcpy(&message.data[22], &launchMech, 2);
+//         // Offset 22
+//         uint16_t launchMech = static_cast<uint16_t>(refTurretData.launchMechanismID);
+//         std::memcpy(&message.data[22], &launchMech, 2);
 
-        // Offset 24
-        uint16_t yaw = static_cast<uint16_t>(refTurretData.yaw);
-        std::memcpy(&message.data[24], &yaw, 2);
+//         // Offset 24
+//         uint16_t yaw = static_cast<uint16_t>(refTurretData.yaw);
+//         std::memcpy(&message.data[24], &yaw, 2);
 
-        message.setCRC16();
-        drivers->uart.write(
-            VISION_COMMS_TX_UART_PORT,
-            reinterpret_cast<uint8_t*>(&message),
-            sizeof(message));
-    }
-}
+//         message.setCRC16();
+//         drivers->uart.write(
+//             VISION_COMMS_TX_UART_PORT,
+//             reinterpret_cast<uint8_t*>(&message),
+//             sizeof(message));
+//     }
+// }
 
 // Should do something like this (from ARUW)
 

@@ -15,8 +15,8 @@ namespace src::chassis
 {
 class ChassisAutoDrive
 {
-    static constexpr float MAXIMUM_MPS = 1.2f;
-    static constexpr float MINIMUM_MPS = 0.55f;
+    static constexpr float MAXIMUM_MPS = 1.5f;
+    static constexpr float MINIMUM_MPS = 0.65f;
 
     static constexpr float T_INCREASE_MULT = 0.01f;
     static constexpr float T_INCREASE = T_INCREASE_MULT * MAXIMUM_MPS;
@@ -28,7 +28,6 @@ class ChassisAutoDrive
     static constexpr float T_LOOKAHEAD = T_LOOKAHEAD_MULT * MAXIMUM_MPS;
 
     static constexpr float SLOWDOWN_DISTANCE = 0.15f;
-    static constexpr float MAX_POSITION_ERROR = 0.02f;
     static constexpr float DEGEN_CURVE_LENGTH = 0.1f;
 
     src::chassis::ChassisSubsystem* chassis;
