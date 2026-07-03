@@ -27,6 +27,11 @@ void ChassisAutoDrive::setCurve(CubicBezier* newPoint)
 
 void ChassisAutoDrive::updateAutoDrive()
 {
+    if (currentT > 1)
+    {
+        currentT = 1;
+    }
+
     if (!tryUpdatePath())
     {
         desiredGlobalVelocity = modm::Vector<float, 2>(0, 0);
@@ -36,20 +41,14 @@ void ChassisAutoDrive::updateAutoDrive()
 
     modm::Vector<float, 2> dirToTarget = getDirectionToCurve(currentT);
     float distanceToTarget = dirToTarget.getLength();
-    float distanceStraightToEndPoint = distanceToEndPoint();
+    float distanceToEnd = approximateDistanceToEndOfCurve();
 
-    if (distanceToTarget < T_CHECK && distanceStraightToEndPoint > T_CHECK && currentT < 1)
+    if (distanceToTarget < T_CHECK && distanceToEnd > T_CHECK && currentT < 1)
     {
         currentT += T_INCREASE;
         return;
     }
 
-    if (currentT > 1)
-    {
-        currentT = 1;
-    }
-
-    float distanceToEnd = approximateDistanceToEndOfCurve();
     float slowdownMult = 1;
 
     if (distanceToEnd < SLOWDOWN_DISTANCE)
