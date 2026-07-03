@@ -136,6 +136,11 @@ private:
         return length - (length * currentT);
     }
 
+    float distanceToEndPoint()
+    {
+        return (chassisOdometry->getPositionGlobal() - currentCurve->getEnd()).getLength();
+    }
+
     float approximateTClosestToPoint(modm::Vector<float, 2> pos)
     {
         float t = 0.0f;
