@@ -20,7 +20,7 @@ public:
 
     void initialize() override;
 
-    void execute() override{};
+    void execute() override;
 
     void end(bool interrupted) override;
 
@@ -37,12 +37,14 @@ private:
     float upperLimit = 14.5f;
     float lowerLimit = 13.5f;
     float increment = 0.1f;
-    float decrement = 0.4f;
+    float decrement = 0.1f;
+    float lastShotSpeed = 14;
 #else
     float upperLimit = 24.5f;
     float lowerLimit = 23.5f;
     float increment = 0.1f;
-    float decrement = 0.4f;
+    float decrement = 0.1f;
+    float lastShotSpeed = 24;
 #endif
 };
 }  // namespace src::control::flywheel

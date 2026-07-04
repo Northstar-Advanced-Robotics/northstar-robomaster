@@ -14,9 +14,11 @@ TwoFlywheelRunCommand::TwoFlywheelRunCommand(
     addSubsystemRequirement(flywheel);
 }
 
-void TwoFlywheelRunCommand::initialize()
+void TwoFlywheelRunCommand::initialize() { flywheel->setDesiredLaunchSpeed(launchSpeed); }
+
+void TwoFlywheelRunCommand::execute()
 {
-    if (refSerial != nullptr)
+    if (refSerial != nullptr && lastShotSpeed != refSerial->getRobotData().turret.bulletSpeed)
     {
         if (refSerial->getRobotData().turret.bulletSpeed > upperLimit)
         {
@@ -27,6 +29,7 @@ void TwoFlywheelRunCommand::initialize()
             launchSpeed += increment;
         }
     }
+    lastShotSpeed = refSerial->getRobotData().turret.bulletSpeed;
     flywheel->setDesiredLaunchSpeed(launchSpeed);
 }
 
