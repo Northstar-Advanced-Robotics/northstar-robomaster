@@ -142,7 +142,7 @@ PlaySongCommand playStartupSongCommand(&buzzerSubsystem, tsnSong);
 // flywheel
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS, true);
 
-TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 14);
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 14, &drivers()->refSerial);
 
 // flywheel mappings
 RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
