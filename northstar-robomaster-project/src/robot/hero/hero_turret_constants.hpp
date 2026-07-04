@@ -80,6 +80,14 @@ namespace world_rel_turret_imu
 {
 static constexpr float BEYBLADE_FF_GAIN = 80.0f;
 
+// Feedforward terms to overcome static friction (stiction) when starting the turret moving from
+// rest. Tune by increasing the gain from 0 until the turret just breaks free from rest without
+// jumping.
+static constexpr float YAW_STATIC_FRICTION_FF_GAIN = 1700.0f;
+static constexpr float PITCH_STATIC_FRICTION_FF_GAIN = 800.0f;
+static constexpr float STATIC_FRICTION_FF_VELOCITY_DEADZONE = 0.1f;  // rad/s
+static constexpr float STATIC_FRICTION_FF_ERROR_DEADZONE = 0.01f;    // rad
+
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
     .kp = 15.0f,
     .ki = 0.0f,
@@ -120,7 +128,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_AUTO_AIM_CONFIG = 
 };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 1800.0f,
+    .kp = 1500.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1'000.0f,

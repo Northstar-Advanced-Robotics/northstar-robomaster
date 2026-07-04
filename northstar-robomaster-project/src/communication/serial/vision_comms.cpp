@@ -138,8 +138,12 @@ bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
             if (it != plateLookup.end())
             {
                 PlateDims dims = it->second;
+#ifdef TARGET_SENTRY
                 aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance);
                 aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance);
+#endif
+                aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance) * 1.5;
+                aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance) * 1.5;
             }
         }
     }

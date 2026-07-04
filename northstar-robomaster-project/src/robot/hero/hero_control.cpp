@@ -51,6 +51,7 @@
 #include "control/turret/algorithms/world_frame_chassis_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_can_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_imu_turret_controller.hpp"
+#include "control/turret/algorithms/world_frame_turret_imu_turret_controller_ff.hpp"
 #include "control/turret/constants/turret_constants.hpp"
 #include "control/turret/turret_subsystem.hpp"
 #include "control/turret/user/turret_quick_turn_command.hpp"
@@ -360,7 +361,7 @@ algorithms::WorldFramePitchTurretImuCascadePidTurretController worldFramePitchTu
     worldFramePitchTurretPosPid,
     worldFramePitchTurretVelPid);
 
-algorithms::WorldFrameYawTurretImuCascadePidTurretController worldFrameYawTurretImuController(
+algorithms::WorldFrameYawTurretImuCascadePidTurretControllerFF worldFrameYawTurretImuController(
     *drivers(),
     turret.yawMotor,
     worldFrameYawTurretPosPid,
