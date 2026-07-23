@@ -51,25 +51,25 @@ jobs:
       - name: Build with SCons Standard
         working-directory: ./northstar-robomaster-project
         run: |
-          pipenv run scons build profile=debug profiling=true robot=TARGET_STANDARD
+          pipenv run scons build profile=debug profiling=true robot=STANDARD
 
       # 7. Run SCons Build
       # Runs specifically in the northstar-robomaster-project folder
       - name: Build with SCons Sentry
         working-directory: ./northstar-robomaster-project
         run: |
-          pipenv run scons build profile=debug profiling=true robot=TARGET_SENTRY
+          pipenv run scons build profile=debug profiling=true robot=SENTRY
 
       # 8. Run SCons Build
       # Runs specifically in the northstar-robomaster-project folder
       - name: Build with SCons Hero
         working-directory: ./northstar-robomaster-project
         run: |
-          pipenv run scons build profile=debug profiling=true robot=TARGET_HERO
+          pipenv run scons build profile=debug profiling=true robot=HERO
 
       # 9. Run SCons Build
       # Runs specifically in the northstar-robomaster-project folder
       - name: Build with SCons TestBed
         working-directory: ./northstar-robomaster-project
         run: |
-          pipenv run scons build profile=debug profiling=true robot=TARGET_TEST_BED
+          pipenv run scons build profile=debug profiling=true robot=TEST_BED
