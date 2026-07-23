@@ -40,6 +40,7 @@ enum Spin : u_int8_t
          {{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}},    // SPIN_100
          {{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}}}};  // SPIN_110
 
+// TODO fix constants
 static constexpr modm::Pair<float, float> MPS_TO_RPM[] = {
     {0.0f, 0.0f},
     {15.0f, 4514.0f},

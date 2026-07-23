@@ -146,19 +146,13 @@ DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_B
 TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.7f, &drivers()->refSerial);
 
 // flywheel mappings
-RemoteMapState xNotCtrlPressed(
-    {tap::communication::serial::Remote::Key::X},
-    {tap::communication::serial::Remote::Key::CTRL});
-auto xNotCtrlPressedFlywheels = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&flywheelRunCommand},
-    &xNotCtrlPressed);
+Trigger xNotCtrlPressedFlywheels = (TriggerHelpers::button(drivers(), Remote::Key::X) &&
+                                    !TriggerHelpers::button(drivers(), Remote::Key::CTRL))
+                                       .toggleOnTrue(&flywheelRunCommand);
 
-RemoteMapState leftSwitchUp(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP);
-auto leftSwitchUpFlywheels = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&flywheelRunCommand},
-    &leftSwitchUp);
+Trigger leftSwitchUpFlywheels =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP)
+        .toggleOnTrue(&flywheelRunCommand);
 
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
@@ -252,6 +246,8 @@ auto qOrEPressedCycleShotSpeed = std::make_unique<CycleStateCommandMapping<
     leftMousePressedShoot.get(),
     &MultiShotCvCommandMapping::setShooterState,
     ePressed);
+// TODO this is bad, often acidently get to the wrong state should have CV send a fire rate that
+// lines up with the rotation speed, so one 17 per plate at some rotation speed.
 
 // turret subsystem
 tap::motor::DjiMotor pitchMotor(
@@ -273,9 +269,12 @@ tap::motor::DjiMotor yawMotor(
     false,
     1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(54.0f / 81.0f),
     YAW_MOTOR_CONFIG.startEncoderValue,
-    &drivers()->encoder);
+    &drivers()->encoder);  // TODO new encoder
 
+// TODO unfuck cordiate frame, make right hand rule.
 TurretSubsystem turret(drivers(), &pitchMotor, &yawMotor, PITCH_MOTOR_CONFIG, YAW_MOTOR_CONFIG);
+
+// TODO maybe make better controlers with diffrent control theory, look at UW.
 
 // turret controlers
 algorithms::ChassisFramePitchTurretController chassisFramePitchTurretController(
@@ -351,12 +350,8 @@ cv::TurretCVControlCommand turretCVControlCommand(
     USER_YAW_INPUT_SCALAR,
     USER_PITCH_INPUT_SCALAR);
 
-RemoteMapState rightMousePressed(RemoteMapState::MouseButton::RIGHT);
-auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&turretCVControlCommand},
-    &rightMousePressed,
-    true);
+Trigger rightMousePressedCvControl =
+    TriggerHelpers::rightMouseButton(drivers()).whileTrue(&turretCVControlCommand);
 
 Trigger rightSwitchUpCvControl =
     TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::UP)
@@ -369,6 +364,8 @@ src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdomet
     src::chassis::WHEEL_DIAMETER_M);
 
 // chassis subsystem
+// TODO unfuck cordiate frame, make right hand rule.
+// TODO get curent and voltage sensors and make good power limiting
 src::chassis::ChassisSubsystem chassisSubsystem(
     drivers(),
     src::chassis::ChassisConfig{
@@ -413,38 +410,26 @@ FiredRecentlyGovernor firedRecentlyGovernor(drivers(), 5000);
 PlateHitGovernor plateHitGovernor(drivers(), 5000);
 
 // chassis Mappings
-RemoteMapState fPressed({Remote::Key::F});
-auto fPressedBeyblade = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisBeyBladeCommand},
-    &fPressed);
+Trigger fPressedBeyblade =
+    TriggerHelpers::button(drivers(), Remote::Key::F).toggleOnTrue(&chassisBeyBladeCommand);
 
-RemoteMapState rPressed({Remote::Key::R});
-auto rPressedOrientDrive = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisOrientDriveCommand},
-    &rPressed);
+Trigger rPressedOrientDrive =
+    TriggerHelpers::button(drivers(), Remote::Key::R).toggleOnTrue(&chassisOrientDriveCommand);
 
-RemoteMapState bPressed({Remote::Key::B});
-auto bPressedNormDrive = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisDriveCommand},
-    &bPressed);
+Trigger bPressedNormDrive =
+    TriggerHelpers::button(drivers(), Remote::Key::B).toggleOnTrue(&chassisDriveCommand);
 
-RemoteMapState gPressed({Remote::Key::G});
-auto gPressedWiggle = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisWiggleCommand},
-    &gPressed);
+Trigger gPressedWiggle =
+    TriggerHelpers::button(drivers(), Remote::Key::G).toggleOnTrue(&chassisWiggleCommand);
 
-RemoteMapState rightSwitchDown(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN);
-auto rightswitchDownBeyblade = std::make_unique<HoldRepeatCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisBeyBladeCommand},
-    &rightSwitchDown,
-    true);
+Trigger rightswitchDownBeyblade =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
+        .whileTrue(&chassisBeyBladeCommand);
 
 // imu commands
+// TODO Its anoying that this runs at the start every time, could make it use non imu control
+// starting at whatever position the robot was in when it turns on then when you calabrate it
+// changes to imu control
 imu::ImuCalibrateCommand imuCalibrateCommand(
     drivers(),
     {{
@@ -466,6 +451,7 @@ Trigger imuCalWhenWheelRight =
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
+// TODO Need better ui for cv governor and yaw govornor
 src::control::client_display::graphics::UISubsystem ui(drivers());
 src::control::client_display::graphics::InfantryDrawCommand infantryDrawCommand(
     drivers(),
@@ -525,24 +511,24 @@ void startStandardCommands(Drivers *drivers)
 void registerStandardIoMappings(Drivers *drivers)
 {
     drivers->commandMapper.addMap(std::move(leftMousePressedShoot));
-    drivers->commandMapper.addMap(std::move(xNotCtrlPressedFlywheels));
-    drivers->commandMapper.addMap(std::move(fPressedBeyblade));
-    drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
     drivers->commandMapper.addMap(std::move(cPressedNotCtrlCVGovernorToggle));
     drivers->commandMapper.addMap(std::move(qOrEPressedCycleShotSpeed));
-    drivers->commandMapper.addMap(std::move(gPressedWiggle));
-    drivers->commandMapper.addMap(std::move(rPressedOrientDrive));
-    drivers->commandMapper.addMap(std::move(bPressedNormDrive));
 
-    drivers->commandMapper.addMap(std::move(rightswitchDownBeyblade));
     drivers->commandMapper.addMap(std::move(leftSwitchDownPressedShoot));
-    drivers->commandMapper.addMap(std::move(leftSwitchUpFlywheels));
 
     /// TRIGGERS
     /// Triggers don't need to be added to the command mapper since they register themselves
     /// with the command scheduler when they are constructed, but just listing them here for
     /// clarity
     /*
+    xNotCtrlPressedFlywheels
+    fPressedBeyblade
+    rightMousePressedCvControl
+    gPressedWiggle
+    rPressedOrientDrive
+    bPressedNormDrive
+    rightswitchDownBeyblade
+    leftSwitchUpFlywheels
     vPressedTurretCvTargetingToggleCommand
     rightSwitchUpCvControl
     ctrlZPressedImuCal

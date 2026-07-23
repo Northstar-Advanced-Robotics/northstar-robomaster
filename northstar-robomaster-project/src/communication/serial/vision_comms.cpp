@@ -266,8 +266,7 @@ bool VisionComms::decodeToVT13Remote(const ReceivedSerialMessage& message)
 }
 
 void VisionComms::sendMessage()
-{  // TODO: make these depend on which robot type is selected to make sure that we only send what we
-    // need
+{
     if (drivers->remote.keyPressed(tap::communication::serial::Remote::Key::CTRL) &&
         drivers->remote.keyPressed(tap::communication::serial::Remote::Key::X))
     {
