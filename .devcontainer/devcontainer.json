@@ -1,0 +1,21 @@
+{
+  "name": "Northstar RoboMaster",
+  "build": {
+    "dockerfile": "Dockerfile"
+  },
+  "customizations": {
+    "vscode": {
+      "extensions": [
+        "ms-vscode.cpptools",
+        "ms-python.python",
+        "marus25.cortex-debug"
+      ],
+      "settings": {
+        "C_Cpp.default.compilerPath": "/opt/gcc-arm/bin/arm-none-eabi-gcc",
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-arm"
+      }
+    }
+  },
+  "postCreateCommand": "cd northstar-robomaster-project && pipenv install --dev --python /usr/bin/python3.11",
+  "remoteUser": "vscode"
+}

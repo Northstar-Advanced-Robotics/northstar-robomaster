@@ -61,7 +61,7 @@
 // cv
 #include "control/agitator/multi_shot_cv_command_mapping.hpp"
 #include "control/governor/cv_on_target_governor.hpp"
-#include "control/turret/CV/turret_cv_targeting_toggle_command.hpp"
+#include "control/turret/cv/turret_cv_targeting_toggle_command.hpp"
 #include "control/turret/cv/turret_cv_control_command.hpp"
 
 // flywheel

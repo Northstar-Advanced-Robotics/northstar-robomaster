@@ -5,7 +5,7 @@
 #include "tap/drivers.hpp"
 
 #include "communication/serial/vision_comms.hpp"
-#include "control/turret/CV/turret_cv_control_command.hpp"
+#include "control/turret/cv/turret_cv_control_command.hpp"
 #include "control/turret/algorithms/turret_controller_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
 #include "robot/control_operator_interface.hpp"
