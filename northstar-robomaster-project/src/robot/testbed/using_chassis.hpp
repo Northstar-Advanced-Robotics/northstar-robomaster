@@ -1,3 +1,5 @@
+#ifdef USING_TURRET
+
 #ifndef USING_CHASSIS_HPP_
 #define USING_CHASSIS_HPP_
 
@@ -10,7 +12,6 @@ using namespace tap::control;
 using namespace src::control::turret;
 using namespace src::chassis;
 
-#ifdef USING_TURRET
 
 extern src::control::turret::TurretSubsystem turretSubsystem;
 
@@ -113,10 +114,9 @@ ChassisBeybladeCommand chassisBeyBladeCommand(
     true);
 
 // chassis Mappings
-ToggleCommandMapping bPressed(
-    drivers(),
-    {&chassisBeyBladeCommand},
-    RemoteMapState(RemoteMapState({tap::communication::serial::Remote::Key::B})));
+Trigger bPressedBeyblade =
+    TriggerHelpers::button(drivers(), tap::communication::serial::Remote::Key::B)
+        .toggleOnTrue(&chassisBeyBladeCommand);
 
 #endif
 

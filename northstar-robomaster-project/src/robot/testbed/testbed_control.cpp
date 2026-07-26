@@ -139,15 +139,14 @@ void registerTestIoMappings(src::testbed::Drivers *drivers)
     // leftSwitchUpRunFlywheel
 #endif
 #ifdef USING_FLYWHEEL
-    drivers->commandMapper.addMap(&fPressed);
+    // fPressedRunFlywheel
 #endif
 #ifdef USING_TURRET
-    drivers->commandMapper.addMap(&xPressed);
-    drivers->commandMapper.addMap(&turretTestCommandMapping);
+    // xPressedCvControl
+    // leftSwitchDownTurretTest
 #endif  // USING_TURRET
-    // drivers->commandMapper.addMap(&ctrlCPressed);
 #ifdef USING_CHASSIS
-    drivers->commandMapper.addMap(&bPressed);
+    // bPressedBeyblade
 #endif
 }
 }  // namespace testbed_control

@@ -1,7 +1,8 @@
+#ifdef USING_HUD
+
 #ifndef USING_HUD_HPP_
 #define USING_HUD_HPP_
 
-#ifdef USING_HUD
 
 using namespace src::control::client_display;
 using namespace tap::communication::serial;

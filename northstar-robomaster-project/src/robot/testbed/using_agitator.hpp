@@ -1,3 +1,5 @@
+#ifdef USING_AGITATOR
+
 #ifndef USING_AGITATOR_HPP_
 #define USING_AGITATOR_HPP_
 
@@ -14,7 +16,6 @@ using namespace tap::communication::serial;
 using namespace src::control::governor;
 using namespace tap::control::governor;
 
-#ifdef USING_AGITATOR
 
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
