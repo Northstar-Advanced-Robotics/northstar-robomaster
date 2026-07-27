@@ -154,17 +154,12 @@ DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_B
 TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 19.3f, &drivers()->refSerial);
 
 // flywheel mappings
-RemoteMapState xPressed({tap::communication::serial::Remote::Key::X});
-auto xPressedFlywheels = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&flywheelRunCommand},
-    &xPressed);
+Trigger xPressedFlywheels =
+    TriggerHelpers::button(drivers(), Remote::Key::X).toggleOnTrue(&flywheelRunCommand);
 
-RemoteMapState leftSwitchUp(Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP);
-auto leftSwitchUpFlywheels = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&flywheelRunCommand},
-    &leftSwitchUp);
+Trigger leftSwitchUpFlywheels =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::LEFT_SWITCH, Remote::SwitchState::UP)
+        .toggleOnTrue(&flywheelRunCommand);
 
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
@@ -367,12 +362,8 @@ cv::TurretCVTargetingToggleCommand turretCvTargetingToggleCommand(
 Trigger vPressedTurretCvTargetingToggleCommand =
     TriggerHelpers::button(drivers(), Remote::Key::V).onTrue(&turretCvTargetingToggleCommand);
 
-RemoteMapState rightMousePressed(RemoteMapState::MouseButton::RIGHT);
-auto rightMousePressedCvControl = std::make_unique<HoldRepeatCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&turretCVControlCommand},
-    &rightMousePressed,
-    true);
+Trigger rightMousePressedCvControl =
+    TriggerHelpers::rightMouseButton(drivers()).whileTrue(&turretCVControlCommand);
 
 // chassis odometry
 src::chassis::ChassisOdometry *chassisOdometry = new src::chassis::ChassisOdometry(
@@ -443,37 +434,21 @@ FiredRecentlyGovernor firedRecentlyGovernor(drivers(), 5000);
 PlateHitGovernor plateHitGovernor(drivers(), 5000);
 
 // chassis Mappings
-RemoteMapState fPressed({Remote::Key::F});
-auto fPressedBeyblade = std::make_unique<HoldRepeatCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisBeyBladeCommand},
-    &fPressed,
-    true);
+Trigger fPressedBeyblade =
+    TriggerHelpers::button(drivers(), Remote::Key::F).whileTrue(&chassisBeyBladeCommand);
 
-RemoteMapState rPressed({Remote::Key::R});
-auto rPressedOrientDrive = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisOrientDriveCommand},
-    &rPressed);
+Trigger rPressedOrientDrive =
+    TriggerHelpers::button(drivers(), Remote::Key::R).toggleOnTrue(&chassisOrientDriveCommand);
 
-RemoteMapState bPressed({Remote::Key::B});
-auto bPressedNormDrive = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisDriveCommand},
-    &bPressed);
+Trigger bPressedNormDrive =
+    TriggerHelpers::button(drivers(), Remote::Key::B).toggleOnTrue(&chassisDriveCommand);
 
-RemoteMapState gPressed({Remote::Key::G});
-auto gPressedWiggle = std::make_unique<ToggleCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisWiggleCommand},
-    &gPressed);
+Trigger gPressedWiggle =
+    TriggerHelpers::button(drivers(), Remote::Key::G).toggleOnTrue(&chassisWiggleCommand);
 
-RemoteMapState rightSwitchDown(Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN);
-auto rightswitchDownBeyblade = std::make_unique<HoldRepeatCommandMapping>(
-    drivers(),
-    std::vector<Command *>{&chassisBeyBladeCommand},
-    &rightSwitchDown,
-    true);
+Trigger rightswitchDownBeyblade =
+    TriggerHelpers::switchState(drivers(), Remote::Switch::RIGHT_SWITCH, Remote::SwitchState::DOWN)
+        .whileTrue(&chassisBeyBladeCommand);
 
 // sentry scan
 cv::SentryScanCommand sentryScanCommand(
@@ -609,28 +584,29 @@ void startSentryCommands(Drivers *drivers)
 void registerSentryIoMappings(Drivers *drivers)
 {
     drivers->commandMapper.addMap(std::move(leftMousePressedShoot));
-    drivers->commandMapper.addMap(std::move(xPressedFlywheels));
-    drivers->commandMapper.addMap(std::move(fPressedBeyblade));
-    drivers->commandMapper.addMap(std::move(rightMousePressedCvControl));
     drivers->commandMapper.addMap(std::move(cPressedNotCtrlCVGovernorToggle));
     drivers->commandMapper.addMap(std::move(qOrEPressedCycleShotSpeed));
-    drivers->commandMapper.addMap(std::move(gPressedWiggle));
-    drivers->commandMapper.addMap(std::move(rPressedOrientDrive));
-    drivers->commandMapper.addMap(std::move(bPressedNormDrive));
 
-    drivers->commandMapper.addMap(std::move(rightswitchDownBeyblade));
     drivers->commandMapper.addMap(std::move(leftSwitchDownPressedShoot));
-    drivers->commandMapper.addMap(std::move(leftSwitchUpFlywheels));
 
     /// TRIGGERS
     /// Triggers don't need to be added to the command mapper since they register themselves with
     /// the command scheduler when they are constructed, but just listing them here for clarity
     /*
+    xPressedFlywheels
+    leftSwitchUpFlywheels
+    fPressedBeyblade
+    rPressedOrientDrive
+    bPressedNormDrive
+    gPressedWiggle
+    rightswitchDownBeyblade
+    rightMousePressedCvControl
     vPressedTurretCvTargetingToggleCommand
-    scanWhenWheelLeft
+    cvControl
+    scan
     ctrlZPressedImuCal
     imuCalWhenWheelRight
-    rightSwitchMidOrientDriveWhenImuCalibrated
+    switchesMidOrientDriveWhenImuCalibratedAndNotInMatch
     ctrlCPressedUI
     */
 }
