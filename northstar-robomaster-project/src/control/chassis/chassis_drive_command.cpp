@@ -26,7 +26,7 @@ void ChassisDriveCommand::execute()
         operatorInterface->getDrivetrainHorizontalTranslation());
     chassis->setVelocityTurretDrive(
         normInput.first,
-        -normInput.second,
+        normInput.second,
         operatorInterface->getDrivetrainRotationalTranslation());
 }
 

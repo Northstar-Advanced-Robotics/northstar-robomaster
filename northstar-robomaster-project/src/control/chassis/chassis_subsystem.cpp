@@ -8,10 +8,10 @@
 using tap::algorithms::limitVal;
 
 /*
-    Chassis Subsystem uses a 2D coordinate system, using the ground as the XY plane
-    +X: Right
-    +Y: Forward
-    +Rotation: CW
+    Chassis subsystem uses right hand rule, causing the following.
+    +X: Forward
+    -Y: Sideways 
+    +Rotation: CCW
 */
 
 namespace src::chassis
@@ -250,30 +250,30 @@ void ChassisSubsystem::driveBasedOnHeading(
         ROTATION_ACCEL_VALUE,
         static_cast<float>(tap::Drivers::DT) / 1E3F);
 
-    float rampedForward = rampControllers[0].getValue();
-    float rampedSideways = rampControllers[1].getValue();
+    float rampedXVelocity = rampControllers[0].getValue();
+    float rampedYVelocity = rampControllers[1].getValue();
     float rampedRotational = rampControllers[2].getValue();
 
     float cos_theta = cos(heading);
     float sin_theta = sin(heading);
 
-    float vx_local = rampedForward * cos_theta + rampedSideways * sin_theta;
-    float vy_local = -rampedForward * sin_theta + rampedSideways * cos_theta;
+    float vx_local = rampedXVelocity * cos_theta + rampedYVelocity * sin_theta;
+    float vy_local = -rampedXVelocity * sin_theta + rampedYVelocity * cos_theta;
 
-    isPeeking = abs(vx_local) > 0.1;
-    isPeekingLeft = isPeeking && (vx_local < 0);
+    isPeeking = abs(vy_local) > 0.1;
+    isPeekingLeft = isPeeking && (vy_local < 0);
 
     LFSpeed = mpsToRpm(
-        (vx_local - vy_local) / M_SQRT2 +
+        (vx_local - vy_local) / M_SQRT2 -
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-left wheel
     RFSpeed = mpsToRpm(
-        (-vx_local - vy_local) / M_SQRT2 +
+        (-vx_local - vy_local) / M_SQRT2 -
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-right wheel
     RBSpeed = mpsToRpm(
-        (-vx_local + vy_local) / M_SQRT2 +
+        (-vx_local + vy_local) / M_SQRT2 -
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-right wheel
     LBSpeed = mpsToRpm(
-        (vx_local + vy_local) / M_SQRT2 +
+        (vx_local + vy_local) / M_SQRT2 -
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-left wheel
     int LF = static_cast<int>(MotorId::LF);
     int LB = static_cast<int>(MotorId::LB);
