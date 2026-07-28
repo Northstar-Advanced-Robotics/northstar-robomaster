@@ -123,7 +123,8 @@ void setDefaultTestCommands(src::testbed::Drivers *drivers)
 
 void startTestCommands(src::testbed::Drivers *drivers)
 {
-    drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(0, 0, 0, 0, 0, 0));
+    drivers->bmi088.setMountingTransform(
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 
 void registerTestIoMappings(src::testbed::Drivers *drivers)
