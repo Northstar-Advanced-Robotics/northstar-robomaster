@@ -272,7 +272,7 @@ tap::motor::DjiMotor pitchMotor(
     drivers(),
     PITCH_MOTOR_ID,
     CAN_BUS_PITCH,
-    false,
+    true,
     "PitchMotor",
     false,
     1,
