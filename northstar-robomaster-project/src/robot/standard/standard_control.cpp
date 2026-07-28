@@ -505,7 +505,7 @@ void startStandardCommands(Drivers *drivers)
     drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(
-        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(0)));
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 
 void registerStandardIoMappings(Drivers *drivers)
