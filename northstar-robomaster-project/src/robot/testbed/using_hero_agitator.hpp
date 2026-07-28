@@ -1,3 +1,5 @@
+#ifdef USING_HERO_AGITATOR
+
 #ifndef USING__HERO_AGITATOR_HPP_
 #define USING__HERO_AGITATOR_HPP_
 
@@ -15,7 +17,6 @@ using namespace src::control::governor;
 using namespace tap::control::governor;
 using namespace src::control::flywheel;
 
-#ifdef USING_HERO_AGITATOR
 
 // flywheel
 DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS, true);
