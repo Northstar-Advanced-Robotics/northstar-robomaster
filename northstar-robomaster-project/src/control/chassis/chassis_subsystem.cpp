@@ -84,7 +84,8 @@ float RBSpeed;
 
 inline float ChassisSubsystem::getTurretYaw()
 {
-    return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
+    // Motor is inverted, doing this for now for testing.
+    return -yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
 
 float ChassisSubsystem::getChassisZeroTurret()
