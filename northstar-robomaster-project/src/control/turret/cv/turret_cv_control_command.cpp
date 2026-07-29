@@ -37,8 +37,7 @@ TurretCVControlCommand::TurretCVControlCommand(
     algorithms::TurretYawControllerInterface *yawController,
     algorithms::TurretPitchControllerInterface *pitchController,
     float userYawInputScalar,
-    float userPitchInputScalar,
-    uint8_t turretID)
+    float userPitchInputScalar)
     : drivers(drivers),
       controlOperatorInterface(controlOperatorInterface),
       visionComms(visionComms),
@@ -46,8 +45,7 @@ TurretCVControlCommand::TurretCVControlCommand(
       yawController(yawController),
       pitchController(pitchController),
       userYawInputScalar(userYawInputScalar),
-      userPitchInputScalar(userPitchInputScalar),
-      turretID(turretID)
+      userPitchInputScalar(userPitchInputScalar)
 {
     TurretCVControlCommandTemplate::addSubsystemRequirement(turretSubsystem);
 }
@@ -66,10 +64,10 @@ void TurretCVControlCommand::execute()
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
     uint32_t dt = currTime - prevTime;
     prevTime = currTime;
-    if (visionComms.isAimDataUpdated(turretID))
+    if (visionComms.isAimDataUpdated())
     {
         // up has positive error so up positive
-        const WrappedFloat pitchSetpoint = Angle(visionComms.getLastAimData(turretID).pitch);
+        const WrappedFloat pitchSetpoint = Angle(visionComms.getLastAimData().pitch);
         pitchController->runController(dt, pitchSetpoint);
         if (pitchOnlyMode)
         {
@@ -81,19 +79,19 @@ void TurretCVControlCommand::execute()
         else
         {
             // left neg right post
-            const WrappedFloat yawSetpoint = Angle(visionComms.getLastAimData(turretID).yaw);
+            const WrappedFloat yawSetpoint = Angle(visionComms.getLastAimData().yaw);
             yawController->runController(dt, yawSetpoint);
         }
 
         withinAimingTolerance =
             abs(Angle(
-                    visionComms.getLastAimData(turretID).yaw -
+                    visionComms.getLastAimData().yaw -
                     yawController->getMeasurement().getWrappedValue())
-                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorYaw &&
+                    .minDifference(0.0f)) < visionComms.getLastAimData().maxErrorYaw &&
             abs(Angle(
-                    visionComms.getLastAimData(turretID).pitch -
+                    visionComms.getLastAimData().pitch -
                     pitchController->getMeasurement().getWrappedValue())
-                    .minDifference(0.0f)) < visionComms.getLastAimData(turretID).maxErrorPitch;
+                    .minDifference(0.0f)) < visionComms.getLastAimData().maxErrorPitch;
     }
     else
     {

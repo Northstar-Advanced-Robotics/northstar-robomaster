@@ -36,7 +36,7 @@ enum Spin : u_int8_t
     SPIN_COUNT
 };
 
-static std::array<std::array<modm::Pair<float, float>, 4>, SPIN_COUNT>
+[[maybe_unused]] static std::array<std::array<modm::Pair<float, float>, 4>, SPIN_COUNT>
     SPIN_TO_INTERPOLATABLE_MPS_TO_RPM = {
         {{{{0.0f, 0.0f},  // SPIN_90
            {5.0f, 2'600.0f},

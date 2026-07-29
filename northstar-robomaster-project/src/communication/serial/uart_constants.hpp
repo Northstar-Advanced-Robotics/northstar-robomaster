@@ -3,11 +3,11 @@
 
 #ifdef TARGET_STANDARD
 #include "robot/standard/standard_uart_constants.hpp"
-#elif TARGET_SENTRY
+#elif defined(TARGET_SENTRY)
 #include "robot/sentry/sentry_uart_constants.hpp"
-#elif TARGET_HERO
+#elif defined(TARGET_HERO)
 #include "robot/hero/hero_uart_constants.hpp"
-#elif TURRET
+#elif defined(TARGET_TURRET)
 #include "robot/standard/standard_uart_constants.hpp"
 #else
 #include "robot/standard/standard_uart_constants.hpp"

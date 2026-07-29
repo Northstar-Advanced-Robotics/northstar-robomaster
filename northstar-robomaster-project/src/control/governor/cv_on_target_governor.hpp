@@ -39,7 +39,6 @@ public:
         tap::Drivers *drivers,
         src::serial::VisionComms &visionComms,
         src::control::turret::cv::TurretCVControlCommandTemplate &turretCVCommand,
-        [[maybe_unused]] uint8_t turretID = 0,
         bool sentry = false)
         : drivers(drivers),
           visionComms(visionComms),
@@ -77,11 +76,11 @@ public:
                 return true;
             }
 
-            return turretCVCommand.isAimingWithinLaunchingTolerance(turretID);
+            return turretCVCommand.isAimingWithinLaunchingTolerance();
         }
         else
         {
-            return turretCVCommand.isAimingWithinLaunchingTolerance(turretID);
+            return turretCVCommand.isAimingWithinLaunchingTolerance();
         }
     }
 
@@ -96,7 +95,6 @@ private:
     tap::Drivers *drivers;
     src::serial::VisionComms &visionComms;
     src::control::turret::cv::TurretCVControlCommandTemplate &turretCVCommand;
-    uint8_t turretID;
     bool enabled = true;
     bool sentry;
 };

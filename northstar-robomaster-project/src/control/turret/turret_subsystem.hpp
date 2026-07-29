@@ -29,7 +29,7 @@
 #include "turret_motor_config.hpp"
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
-#include "src/mock/turret_motor_mock.hpp"
+#include "mock/turret_motor_mock.hpp"
 #else
 
 #include "turret_motor_DJI.hpp"

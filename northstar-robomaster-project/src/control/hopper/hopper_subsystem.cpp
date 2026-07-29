@@ -10,9 +10,9 @@ HopperSubsystem::HopperSubsystem(
     float maxPwm,
     tap::gpio::Pwm::Pin pwmPin)
     : tap::control::Subsystem(drivers),
+      pwmPin(pwmPin),
       minPwm(minPwm),
       maxPwm(maxPwm),
-      pwmPin(pwmPin),
       pwm(minPwm)
 {
 }

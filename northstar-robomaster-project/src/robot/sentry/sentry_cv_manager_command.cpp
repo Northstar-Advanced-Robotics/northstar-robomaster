@@ -12,14 +12,13 @@ SentryCvManagerCommand::SentryCvManagerCommand(
     src::control::turret::algorithms::TurretYawControllerInterface *yawController,
     src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
     src::chassis::ChassisOdometry *chassisOdometry,
-    float userYawInputScalar,
-    float userPitchInputScalar,
+    float /* userYawInputScalar */,
+    float /* userPitchInputScalar */,
     float MIN_PITCH_ANGLE,
     float MAX_PITCH_ANGLE,
     float PITCH_SPEED,
     float YAW_SPEED)
     : tap::control::ComprisedCommand(drivers),
-      visionComms(visionComms),
       turretCVControlCommand(turretCVControlCommand),
       turretScanCommand(
           drivers,
@@ -30,8 +29,8 @@ SentryCvManagerCommand::SentryCvManagerCommand(
           MIN_PITCH_ANGLE,
           MAX_PITCH_ANGLE,
           PITCH_SPEED,
-          YAW_SPEED)
-
+          YAW_SPEED),
+      visionComms(visionComms)
 {
     comprisedCommandScheduler.registerSubsystem(sentryTurretSubsystem);
     addSubsystemRequirement(sentryTurretSubsystem);
@@ -49,13 +48,12 @@ void SentryCvManagerCommand::initialize()
 void SentryCvManagerCommand::execute()
 {
     if (!comprisedCommandScheduler.isCommandScheduled(&turretCVControlCommand) &&
-        (visionComms.isAimDataUpdated(0) || visionComms.isAimDataUpdated(1)))
+        visionComms.isAimDataUpdated())
     {
         comprisedCommandScheduler.addCommand(&turretCVControlCommand);
     }
     if (!comprisedCommandScheduler.isCommandScheduled(&turretScanCommand) &&
-        (!visionComms.isAimDataUpdated(0) && !visionComms.isAimDataUpdated(1)))
-
+        !visionComms.isAimDataUpdated())
     {
         comprisedCommandScheduler.addCommand(&turretScanCommand);
     }

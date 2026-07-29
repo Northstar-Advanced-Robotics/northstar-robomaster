@@ -27,7 +27,7 @@ public:
 
     void execute() { odometry->zeroOdometry(); }
 
-    void end(bool interrupted) {}
+    void end(bool) {}
 
     bool isFinished() const { return true; }
 

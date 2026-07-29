@@ -39,13 +39,22 @@ TurretSubsystem::TurretSubsystem(
     MotorInterface *yawMotor,
     const TurretMotorConfig &pitchMotorConfig,
     const TurretMotorConfig &yawMotorConfig)
+#ifdef ENV_UNIT_TESTS
+    // The mocks are default-constructed; the motor/config params are unused.
+    : tap::control::Subsystem(drivers)
+#else
     : tap::control::Subsystem(drivers),
       pitchMotor(pitchMotor, pitchMotorConfig),
       yawMotor(yawMotor, yawMotorConfig)
+#endif
 {
     assert(drivers != nullptr);
     assert(pitchMotor != nullptr);
     assert(yawMotor != nullptr);
+#ifdef ENV_UNIT_TESTS
+    (void)pitchMotorConfig;
+    (void)yawMotorConfig;
+#endif
 }
 
 void TurretSubsystem::initialize()

@@ -209,7 +209,6 @@ CvOnTargetGovernor cvOnTargetGovernor(
     drivers(),
     drivers()->visionComms,
     turretCVControlCommand,
-    0,
     true);
 
 RemoteMapState cPressedNotCtrl({Remote::Key::C}, {Remote::Key::CTRL});
@@ -566,7 +565,7 @@ Trigger ctrlCPressedUI = (TriggerHelpers::button(drivers(), Remote::Key::C) &&
                           TriggerHelpers::button(drivers(), Remote::Key::CTRL))
                              .onTrue(&sentryDrawCommand);
 
-void initializeSubsystems(Drivers *drivers)
+void initializeSubsystems(Drivers *)
 {
     chassisSubsystem.initialize();
     agitator.initialize();

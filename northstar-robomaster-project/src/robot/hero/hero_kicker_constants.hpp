@@ -32,6 +32,7 @@ static constexpr src::kicker::KickerSubsystemConfig KICKER_CONFIG = {
     .kickerMotorId = tap::motor::MOTOR3,
     .kickerCanBusId = tap::can::CanBus::CAN_BUS2,
     .isKickerInverted = false,
+    .velocityPIDFeedForwardGain = 0.0f,
 };
 }  // namespace src::control::kicker::constants
 

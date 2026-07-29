@@ -94,10 +94,12 @@ bool TurretTestCommand::isFinished() const
         abs(yawSetpoint.minDifference(turretSubsystem->yawMotor.getChassisFrameMeasuredAngle())) <=
         allowedError;
 
-    WrappedFloat pitchSetpoint = pitchController->getSetpoint();
-    bool pitchMovementDone =
-        abs(pitchSetpoint.minDifference(
-            turretSubsystem->pitchMotor.getChassisFrameMeasuredAngle())) <= allowedError;
+    // Pitch is intentionally not part of the finished check right now; restore this
+    // if the test should wait on pitch as well.
+    // WrappedFloat pitchSetpoint = pitchController->getSetpoint();
+    // bool pitchMovementDone =
+    //     abs(pitchSetpoint.minDifference(
+    //         turretSubsystem->pitchMotor.getChassisFrameMeasuredAngle())) <= allowedError;
 
     return yawMovementDone;
 }

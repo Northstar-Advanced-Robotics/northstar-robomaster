@@ -7,11 +7,11 @@
 
 #ifdef TARGET_STANDARD
 #include "robot/standard/standard_flywheel_constants.hpp"
-#elif TARGET_SENTRY
+#elif defined(TARGET_SENTRY)
 #include "robot/sentry/sentry_flywheel_constants.hpp"
-#elif TARGET_HERO
+#elif defined(TARGET_HERO)
 #include "robot/hero/hero_flywheel_constants.hpp"
-#elif TURRET
+#elif defined(TARGET_TURRET)
 #include "robot/standard/standard_flywheel_constants.hpp"
 #else
 #include "robot/hero/hero_flywheel_constants.hpp"

@@ -1,5 +1,7 @@
 #ifndef SENTRY_FLYWHEEL_CONSTANTS_HPP_
 #define SENTRY_FLYWHEEL_CONSTANTS_HPP_
+#include <optional>
+
 #include <modm/container/pair.hpp>
 
 #include "tap/motor/dji_motor.hpp"
@@ -38,7 +40,7 @@ enum Spin : u_int8_t
     SPIN_TO_INTERPOLATABLE_MPS_TO_RPM = {
         {{{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}},    // SPIN_90
          {{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}},    // SPIN_100
-         {{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}}}};  // SPIN_110\
+         {{{0.0f, 0.0f}, {15.0f, 4714.0f}, {18.0f, 5621.0f}, {24.5f, 7700.0f}}}}};  // SPIN_110
 
 static constexpr modm::Pair<float, float> MPS_TO_RPM[] = {
     {0.0f, 0.0f},

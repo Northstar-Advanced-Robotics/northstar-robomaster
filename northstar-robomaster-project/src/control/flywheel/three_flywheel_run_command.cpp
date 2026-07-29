@@ -20,6 +20,6 @@ void ThreeFlywheelRunCommand::initialize()
     flywheel->setDesiredLaunchSpeed(launchSpeed);
 }
 
-void ThreeFlywheelRunCommand::end(bool interrupted) { flywheel->setDesiredLaunchSpeed(0); }
+void ThreeFlywheelRunCommand::end(bool) { flywheel->setDesiredLaunchSpeed(0); }
 
 }  // namespace src::control::flywheel

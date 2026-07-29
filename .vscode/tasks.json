@@ -395,6 +395,44 @@
             "options": {
                 "cwd": "${workspaceRoot}/northstar-robomaster-project"
             }
+        },
+        {
+            "label": "New Subsystem",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 build_tools/new_control.py subsystem ${input:newClassName}",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}/northstar-robomaster-project"
+            }
+        },
+        {
+            "label": "New Command",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 build_tools/new_control.py command ${input:newClassName} --subsystem ${input:subsystemClassName}",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}/northstar-robomaster-project"
+            }
+        }
+    ],
+    "inputs": [
+        {
+            "id": "newClassName",
+            "type": "promptString",
+            "description": "Class name for the new subsystem/command, e.g. FlywheelCooler (Subsystem/Command suffix is added automatically)"
+        },
+        {
+            "id": "subsystemClassName",
+            "type": "promptString",
+            "description": "Class name of the existing subsystem this command requires, e.g. FlywheelCooler"
         }
     ]
 }

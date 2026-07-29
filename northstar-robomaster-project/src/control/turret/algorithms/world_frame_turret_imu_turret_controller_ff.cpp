@@ -211,9 +211,9 @@ static inline float runWorldFrameTurretImuController(
     const TurretMotor &turretMotor,
     tap::algorithms::SmoothPid &positionPid,
     tap::algorithms::SmoothPid &velocityPid,
-    const float staticFrictionFFGain,
-    const float staticFrictionVelocityDeadzone,
-    const float staticFrictionErrorDeadzone)
+    [[maybe_unused]] const float staticFrictionFFGain,
+    [[maybe_unused]] const float staticFrictionVelocityDeadzone,
+    [[maybe_unused]] const float staticFrictionErrorDeadzone)
 {
     const float positionControllerError = turretMotor.getValidMinError(
         chassisFrameAngleMeasurement + worldFrameAngleError,
@@ -223,12 +223,13 @@ static inline float runWorldFrameTurretImuController(
     const float velocityControllerError = positionPidOutput - worldFrameVelocityMeasured;
     const float velocityPidOutput =
         velocityPid.runControllerDerivateError(velocityControllerError, dt);
-    const float staticFrictionFF = computeStaticFrictionFF(
-        positionControllerError,
-        worldFrameVelocityMeasured,
-        staticFrictionFFGain,
-        staticFrictionVelocityDeadzone,
-        staticFrictionErrorDeadzone);
+    // Static friction feedforward is currently disabled; restore this to re-enable.
+    // const float staticFrictionFF = computeStaticFrictionFF(
+    //     positionControllerError,
+    //     worldFrameVelocityMeasured,
+    //     staticFrictionFFGain,
+    //     staticFrictionVelocityDeadzone,
+    //     staticFrictionErrorDeadzone);
     return velocityPidOutput;  //+ staticFrictionFF;
 }
 
@@ -290,6 +291,11 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::runController(
         world_rel_turret_imu::STATIC_FRICTION_FF_VELOCITY_DEADZONE,
         world_rel_turret_imu::STATIC_FRICTION_FF_ERROR_DEADZONE);
 
+#ifdef ENV_UNIT_TESTS
+    // TurretMotorDJI (and its DJI-encoder-specific velocity) doesn't exist in the
+    // unit test environment; use the generic interface velocity instead.
+    const float chassisYawRate = turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+#else
     const float chassisYawRate =
         compareFloatClose(
             static_cast<src::control::turret::TurretMotorDJI &>(turretMotor)
@@ -299,6 +305,7 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::runController(
             1)
             ? 0
             : turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+#endif
     turretMotor.setMotorOutput(pidOut + chassisYawRate * world_rel_turret_imu::BEYBLADE_FF_GAIN);
 }
 

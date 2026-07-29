@@ -35,15 +35,17 @@ DJIThreeFlywheelSubsystem::DJIThreeFlywheelSubsystem(
           FLYWHEEL_PID_KD_DJI,
           FLYWHEEL_PID_MAX_ERROR_SUM_DJI,
           FLYWHEEL_PID_MAX_OUTPUT_DJI),
-      leftWheel(drivers, leftMotorId, canBus, true, "Left Flywheel"),
-      rightWheel(drivers, rightMotorId, canBus, true, "Right Flywheel"),
-      downWheel(drivers, downMotorId, canBus, true, "Down Flywheel"),
       desiredLaunchSpeedLeft(0),
       desiredLaunchSpeedRight(0),
       desiredLaunchSpeedDown(0),
       desiredRpmRampLeft(0),
       desiredRpmRampRight(0),
-      desiredRpmRampDown(0){};
+      desiredRpmRampDown(0),
+      leftWheel(drivers, leftMotorId, canBus, true, "Left Flywheel"),
+      rightWheel(drivers, rightMotorId, canBus, true, "Right Flywheel"),
+      downWheel(drivers, downMotorId, canBus, true, "Down Flywheel")
+{
+}
 
 void DJIThreeFlywheelSubsystem::initialize()
 {
@@ -87,7 +89,7 @@ float DJIThreeFlywheelSubsystem::launchSpeedToFlywheelRpm(float launchSpeed) con
 {
     modm::interpolation::Linear<modm::Pair<float, float>> MPSToRPMInterpolator = {
         spinToRPMMap.at(desiredSpin).data(),
-        spinToRPMMap.at(desiredSpin).size()};
+        static_cast<uint8_t>(spinToRPMMap.at(desiredSpin).size())};
     return MPSToRPMInterpolator.interpolate(launchSpeed);
 }
 float debugWheelLeft2 = 0;

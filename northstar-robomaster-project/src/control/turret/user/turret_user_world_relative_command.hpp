@@ -80,8 +80,7 @@ public:
         algorithms::TurretYawControllerInterface *turretImuYawController,
         algorithms::TurretPitchControllerInterface *turretImuPitchController,
         float userYawInputScalar,
-        float userPitchInputScalar,
-        uint8_t turretID = 0);
+        float userPitchInputScalar);
 
     bool isReady() override;
 

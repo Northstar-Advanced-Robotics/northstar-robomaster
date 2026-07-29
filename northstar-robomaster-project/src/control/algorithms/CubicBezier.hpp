@@ -11,6 +11,9 @@
 class CubicBezier
 {
 public:
+    // Used as a wire format (memcpy'd from received messages in vision_comms.cpp).
+    // The members are all 4-byte-aligned floats, so the natural layout has no
+    // padding; the static_assert below guarantees this stays true.
     struct CurveData
     {
         modm::Vector<float, 2> start;
@@ -18,7 +21,8 @@ public:
         modm::Vector<float, 2> startControl;
         modm::Vector<float, 2> endControl;
         float length;
-    } modm_packed;
+    };
+    static_assert(sizeof(CurveData) == 9 * sizeof(float), "CurveData must be packed");
 
     CubicBezier(CurveData curveData) : curveData(curveData) {}
 

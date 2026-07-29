@@ -26,10 +26,12 @@ Import("args")
 Import("sources")
 
 
-# Don't compile this stuff when testing
+# Don't compile this stuff when testing.
+# NOTE: source paths here are relative to this SConscript's directory (src/),
+# e.g. "robot/standard/standard_control.cpp", NOT "src/robot/...".
 IGNORED_FILES_WHILE_TESTING = [
     "main.cpp",
-    "src/robot/**/*_control.cpp",
+    "robot/**/*_control.cpp",
 ]
 
 ignored_files = []
@@ -38,8 +40,8 @@ ignored_dirs = []
 # this list could be generated dynamically by opening each source file and looking for the
 #   appropriate #include, but these files are very rare and so that's probably overkill.
 BUILD_INFO_USERS = [
-    join("src", "display", "about_menu.cpp"),
-    join("src", "communication", "rtt", "rtt_telemetry.cpp")
+    join("display", "about_menu.cpp"),
+    join("communication", "rtt", "rtt_telemetry.cpp")
 ]
 
 def get_output(command):
@@ -96,11 +98,11 @@ rawSrcs = env_cpy.FindSourceFiles(
     ".", ignorePaths=ignored_dirs, ignoreFiles=ignored_files
 )
 
-robot_directory = join("src", "robot")
+robot_directory = "robot"
 robot_class = extract_robot_type.ROBOT_CLASS[args["ROBOT_TYPE"][len("TARGET_") :]]
 class_directory = join(robot_directory, robot_class)
 
-sim_directory = join("src", "sim-initialization")
+sim_directory = "sim-initialization"
 
 for source in rawSrcs:
     # Only compile robot-specific sources

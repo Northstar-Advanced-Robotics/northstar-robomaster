@@ -30,7 +30,7 @@ public:
 
     bool isFinished() const override { return true; }
 
-    void end(bool interupted) override{};
+    void end(bool) override {}
 
 private:
     TurretCVControlCommand *turretCVControlCommand;

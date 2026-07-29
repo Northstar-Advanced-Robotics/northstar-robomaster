@@ -253,6 +253,11 @@ void WorldFrameYawTurretImuCascadePidTurretController::runController(
         velocityPid);
 
     lastpidOut = pidOut;
+#ifdef ENV_UNIT_TESTS
+    // TurretMotorDJI (and its DJI-encoder-specific velocity) doesn't exist in the
+    // unit test environment; use the generic interface velocity instead.
+    const float chassisYawRate = turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+#else
     const float chassisYawRate =
         compareFloatClose(
             static_cast<src::control::turret::TurretMotorDJI &>(turretMotor)
@@ -262,6 +267,7 @@ void WorldFrameYawTurretImuCascadePidTurretController::runController(
             1)
             ? 0
             : turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+#endif
     turretMotor.setMotorOutput(pidOut + chassisYawRate * world_rel_turret_imu::BEYBLADE_FF_GAIN);
 }
 

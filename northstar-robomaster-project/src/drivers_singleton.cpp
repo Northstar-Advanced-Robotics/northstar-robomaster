@@ -23,13 +23,13 @@
 
 #ifdef TARGET_STANDARD
 namespace src::standard
-#elif TARGET_SENTRY
+#elif defined(TARGET_SENTRY)
 namespace src::sentry
-#elif TARGET_HERO
+#elif defined(TARGET_HERO)
 namespace src::hero
-#elif TURRET
+#elif defined(TARGET_TURRET)
 namespace src::gyro
-#elif TARGET_TEST_BED
+#elif defined(TARGET_TEST_BED)
 namespace src::testbed
 #endif
 {

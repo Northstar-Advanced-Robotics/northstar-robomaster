@@ -8,7 +8,7 @@ namespace src::control::turret::cv
 class TurretCVControlCommandTemplate : public tap::control::Command
 {
 public:
-    virtual bool isAimingWithinLaunchingTolerance(uint8_t turretId) const = 0;
+    virtual bool isAimingWithinLaunchingTolerance() const = 0;
 };
 }  // namespace src::control::turret::cv
 

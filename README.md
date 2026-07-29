@@ -41,7 +41,7 @@ _Make sure you have followed the above setup instructions._
 Run the following to clone this repository:
 
 ```
-git clone --recursive https://github.com/GOFIRST-Robotics/RoboMaster2025NorthStar.git
+git clone --recursive https://github.com/Northstar-Advanced-Robotics/northstar-robomaster.git
 ```
 
 If you use the Docker container, or have already cloned the repository yourself, you should instead
@@ -111,8 +111,10 @@ how to use the J-Link.
 ### Selecting and using robot types
 
 Specify the robot type via the command line when compiling (see
-[below](#building-and-running-via-the-terminal)). For vscode IntelliSense, navigate to
-`/northstar-robomaster-project/robot-type/robot_type.hpp` and change the macro defined in this file.
+[below](#building-and-running-via-the-terminal)), e.g. `scons build robot=STANDARD`. If you omit
+the `robot=` argument you will be prompted to pick one. For vscode IntelliSense, select the
+matching C/C++ configuration (see "How to select an appropriate VSCode C/C++ configuration"
+below) — each robot has its own configuration that defines the right `TARGET_<ROBOT_TYPE>` macro.
 
 Each robot is signified by a unique macro which can be checked to special-case code:
 
@@ -122,6 +124,22 @@ Each robot is signified by a unique macro which can be checked to special-case c
 initializeStandard();
 #endif
 ```
+
+### Creating a new subsystem or command
+
+Instead of writing the boilerplate by hand, run the VS Code task `New Subsystem` or
+`New Command` (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd> → `Tasks: Run Task`), or from a
+terminal in `northstar-robomaster-project/`:
+
+```
+python3 build_tools/new_control.py subsystem FlywheelCooler
+python3 build_tools/new_control.py command SpinUp --subsystem FlywheelCooler
+```
+
+This generates correctly-named `.hpp`/`.cpp` files following the project conventions (the
+`Subsystem`/`Command` class suffix is added automatically). New files are picked up by the next
+`scons build` automatically; you still need to instantiate and register them in the relevant
+`src/robot/<robot>/*_control.cpp`.
 
 ### How to select an appropriate VSCode C/C++ configuration
 

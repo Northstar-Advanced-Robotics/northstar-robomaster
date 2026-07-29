@@ -604,7 +604,11 @@ public:
 
     void setString(const char* newString)
     {
-        strncpy(string, newString, STRING_SIZE);
+        // Truncate to the buffer size and always null-terminate; a plain
+        // strncpy(dst, src, STRING_SIZE) leaves the buffer unterminated when
+        // the source is STRING_SIZE chars or longer.
+        strncpy(string, newString, STRING_SIZE - 1);
+        string[STRING_SIZE - 1] = '\0';
         calculateNumbers();
     }
 

@@ -6,6 +6,8 @@
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 #include "tap/mock/imu_terminal_serial_handler_mock.hpp"
 
+#include "mock/control_operator_interface_mock.hpp"
+
 // #include "src/mock/turret_mcb_can_comm_mock.hpp"
 
 #else
@@ -27,6 +29,9 @@ class Drivers : public tap::Drivers
 #ifdef ENV_UNIT_TESTS
 public:
 #endif
+#if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
+    Drivers() : tap::Drivers(), controlOperatorInterface(this) {}
+#else
     Drivers()
         : tap::Drivers(),
           controlOperatorInterface(this),
@@ -34,6 +39,7 @@ public:
           encoder(true, 1.0f)
     {
     }
+#endif
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
     testing::NiceMock<mock::ControlOperatorInterfaceMock> controlOperatorInterface;

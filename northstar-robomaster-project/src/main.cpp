@@ -23,8 +23,7 @@
 /* hosted environment (simulator) includes --------------------------------- */
 #include <iostream>
 
-#include "tap/communication/tcp-server/tcp_server.hpp"
-#include "tap/motor/motorsim/sim_handler.hpp"
+#include "tap/motor/motorsim/dji_motor_sim_handler.hpp"
 #endif
 
 #include "tap/board/board.hpp"
@@ -56,15 +55,15 @@ tap::arch::PeriodicMilliTimer sendMotorTimeout(tap::Drivers::DT);
 
 #ifdef TARGET_STANDARD
 using namespace src::standard;
-#elif TARGET_SENTRY
+#elif defined(TARGET_SENTRY)
 using namespace src::sentry;
-#elif TARGET_HERO
+#elif defined(TARGET_HERO)
 using namespace src::hero;
-#elif TURRET
+#elif defined(TARGET_TURRET)
 #include "communication/can/chassis/chassis_mcb_can_comm.hpp"
 using namespace src::gyro;
 ChassisMcbCanComm chassisMcbCanComm(DoNotUse_getDrivers());
-#elif TARGET_TEST_BED
+#elif defined(TARGET_TEST_BED)
 using namespace src::testbed;
 #endif
 
@@ -99,9 +98,7 @@ int main()
     initializeIo(drivers);
     initSubsystemCommands(drivers);
 #ifdef PLATFORM_HOSTED
-    tap::motorsim::SimHandler::resetMotorSims();
-    // Blocking call, waits until Windows Simulator connects.
-    tap::communication::TCPServer::MainServer()->getConnection();
+    tap::motor::motorsim::DjiMotorSimHandler::getInstance()->resetMotorSims();
 #endif
 
     while (1)
@@ -117,11 +114,13 @@ int main()
 
             PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
 
+#ifndef TARGET_TURRET
             PROFILE(drivers->profiler, drivers->encoder.update, ());
+#endif
 
             // PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
             PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
-#ifdef TURRET
+#ifdef TARGET_TURRET
             PROFILE(drivers->profiler, chassisMcbCanComm.sendIMUData, ());
             PROFILE(drivers->profiler, chassisMcbCanComm.sendSynchronizationRequest, ());
 #else
@@ -139,7 +138,9 @@ int main()
         //         {
         //             PROFILE(drivers->profiler, drivers->revMotorTxHandler.heartBeat, ());
         //         }
+#ifndef TARGET_TURRET
         PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
+#endif
 
         // #endif
         modm::delay_us(10);
@@ -183,8 +184,10 @@ static void initializeIo(Drivers *drivers)
     drivers->can.initialize();
     drivers->errorController.init();
 
+#ifndef TARGET_TURRET
     drivers->encoder.initialize();
     drivers->visionComms.initializeUartDelays();
+#endif
 
     drivers->refSerial.initialize();
 
@@ -198,7 +201,9 @@ static void initializeIo(Drivers *drivers)
     drivers->bmi088.setCalibrationSamples(2000);
 #endif
 
+#ifndef TARGET_TURRET
     drivers->visionComms.initializeCV();
+#endif
 }
 float debugXAccel = 0.0f;
 float debugYAccel = 0.0f;
@@ -229,13 +234,13 @@ static void updateIo(Drivers *drivers)
     }
 // #endif
 #ifdef PLATFORM_HOSTED
-    tap::motorsim::SimHandler::updateSims();
+    tap::motor::motorsim::DjiMotorSimHandler::getInstance()->updateSims();
 #endif
 
     drivers->canRxHandler.pollCanData();
     drivers->bmi088.read();
 
-#ifndef TURRET
+#ifndef TARGET_TURRET
     drivers->refSerial.updateSerial();
 #ifndef FLYSKY
     drivers->visionComms.updateSerial();

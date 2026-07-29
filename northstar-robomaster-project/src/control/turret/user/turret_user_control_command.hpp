@@ -62,8 +62,7 @@ public:
         algorithms::TurretYawControllerInterface *yawController,
         algorithms::TurretPitchControllerInterface *pitchController,
         float userYawInputScalar,
-        float userPitchInputScalar,
-        uint8_t turretID = 0);
+        float userPitchInputScalar);
 
     bool isReady() override;
 
@@ -89,8 +88,6 @@ private:
 
     const float userYawInputScalar;
     const float userPitchInputScalar;
-
-    const uint8_t turretID;
 };
 }  // namespace src::control::turret::user
 

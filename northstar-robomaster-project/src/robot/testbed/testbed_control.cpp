@@ -46,7 +46,7 @@ src::control::RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers(
 
 #endif  // USING_FLYWHEEL
 
-void initializeSubsystems(src::testbed::Drivers *drivers)
+void initializeSubsystems([[maybe_unused]] src::testbed::Drivers *drivers)
 {
     dummySubsystem.initialize();
 #ifdef USING_AGITATOR
@@ -105,7 +105,7 @@ void registerTestSubsystems(src::testbed::Drivers *drivers)
 #endif
 }
 
-void setDefaultTestCommands(src::testbed::Drivers *drivers)
+void setDefaultTestCommands([[maybe_unused]] src::testbed::Drivers *drivers)
 {
 #ifdef USING_TURRET
     turretSubsystem.setDefaultCommand(&turretUserControlCommand);
@@ -126,7 +126,7 @@ void startTestCommands(src::testbed::Drivers *drivers)
     drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(0, 0, 0, 0, 0, 0));
 }
 
-void registerTestIoMappings(src::testbed::Drivers *drivers)
+void registerTestIoMappings([[maybe_unused]] src::testbed::Drivers *drivers)
 {
 #ifdef USING_AGITATOR
     // rightSwitchUp10RPS

@@ -44,7 +44,7 @@ void ChassisBeybladeCommand::execute()
     float verticalSpeed = normInput.first;
     float horizontalSpeed = normInput.second;
     calcedRot = calculateBeyBladeRotationSpeed(
-        chassis->calculateMaxRotationSpeed(verticalSpeed, horizontalSpeed),
+        chassis->calculateMaxRotationSpeed(),
         dt);
     if (chassis->getChassisOdometry()->getVelocityLocal().getLength() <
         beyBladeFastSpinSpeedThreshold)
@@ -73,11 +73,15 @@ float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uin
     {
         return maxSpeed * direction;
     }
+#ifndef PLATFORM_HOSTED
     RandomNumberGenerator::enable();
+#endif
 
     if (accumTime > 500)
     {
         calcSpeed = limitVal<float>(1.0f, 0.0f, 0.9f) * direction;
+#ifndef PLATFORM_HOSTED
+        // The hardware RNG does not exist in the hosted (test/sim) environment.
         if (RandomNumberGenerator::isReady())
         {
             calcSpeed = limitVal<float>(
@@ -85,6 +89,7 @@ float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uin
                 -1.0f,
                 1.0f);
         }
+#endif
         accumTime = 0;
     }
     return calcSpeed * maxSpeed * direction;

@@ -56,8 +56,8 @@ void ChassisAutoDrive::updateAutoDrive()
         slowdownMult = tap::algorithms::limitVal(slowdownMult, 0.2f, 1.0f);
     }
 
-    modm::Vector<float, 2> lookaheadDerivative = getLookaheadDeriv(currentT, T_LOOKAHEAD);
-    modm::Vector<float, 2> lookaheadDirection = getDirectionToLookaheadPoint(currentT, T_LOOKAHEAD);
+    modm::Vector<float, 2> lookaheadDerivative = getLookaheadDeriv(T_LOOKAHEAD);
+    modm::Vector<float, 2> lookaheadDirection = getDirectionToLookaheadPoint(T_LOOKAHEAD);
     modm::Vector<float, 2> globalVelocity = chassisOdometry->getVelocityGlobal();
 
     float globalSpeed = globalVelocity.getLength();

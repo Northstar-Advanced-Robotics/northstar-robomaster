@@ -33,6 +33,6 @@ void TwoFlywheelRunCommand::execute()
     flywheel->setDesiredLaunchSpeed(launchSpeed);
 }
 
-void TwoFlywheelRunCommand::end(bool interrupted) { flywheel->setDesiredLaunchSpeed(0); }
+void TwoFlywheelRunCommand::end(bool) { flywheel->setDesiredLaunchSpeed(0); }
 
 }  // namespace src::control::flywheel

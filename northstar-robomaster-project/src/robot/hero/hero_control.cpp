@@ -528,7 +528,7 @@ Trigger ctrlCPressedUI = (TriggerHelpers::button(drivers(), Remote::Key::C) &&
                           TriggerHelpers::button(drivers(), Remote::Key::CTRL))
                              .onTrue(&heroDrawCommand);
 
-void initializeSubsystems(Drivers *drivers)
+void initializeSubsystems(Drivers *)
 {
     dummySubsystem.initialize();
     chassisSubsystem.initialize();
@@ -551,7 +551,7 @@ void registerHeroSubsystems(Drivers *drivers)
     drivers->commandScheduler.registerSubsystem(&ui);
 }
 
-void setDefaultHeroCommands(Drivers *drivers)
+void setDefaultHeroCommands(Drivers *)
 {
     chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
     turret.setDefaultCommand(&turretUserControlCommand);

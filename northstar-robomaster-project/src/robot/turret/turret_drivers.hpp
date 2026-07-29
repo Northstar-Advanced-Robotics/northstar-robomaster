@@ -38,11 +38,15 @@ class Drivers : public tap::Drivers
 #ifdef ENV_UNIT_TESTS
 public:
 #endif
+#if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
+    Drivers() : tap::Drivers() {}
+#else
     Drivers()
         : tap::Drivers(),
-        chassisMcbCanComm(this)
+          chassisMcbCanComm(this)
     {
     }
+#endif
  
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 

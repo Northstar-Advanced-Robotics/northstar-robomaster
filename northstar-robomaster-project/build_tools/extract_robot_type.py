@@ -19,11 +19,11 @@ from build_tools.parse_args import USAGE
 from SCons.Script import *
 
 # TODO: Make this sync up with check.py and c_cpp_properties.json if possible
+# Each robot type must have a matching directory under src/robot/ and a branch
+# in the target conditionals (robot_control.hpp, drivers_singleton.hpp, ...).
 VALID_ROBOT_TYPES   = [ "STANDARD",
                         "HERO",
                         "SENTRY",
-                        "DRONE",
-                        "ENGINEER",
                         "TURRET",
                         "TEST_BED"]
 
@@ -31,11 +31,9 @@ VALID_ROBOT_TYPES   = [ "STANDARD",
 ROBOT_CLASS = {
     "STANDARD": "standard",
     "TURRET": "turret",
-    "ENGINEER": "engineer",
     "SENTRY": "sentry",
     "HERO": "hero",
     "TEST_BED": "testbed",
-    "DRONE": "drone",
 }
 
 # Make sure that all robots have a class
@@ -43,11 +41,16 @@ assert all([robot in ROBOT_CLASS.keys() for robot in VALID_ROBOT_TYPES])
 
 
 def search_for_robot_type(query):
-    return (
-        [robot for robot in VALID_ROBOT_TYPES if query.lower() in robot.lower()]
-        if query
-        else []
-    )
+    if not query:
+        return []
+    # Accept the documented "TARGET_<ROBOT_TYPE>" form as well as bare names
+    if query.upper().startswith("TARGET_"):
+        query = query[len("TARGET_"):]
+    # An exact match always wins, even if it is also a substring of another type
+    exact = [robot for robot in VALID_ROBOT_TYPES if query.lower() == robot.lower()]
+    if exact:
+        return exact
+    return [robot for robot in VALID_ROBOT_TYPES if query.lower() in robot.lower()]
 
 
 def get_robot_type():
@@ -63,7 +66,15 @@ def get_robot_type():
         for type in VALID_ROBOT_TYPES:
             prompt += type + "\n"
         prompt += "--> "
-        robot_query = input(prompt)
+        try:
+            robot_query = input(prompt)
+        except EOFError:
+            # Non-interactive build (CI, scripts): fail with a helpful message
+            # instead of an EOFError traceback.
+            raise Exception(
+                "No valid robot type specified and cannot prompt for one "
+                "(stdin is not interactive). Pass robot=<ROBOT_TYPE>.\n" + USAGE
+            )
         robot_type_matches = search_for_robot_type(robot_query)
 
     # Check against valid robot type

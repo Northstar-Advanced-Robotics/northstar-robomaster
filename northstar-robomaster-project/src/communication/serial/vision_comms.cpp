@@ -4,11 +4,11 @@ namespace src::serial
 {
 VisionComms::VisionComms(tap::Drivers* drivers)
     : DJISerial(drivers, VISION_COMMS_RX_UART_PORT),
-      lastAimData(),
       chassisOdometry(nullptr),
       chassisAutoDrive(nullptr),
+      remote(nullptr),
       pitchMotor(nullptr),
-      remote(nullptr)
+      lastAimData()
 {
 }
 
@@ -102,49 +102,38 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
 bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
 {
     int curreIndex = 0;
-    for (size_t i = 0; i < control::turret::NUM_TURRETS; i++)
+    if ((curreIndex + sizeof(TurretAimData) - sizeof(float) * 2 - 2) > message.header.dataLength)
     {
-        if ((curreIndex + sizeof(TurretAimData) - sizeof(float) * 2 - 2) >
-            message.header.dataLength)
+        return false;  // Not enough data for the turret aim data
+    }
+
+    TurretAimData& aimData = lastAimData;
+    memcpy(&aimData.yaw, &message.data[curreIndex], sizeof(float));
+    curreIndex += sizeof(float);
+
+    memcpy(&aimData.pitch, &message.data[curreIndex], sizeof(float));
+    curreIndex += sizeof(float);
+
+    aimDataUpdated = !(aimData.yaw == 0 && aimData.pitch == 0);
+
+    memcpy(&aimData.distance, &message.data[curreIndex], sizeof(float));
+    curreIndex += sizeof(float);
+
+    memcpy(&aimData.robotId, &message.data[curreIndex], sizeof(aimData.robotId));
+    curreIndex += sizeof(aimData.robotId);
+
+    if (aimData.distance != 0)
+    {
+        auto it = plateLookup.find(uint8_t(aimData.robotId));
+        if (it != plateLookup.end())
         {
-            return false;  // Not enough data for another turret aim data
-        }
-
-        TurretAimData& aimData = lastAimData[i];
-        memcpy(&aimData.yaw, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
-
-        memcpy(&aimData.pitch, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
-
-        if (aimData.yaw == 0 && aimData.pitch == 0)
-        {
-            aimDataUpdated[i] = false;
-        }
-        else
-        {
-            aimDataUpdated[i] = true;
-        }
-
-        memcpy(&aimData.distance, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
-
-        memcpy(&aimData.robotId, &message.data[curreIndex], sizeof(aimData.robotId));
-        curreIndex += sizeof(aimData.robotId);
-
-        if (aimData.distance != 0)
-        {
-            auto it = plateLookup.find(uint8_t(aimData.robotId));
-            if (it != plateLookup.end())
-            {
-                PlateDims dims = it->second;
+            PlateDims dims = it->second;
 #ifdef TARGET_SENTRY
-                aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance);
-                aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance);
+            aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance);
+            aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance);
 #endif
-                aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance) * 1.5;
-                aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance) * 1.5;
-            }
+            aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance) * 1.5;
+            aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance) * 1.5;
         }
     }
     return true;
@@ -339,7 +328,7 @@ void VisionComms::sendRobotOdometry()
 
         OdometryData* data = reinterpret_cast<OdometryData*>(odometryMessage.data);
 
-        modm::Vector2f global_pos = chassisOdometry->getPositionGlobal();
+        // modm::Vector2f global_pos = chassisOdometry->getPositionGlobal();
         modm::Vector2f global_vel = chassisOdometry->getVelocityGlobalVision();
 
         data->timestamp = tap::arch::clock::getTimeMicroseconds();

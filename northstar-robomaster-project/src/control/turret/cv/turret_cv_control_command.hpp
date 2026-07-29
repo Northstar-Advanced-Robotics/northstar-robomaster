@@ -38,8 +38,7 @@ public:
         algorithms::TurretYawControllerInterface *yawController,
         algorithms::TurretPitchControllerInterface *pitchController,
         float userYawInputScalar,
-        float userPitchInputScalar,
-        uint8_t turretID = 0);
+        float userPitchInputScalar);
 
     bool isReady() override;
 
@@ -53,10 +52,7 @@ public:
 
     void end(bool interrupted) override;
 
-    bool isAimingWithinLaunchingTolerance([[maybe_unused]] uint8_t turretID) const
-    {
-        return withinAimingTolerance;
-    }
+    bool isAimingWithinLaunchingTolerance() const override { return withinAimingTolerance; }
 
     void setPitchOnlyMode(bool pitchOnly) { pitchOnlyMode = pitchOnly; }
 
@@ -75,8 +71,6 @@ private:
 
     const float userYawInputScalar;
     const float userPitchInputScalar;
-
-    const uint8_t turretID;
 
     float AIMING_TOLERANCE_YAW = .05;
     float AIMING_TOLERANCE_PITCH = .05;

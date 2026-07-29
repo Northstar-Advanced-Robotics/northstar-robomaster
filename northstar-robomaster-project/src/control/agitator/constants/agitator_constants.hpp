@@ -5,13 +5,13 @@
 
 #ifdef TARGET_STANDARD
 #include "robot/standard/standard_agitator_constants.hpp"
-#elif TARGET_SENTRY
+#elif defined(TARGET_SENTRY)
 #include "robot/sentry/sentry_agitator_constants.hpp"
-#elif TARGET_HERO
+#elif defined(TARGET_HERO)
 #include "robot/hero/hero_agitator_constants.hpp"
-#elif TURRET
+#elif defined(TARGET_TURRET)
 #include "robot/standard/standard_agitator_constants.hpp"
-#elif TARGET_TEST_BED
+#elif defined(TARGET_TEST_BED)
 #ifdef USING_HERO_AGITATOR
 #include "robot/hero/hero_agitator_constants.hpp"
 #else

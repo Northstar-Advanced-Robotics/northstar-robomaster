@@ -6,7 +6,9 @@
 #include "tap/board/board.hpp"
 #include "tap/communication/sensors/encoder/wrapped_encoder.hpp"
 
+#ifndef PLATFORM_HOSTED
 #include "modm/platform/timer/timer_12.hpp"
+#endif
 
 
 namespace tap::encoder

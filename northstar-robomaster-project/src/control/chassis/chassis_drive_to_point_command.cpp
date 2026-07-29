@@ -48,7 +48,7 @@ void ChassisDriveToPointCommand::execute()
     chassis->setVelocityFieldDrive(velocityToTarget.y, velocityToTarget.x, 0);
 }
 
-void ChassisDriveToPointCommand::end(bool interrupted) { chassis->setVelocityTurretDrive(0, 0, 0); }
+void ChassisDriveToPointCommand::end(bool) { chassis->setVelocityTurretDrive(0, 0, 0); }
 
 bool ChassisDriveToPointCommand::isFinished() const
 {

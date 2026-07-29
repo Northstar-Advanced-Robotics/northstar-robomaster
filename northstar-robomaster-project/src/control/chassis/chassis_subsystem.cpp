@@ -25,8 +25,9 @@ ChassisSubsystem::ChassisSubsystem(
     src::control::turret::TurretMotor* yawMotor,
     ChassisOdometry* chassisOdometry_)
     : Subsystem(drivers),
+      chassisOdometry(chassisOdometry_),
+      yawMotor(yawMotor),
       desiredOutput{},
-      rampControllers{},
       pidControllers{
           modm::Pid<float>(
               VELOCITY_PID_KP,
@@ -52,6 +53,10 @@ ChassisSubsystem::ChassisSubsystem(
               VELOCITY_PID_KD,
               VELOCITY_PID_MAX_ERROR_SUM,
               VELOCITY_PID_MAX_OUTPUT)},
+      rampControllers{
+          tap::algorithms::Ramp(0.0f),
+          tap::algorithms::Ramp(0.0f),
+          tap::algorithms::Ramp(0.0f)},
       motors{
           Motor(drivers, config.leftFrontId, config.canBus, false, "LF", false, CHASSIS_GEAR_RATIO),
           Motor(drivers, config.leftBackId, config.canBus, false, "LB", false, CHASSIS_GEAR_RATIO),
@@ -64,9 +69,7 @@ ChassisSubsystem::ChassisSubsystem(
               false,
               CHASSIS_GEAR_RATIO),
           Motor(drivers, config.rightBackId, config.canBus, false, "RB", false, CHASSIS_GEAR_RATIO),
-      },
-      yawMotor(yawMotor),
-      chassisOdometry(chassisOdometry_)
+      }
 {
 }
 
@@ -81,11 +84,6 @@ float LFSpeed;
 float LBSpeed;
 float RFSpeed;
 float RBSpeed;
-
-inline float ChassisSubsystem::getTurretYaw()
-{
-    return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
-}
 
 float ChassisSubsystem::getChassisZeroTurret()
 {
@@ -104,7 +102,7 @@ float ChassisSubsystem::getChassisRotationSpeed()
     return (motorSum * WHEEL_DIAMETER_M / 2.0f) / (4 * DIST_TO_CENTER);
 }
 
-float ChassisSubsystem::calculateMaxRotationSpeed(float vert, float hor)
+float ChassisSubsystem::calculateMaxRotationSpeed()
 {
     float maxWheelSpeed = getMaxWheelSpeed(
         drivers->refSerial.getRefSerialReceivingData(),

@@ -36,16 +36,14 @@ TurretUserControlCommand::TurretUserControlCommand(
     algorithms::TurretYawControllerInterface *yawController,
     algorithms::TurretPitchControllerInterface *pitchController,
     float userYawInputScalar,
-    float userPitchInputScalar,
-    uint8_t turretID)
+    float userPitchInputScalar)
     : drivers(drivers),
       controlOperatorInterface(controlOperatorInterface),
       turretSubsystem(turretSubsystem),
       yawController(yawController),
       pitchController(pitchController),
       userYawInputScalar(userYawInputScalar),
-      userPitchInputScalar(userPitchInputScalar),
-      turretID(turretID)
+      userPitchInputScalar(userPitchInputScalar)
 {
     addSubsystemRequirement(turretSubsystem);
 }

@@ -1,15 +1,12 @@
-#ifdef TURRET
+#ifdef TARGET_TURRET
 
 #include "tap/drivers.hpp"
-#include "drivers_singleton.hpp"
-#include "../../robot-type/robot_type.hpp"
-
 #include "tap/util_macros.hpp"
-#include "control/turret/constants/turret_constants.hpp"
-#include "robot/turret/turret_drivers.hpp"
 
-#include "control/chassis/chassis_subsystem.hpp"
-#include "control/chassis/chassis_drive_command.hpp"
+#include "control/turret/constants/turret_constants.hpp"
+#include "drivers_singleton.hpp"
+#include "robot/robot_control.hpp"
+#include "robot/turret/turret_drivers.hpp"
 
 using namespace src::gyro;
 
@@ -17,29 +14,15 @@ driversFunc drivers = DoNotUse_getDrivers;
 
 namespace turret_control
 {
-    
-    
-void initializeSubsystems(Drivers *drivers)
-{
-    
-}
+void initializeSubsystems(Drivers *) {}
 
-void registerSoldierSubsystems(Drivers *drivers)
-{
-   
-}
+void registerSoldierSubsystems(Drivers *) {}
 
-void setDefaultSoldierCommands(Drivers *drivers)
-{
-    
-}
+void setDefaultSoldierCommands(Drivers *) {}
 
-void startSoldierCommands(Drivers *drivers) {}
+void startSoldierCommands(Drivers *) {}
 
-void registerSoldierIoMappings(Drivers *drivers)
-{
-   
-}
+void registerSoldierIoMappings(Drivers *) {}
 }  // namespace turret_control
 
 namespace src::gyro
@@ -52,6 +35,8 @@ void initSubsystemCommands(src::gyro::Drivers *drivers)
     turret_control::startSoldierCommands(drivers);
     turret_control::registerSoldierIoMappings(drivers);
 }
-} //namespace src::gyro
+
+src::control::imu::ImuCalibrateCommandBase *getImuCalibrateCommand() { return nullptr; }
+}  // namespace src::gyro
 
 #endif

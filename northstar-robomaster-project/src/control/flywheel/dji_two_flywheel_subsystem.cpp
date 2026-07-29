@@ -29,12 +29,12 @@ DJITwoFlywheelSubsystem::DJITwoFlywheelSubsystem(
           FLYWHEEL_PID_KD_DJI,
           FLYWHEEL_PID_MAX_ERROR_SUM_DJI,
           FLYWHEEL_PID_MAX_OUTPUT_DJI),
-      leftWheel(drivers, leftMotorId, canBus, inInverted, "Left Flywheel"),
-      rightWheel(drivers, rightMotorId, canBus, !inInverted, "Right Flywheel"),
       desiredLaunchSpeedLeft(0),
       desiredLaunchSpeedRight(0),
       desiredRpmRampLeft(0),
-      desiredRpmRampRight(0)
+      desiredRpmRampRight(0),
+      leftWheel(drivers, leftMotorId, canBus, inInverted, "Left Flywheel"),
+      rightWheel(drivers, rightMotorId, canBus, !inInverted, "Right Flywheel")
 {
 }
 

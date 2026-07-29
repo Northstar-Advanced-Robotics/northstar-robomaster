@@ -108,11 +108,9 @@ public:
     /**
      * Calculates the max rotation speed based on the max chassis wheel speed.
      *
-     * @param forward The forward commanded chassis velocity.
-     * @param sideways The sideways commanded chassis velocity.
      * @return the maximum rotational speed to use based on forward and sideways velocity.
      */
-    float calculateMaxRotationSpeed(float forward, float sideways);
+    float calculateMaxRotationSpeed();
 
     /**
      * Calculates the chassis rotational speed.
@@ -263,7 +261,10 @@ private:
     /**
      * @return The turret yaw angle in radians.
      */
-    inline float getTurretYaw();
+    inline float getTurretYaw()
+    {
+        return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
+    }
 
 protected:
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;

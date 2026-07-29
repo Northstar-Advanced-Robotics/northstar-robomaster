@@ -39,7 +39,7 @@ public:
     ///
     void refresh() override;
 
-    const char* getName() { return "SubsystemTester"; }
+    const char* getName() const override { return "SubsystemTester"; }
 
 private:
     Motor debugPitchMotor;

@@ -19,6 +19,6 @@ void TwoFlywheelRunRPMCommand::execute()
     if (rpm != flywheel->getDesiredFlywheelSpeed()) flywheel->setDesiredFlywheelSpeed(rpm);
 }
 
-void TwoFlywheelRunRPMCommand::end(bool interrupted) { flywheel->setDesiredFlywheelSpeed(0); }
+void TwoFlywheelRunRPMCommand::end(bool) { flywheel->setDesiredFlywheelSpeed(0); }
 
 }  // namespace src::control::flywheel

@@ -189,20 +189,11 @@ public:
 
     mockable bool isCvOnline() const;
 
-    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 0) const
-    {
-        return lastAimData[turretID];
-    }
+    mockable inline const TurretAimData& getLastAimData() const { return lastAimData; }
 
-    mockable inline bool isAimDataUpdated(uint8_t turretID = 0) const
-    {
-        return aimDataUpdated[turretID];
-    }
+    mockable inline bool isAimDataUpdated() const { return aimDataUpdated; }
 
-    mockable inline bool getSomeTurretHasTarget(uint8_t turretID = 0) const
-    {
-        return isAimDataUpdated();
-    }
+    mockable inline bool getSomeTurretHasTarget() const { return isAimDataUpdated(); }
 
     mockable inline void attachOdometry(src::chassis::ChassisOdometry* chassisOdometry)
     {
@@ -231,9 +222,9 @@ private:
 
     tap::arch::MilliTimeout cvOfflineTimeout;
 
-    TurretAimData lastAimData[control::turret::NUM_TURRETS] = {};
+    TurretAimData lastAimData = {};
 
-    bool aimDataUpdated[control::turret::NUM_TURRETS] = {};
+    bool aimDataUpdated = false;
 
     mockable void sendCvRestartMessage();
 

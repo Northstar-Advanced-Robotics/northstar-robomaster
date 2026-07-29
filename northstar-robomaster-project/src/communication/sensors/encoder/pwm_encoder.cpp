@@ -1,5 +1,7 @@
 #include "pwm_encoder.hpp"
 
+#ifndef PLATFORM_HOSTED
+
 // We need device.hpp to ensure definitions are visible
 #include <modm/platform/device.hpp>
 
@@ -91,3 +93,24 @@ bool PwmEncoder::isOnline() const
 }
 
 }  // namespace tap::encoder
+
+#else  // PLATFORM_HOSTED
+
+// No-op stubs for the hosted (sim) environment, where the STM32 timer capture
+// hardware backing this encoder does not exist.
+namespace tap::encoder
+{
+PwmEncoder::PwmEncoder(bool isInverted, float gearRatio)
+    : WrappedEncoder(isInverted, ENC_RESOLUTION, gearRatio)
+{
+}
+
+void PwmEncoder::initialize() {}
+
+void PwmEncoder::update() {}
+
+bool PwmEncoder::isOnline() const { return false; }
+
+}  // namespace tap::encoder
+
+#endif  // PLATFORM_HOSTED

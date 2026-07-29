@@ -36,9 +36,10 @@ USAGE = "Usage: scons <target> [profile=<debug|release|fast>] [robot=TARGET_<ROB
         - \"run-tests-gcov\": builds core code and tests, executes them locally, and captures and prints code coverage information\n\
         - \"build-sim\": build all code for the simulated environment, for the current host platform.\n\
         - \"run-sim\": build all code for the simulated environment, for the current host platform, and execute the simulator locally.\n\
-    \"TARGET_<ROBOT_TYPE>\" is an optional argument that can override whatever robot type has been specified in robot_type.hpp.\n\
+    \"robot=<ROBOT_TYPE>\" selects the robot to build for (a TARGET_ prefix is also accepted).\n\
+        If omitted, you will be prompted to pick one interactively.\n\
         - <ROBOT_TYPE> must be one of the following:\n\
-            - STANDARD, DRONE, ENGINEER, SENTRY, HERO"
+            - STANDARD, HERO, SENTRY, TURRET, TEST_BED"
 
 
 def parse_args():

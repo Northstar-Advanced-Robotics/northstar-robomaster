@@ -69,7 +69,7 @@ public:
         return lookahead;
     }
 
-    modm::Vector<float, 2> getDirectionToLookaheadPoint(float t, float lookaheadVal)
+    modm::Vector<float, 2> getDirectionToLookaheadPoint(float lookaheadVal)
     {
         if (currentCurve->getLength() <= DEGEN_CURVE_LENGTH)
         {
@@ -87,7 +87,7 @@ public:
         }
     }
 
-    modm::Vector<float, 2> getLookaheadDeriv(float t, float lookaheadVal)
+    modm::Vector<float, 2> getLookaheadDeriv(float lookaheadVal)
     {
         float lookahead = getLookahead(lookaheadVal);
 

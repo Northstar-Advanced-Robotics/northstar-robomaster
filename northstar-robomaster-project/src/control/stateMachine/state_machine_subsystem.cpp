@@ -16,11 +16,11 @@ StateMachineSubsystem::StateMachineSubsystem(
     src::chassis::ChassisBeybladeCommand* beybladeCommand,
     src::control::governor::MatchRunningGovernor* matchRunningGovernor)
     : Subsystem(drivers),
-      drivers(drivers),
       chassisSubsystem(chassisSubsystem),
       chassisAutoDrive(chassisAutoDrive),
       beybladeCommand(beybladeCommand),
-      matchRunningGovernor(matchRunningGovernor)
+      matchRunningGovernor(matchRunningGovernor),
+      drivers(drivers)
 {
 }
 
@@ -44,7 +44,7 @@ void StateMachineSubsystem::refresh()
         {
             if (beyblade && beybladeCommand != nullptr)
             {
-                float maxRot = chassisSubsystem->calculateMaxRotationSpeed(0, 0);
+                float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
                 float rotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
                 chassisSubsystem->isBeybladingOnly = true;
                 chassisSubsystem->setVelocityFieldDrive(
@@ -65,9 +65,7 @@ void StateMachineSubsystem::refresh()
 
         if (beyblade && beybladeCommand != nullptr)
         {
-            float maxRot = chassisSubsystem->calculateMaxRotationSpeed(
-                desiredGlobalVelocity.y,
-                -desiredGlobalVelocity.x);
+            float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
             desiredRotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
 
             if (chassisSubsystem->getChassisOdometry()->getVelocityLocal().getLength() < 0.3f)

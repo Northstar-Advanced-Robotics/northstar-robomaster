@@ -111,35 +111,35 @@ if args["TARGET_ENV"] == "hardware":
     env.Alias("all", ["build", "size"])
     env.Default("all")  # For the hardware target env, "all" runs if you don't
     # specify anything (i.e. just type "scons")
-    if args["TARGET_ENV"] == "tests":
-        # Add scons-tools directory to toolpath so we can use the various tools inside it,
-        # then add various tools
-        env.Append(toolpath=[TAPROOT_SCRIPTS_TOOLPATH])
-        env.Tool("run_gcov")
+elif args["TARGET_ENV"] == "tests":
+    # Add scons-tools directory to toolpath so we can use the various tools inside it,
+    # then add various tools
+    env.Append(toolpath=[TAPROOT_SCRIPTS_TOOLPATH])
+    env.Tool("run_gcov")
 
-        program = env.Program(
-            target=env["CONFIG_PROJECT_NAME"] + "-tests.elf", source=sources
-        )
+    program = env.Program(
+        target=env["CONFIG_PROJECT_NAME"] + "-tests.elf", source=sources
+    )
 
-        # Add target environment-specific SCons aliases
-        # WARNING: all aliases must be checked during argument validation
-        env.Alias("build-tests", program)
-        env.Alias(
-            "run-tests",
-            env.Command(
-                "thisfileshouldnotexist",
-                program,
-                '@"%s"' % program[0].abspath
-                + (f" --gtest_filter={args['TEST']}" if "TEST" in args else ""),
-            ),
-        )
-        env.Alias("run-tests-gcov", [env.RunGCOV(program, False, [])])
-    else:
-        program = env.Program(
-            target=env["CONFIG_PROJECT_NAME"] + ".elf", source=sources
-        )
+    # Add target environment-specific SCons aliases
+    # WARNING: all aliases must be checked during argument validation
+    env.Alias("build-tests", program)
+    env.Alias(
+        "run-tests",
+        env.Command(
+            "thisfileshouldnotexist",
+            program,
+            '@"%s"' % program[0].abspath
+            + (f" --gtest_filter={args['TEST']}" if "TEST" in args else ""),
+        ),
+    )
+    env.Alias("run-tests-gcov", [env.RunGCOV(program, False, [])])
+else:
+    program = env.Program(
+        target=env["CONFIG_PROJECT_NAME"] + ".elf", source=sources
+    )
 
-        # Add target environment-specific SCons aliases
-        # WARNING: all aliases must be checked during argument validation
-        env.Alias("build-sim", program)
-        env.Alias("run-sim", env.Run(program))
+    # Add target environment-specific SCons aliases
+    # WARNING: all aliases must be checked during argument validation
+    env.Alias("build-sim", program)
+    env.Alias("run-sim", env.Run(program))

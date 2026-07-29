@@ -22,6 +22,8 @@
 
 #include <optional>
 
+#include <optional>
+
 #include "tap/control/hold_repeat_command_mapping.hpp"
 
 #include "control/agitator/constant_velocity_agitator_command.hpp"
@@ -119,7 +121,7 @@ private:
 #endif
     }
 
-    int getMaxBurst(int targetBurstSize = 10)
+    int getMaxBurst([[maybe_unused]] int targetBurstSize = 10)
     {
 #if defined(TARGET_HERO)
         // Allow for overheating but not to the point of disable. allow for 2 shot burst. We can

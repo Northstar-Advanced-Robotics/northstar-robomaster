@@ -18,7 +18,7 @@ void ConstantVelocityKickerCommand::initialize() { kicker->setSetpoint(velocityS
 
 void ConstantVelocityKickerCommand::execute() {}
 
-void ConstantVelocityKickerCommand::end(bool interrupted) { kicker->setSetpoint(0); }
+void ConstantVelocityKickerCommand::end(bool) { kicker->setSetpoint(0); }
 
 bool ConstantVelocityKickerCommand::isReady() { return true; }
 
