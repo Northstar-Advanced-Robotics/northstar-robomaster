@@ -264,16 +264,16 @@ void ChassisSubsystem::driveBasedOnHeading(
     isPeekingLeft = isPeeking && (vy_local < 0);
 
     LFSpeed = mpsToRpm(
-        (vx_local - vy_local) / M_SQRT2 -
+        (vx_local - vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-left wheel
     RFSpeed = mpsToRpm(
-        (-vx_local - vy_local) / M_SQRT2 -
+        (-vx_local - vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-right wheel
     RBSpeed = mpsToRpm(
-        (-vx_local + vy_local) / M_SQRT2 -
+        (-vx_local + vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-right wheel
     LBSpeed = mpsToRpm(
-        (vx_local + vy_local) / M_SQRT2 -
+        (vx_local + vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-left wheel
     int LF = static_cast<int>(MotorId::LF);
     int LB = static_cast<int>(MotorId::LB);
