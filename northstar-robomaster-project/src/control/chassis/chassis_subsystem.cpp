@@ -84,8 +84,7 @@ float RBSpeed;
 
 inline float ChassisSubsystem::getTurretYaw()
 {
-    // Motor is inverted, doing this for now for testing.
-    return -yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
+    return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
 
 float ChassisSubsystem::getChassisZeroTurret()
@@ -102,7 +101,7 @@ float ChassisSubsystem::getChassisRotationSpeed()
         motorSum += i.getEncoder()->getVelocity();
     }
 
-    return (motorSum * WHEEL_DIAMETER_M / 2.0f) / (4 * DIST_TO_CENTER);
+    return -(motorSum * WHEEL_DIAMETER_M / 2.0f) / (4 * DIST_TO_CENTER);
 }
 
 float ChassisSubsystem::calculateMaxRotationSpeed(float vert, float hor)
@@ -136,7 +135,7 @@ void ChassisSubsystem::setVelocityTurretDrive(float forward, float sideways, flo
 
 void ChassisSubsystem::setVelocityFieldDrive(float forward, float sideways, float rotational)
 {
-    float robotHeading = fmod(getTurretYaw() - drivers->bmi088.getYaw(), 2 * M_PI);
+    float robotHeading = fmod(drivers->bmi088.getYaw() - getTurretYaw(), 2 * M_PI);
     driveBasedOnHeading(forward, sideways, rotational, robotHeading);
 }
 
