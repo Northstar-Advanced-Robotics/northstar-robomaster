@@ -10,7 +10,7 @@ using tap::algorithms::limitVal;
 /*
     Chassis subsystem uses right hand rule, causing the following.
     +X: Forward
-    -Y: Sideways 
+    +Y: Sideways (left)
     +Rotation: CCW
 */
 
@@ -135,7 +135,7 @@ void ChassisSubsystem::setVelocityTurretDrive(float forward, float sideways, flo
 
 void ChassisSubsystem::setVelocityFieldDrive(float forward, float sideways, float rotational)
 {
-    float robotHeading = fmod(drivers->bmi088.getYaw() - getTurretYaw(), 2 * M_PI);
+    float robotHeading = fmod(getTurretYaw() - drivers->bmi088.getYaw(), 2 * M_PI);
     driveBasedOnHeading(forward, sideways, rotational, robotHeading);
 }
 
@@ -257,23 +257,23 @@ void ChassisSubsystem::driveBasedOnHeading(
     float cos_theta = cos(heading);
     float sin_theta = sin(heading);
 
-    float vx_local = rampedXVelocity * cos_theta + rampedYVelocity * sin_theta;
-    float vy_local = -rampedXVelocity * sin_theta + rampedYVelocity * cos_theta;
+    float vx_local = rampedXVelocity * cos_theta - rampedYVelocity * sin_theta;
+    float vy_local = rampedXVelocity * sin_theta + rampedYVelocity * cos_theta;
 
     isPeeking = abs(vy_local) > 0.1;
-    isPeekingLeft = isPeeking && (vy_local < 0);
+    isPeekingLeft = isPeeking && (vy_local > 0);
 
     LFSpeed = mpsToRpm(
-        (vx_local - vy_local) / M_SQRT2 +
+        (vx_local + vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-left wheel
     RFSpeed = mpsToRpm(
-        (-vx_local - vy_local) / M_SQRT2 +
+        (-vx_local + vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Front-right wheel
     RBSpeed = mpsToRpm(
-        (-vx_local + vy_local) / M_SQRT2 +
+        (-vx_local - vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-right wheel
     LBSpeed = mpsToRpm(
-        (vx_local + vy_local) / M_SQRT2 +
+        (vx_local - vy_local) / M_SQRT2 +
         (rampedRotational)*DIST_TO_CENTER * M_SQRT2);  // Rear-left wheel
     int LF = static_cast<int>(MotorId::LF);
     int LB = static_cast<int>(MotorId::LB);
@@ -301,11 +301,6 @@ void ChassisSubsystem::driveBasedOnHeading(
     desiredOutput[LB] = LBSpeed * scale;
     desiredOutput[RF] = RFSpeed * scale;
     desiredOutput[RB] = RBSpeed * scale;
-
-    // desiredOutput[LF] = limitVal<float>(LFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[LB] = limitVal<float>(LBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[RF] = limitVal<float>(RFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[RB] = limitVal<float>(RBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
 }
 
 void ChassisSubsystem::refresh()
