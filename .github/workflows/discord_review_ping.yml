@@ -1,0 +1,38 @@
+name: Discord Review Ping
+
+on:
+  pull_request:
+    types: [review_requested]
+
+jobs:
+  notify:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Ping requested reviewer in Discord
+        env:
+          DISCORD_WEBHOOK_URL: ${{ secrets.DISCORD_WEBHOOK_URL }}
+          REVIEWER: ${{ github.event.requested_reviewer.login }}
+          AUTHOR: ${{ github.event.pull_request.user.login }}
+          PR_TITLE: ${{ github.event.pull_request.title }}
+          PR_URL: ${{ github.event.pull_request.html_url }}
+        run: |
+          REVIEWER_LOWER=$(echo "$REVIEWER" | tr '[:upper:]' '[:lower:]')
+          DISCORD_ID=$(jq -r --arg user "$REVIEWER_LOWER" '.[$user] // empty' .github/discord_reviewers.json)
+
+          if [ -n "$DISCORD_ID" ] && [ "$DISCORD_ID" != "REPLACE_WITH_DISCORD_USER_ID" ]; then
+            MENTION="<@${DISCORD_ID}>"
+          else
+            MENTION="**${REVIEWER}**"
+          fi
+
+          PAYLOAD=$(jq -n \
+            --arg content "$(printf '%s — %s requested your review on \"%s\"\n%s' "$MENTION" "$AUTHOR" "$PR_TITLE" "$PR_URL")" \
+            '{content: $content}')
+
+          curl -sf -H "Content-Type: application/json" -X POST \
+            -d "$PAYLOAD" \
+            "$DISCORD_WEBHOOK_URL"
