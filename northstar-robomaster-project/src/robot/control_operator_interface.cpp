@@ -88,7 +88,7 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     if (prevUpdateCounterY != updateCounter)
     {
         chassisYInput.update(
-            drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
+            -drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
             currTime);
         prevUpdateCounterY = updateCounter;
     }
