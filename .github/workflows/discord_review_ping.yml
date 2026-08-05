@@ -20,7 +20,8 @@ jobs:
           PR_TITLE: ${{ github.event.pull_request.title }}
           PR_URL: ${{ github.event.pull_request.html_url }}
         run: |
-          DISCORD_ID=$(jq -r --arg user "$REVIEWER" '.[$user] // empty' .github/discord_reviewers.json)
+          REVIEWER_LOWER=$(echo "$REVIEWER" | tr '[:upper:]' '[:lower:]')
+          DISCORD_ID=$(jq -r --arg user "$REVIEWER_LOWER" '.[$user] // empty' .github/discord_reviewers.json)
 
           if [ -n "$DISCORD_ID" ] && [ "$DISCORD_ID" != "REPLACE_WITH_DISCORD_USER_ID" ]; then
             MENTION="<@${DISCORD_ID}>"
