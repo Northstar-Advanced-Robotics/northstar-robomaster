@@ -10,7 +10,7 @@ using tap::algorithms::limitVal;
 /*
     Chassis subsystem uses right hand rule, causing the following.
     +X: Forward
-    +Y: Sideways (left)
+    +Y: Left
     +Rotation: CCW
 */
 
@@ -86,7 +86,7 @@ inline float ChassisSubsystem::getTurretYaw()
 {
     return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
-// Returns the angle the chassis is offset form the turret in radians.
+// Returns the angle the chassis is offset from the turret in radians.
 float ChassisSubsystem::getChassisZeroTurret()
 {
     return modm::Angle::normalize(-getTurretYaw());
