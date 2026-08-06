@@ -8,10 +8,10 @@
 using tap::algorithms::limitVal;
 
 /*
-    Chassis Subsystem uses a 2D coordinate system, using the ground as the XY plane
-    +X: Right
-    +Y: Forward
-    +Rotation: CW
+    Chassis subsystem uses right hand rule, causing the following.
+    +X: Forward
+    +Y: Left
+    +Rotation: CCW
 */
 
 namespace src::chassis
@@ -86,11 +86,10 @@ inline float ChassisSubsystem::getTurretYaw()
 {
     return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
-
+// Returns the angle the chassis is offset from the turret in radians.
 float ChassisSubsystem::getChassisZeroTurret()
 {
-    float angle = (getTurretYaw());
-    return (angle > M_PI) ? angle - M_TWOPI : angle;
+    return modm::Angle::normalize(-getTurretYaw());
 }
 
 float ChassisSubsystem::getChassisRotationSpeed()
@@ -101,7 +100,7 @@ float ChassisSubsystem::getChassisRotationSpeed()
         motorSum += i.getEncoder()->getVelocity();
     }
 
-    return (motorSum * WHEEL_DIAMETER_M / 2.0f) / (4 * DIST_TO_CENTER);
+    return -(motorSum * WHEEL_DIAMETER_M / 2.0f) / (4 * DIST_TO_CENTER);
 }
 
 float ChassisSubsystem::calculateMaxRotationSpeed(float vert, float hor)
@@ -135,7 +134,7 @@ void ChassisSubsystem::setVelocityTurretDrive(float forward, float sideways, flo
 
 void ChassisSubsystem::setVelocityFieldDrive(float forward, float sideways, float rotational)
 {
-    float robotHeading = fmod(getTurretYaw() - drivers->bmi088.getYaw(), 2 * M_PI);
+    float robotHeading = getChassisYaw();
     driveBasedOnHeading(forward, sideways, rotational, robotHeading);
 }
 
@@ -250,18 +249,18 @@ void ChassisSubsystem::driveBasedOnHeading(
         ROTATION_ACCEL_VALUE,
         static_cast<float>(tap::Drivers::DT) / 1E3F);
 
-    float rampedForward = rampControllers[0].getValue();
-    float rampedSideways = rampControllers[1].getValue();
+    float rampedXVelocity = rampControllers[0].getValue();
+    float rampedYVelocity = rampControllers[1].getValue();
     float rampedRotational = rampControllers[2].getValue();
 
     float cos_theta = cos(heading);
     float sin_theta = sin(heading);
 
-    float vx_local = rampedForward * cos_theta + rampedSideways * sin_theta;
-    float vy_local = -rampedForward * sin_theta + rampedSideways * cos_theta;
+    float vx_local = rampedXVelocity * cos_theta - rampedYVelocity * sin_theta;
+    float vy_local = rampedXVelocity * sin_theta + rampedYVelocity * cos_theta;
 
-    isPeeking = abs(vx_local) > 0.1;
-    isPeekingLeft = isPeeking && (vx_local < 0);
+    isPeeking = abs(vy_local) > 0.1;
+    isPeekingLeft = isPeeking && (vy_local > 0);
 
     LFSpeed = mpsToRpm(
         (vx_local - vy_local) / M_SQRT2 +
@@ -301,11 +300,6 @@ void ChassisSubsystem::driveBasedOnHeading(
     desiredOutput[LB] = LBSpeed * scale;
     desiredOutput[RF] = RFSpeed * scale;
     desiredOutput[RB] = RBSpeed * scale;
-
-    // desiredOutput[LF] = limitVal<float>(LFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[LB] = limitVal<float>(LBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[RF] = limitVal<float>(RFSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
-    // desiredOutput[RB] = limitVal<float>(RBSpeed, -calculatedMaxRPMPower, calculatedMaxRPMPower);
 }
 
 void ChassisSubsystem::refresh()

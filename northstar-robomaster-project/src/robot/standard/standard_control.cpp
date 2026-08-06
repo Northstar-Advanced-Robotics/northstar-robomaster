@@ -264,7 +264,7 @@ tap::motor::DjiMotor yawMotor(
     drivers(),
     YAW_MOTOR_ID_1,
     CAN_BUS_YAW,
-    true,
+    false,
     "YawMotor1",
     false,
     1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(54.0f / 81.0f),
@@ -505,7 +505,7 @@ void startStandardCommands(Drivers *drivers)
     drivers->visionComms.attachRemote(&drivers->remote);
 
     drivers->bmi088.setMountingTransform(
-        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(0)));
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 
 void registerStandardIoMappings(Drivers *drivers)

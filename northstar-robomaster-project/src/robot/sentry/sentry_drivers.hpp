@@ -49,7 +49,7 @@ public:
         : tap::Drivers(),
           controlOperatorInterface(this),
           visionComms(this),
-          encoder(true, 1.0f)
+          encoder(false, 1.0f)
     //   revMotorTxHandler(this)
     {
     }

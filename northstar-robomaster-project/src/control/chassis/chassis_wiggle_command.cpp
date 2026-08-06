@@ -34,7 +34,7 @@ void ChassisWiggleCommand::execute()
     modm::Pair<float, float> normInput = getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
-    chassis->setVelocityTurretDrive(normInput.first, -normInput.second, calculateWiggle(dt));
+    chassis->setVelocityTurretDrive(normInput.first, normInput.second, calculateWiggle(dt));
 }
 
 void ChassisWiggleCommand::end([[maybe_unused]] bool interrupted)
