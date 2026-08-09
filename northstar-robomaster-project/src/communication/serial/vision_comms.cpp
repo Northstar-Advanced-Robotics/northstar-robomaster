@@ -17,7 +17,7 @@ VisionComms::~VisionComms() {}
 void VisionComms::initializeCV()
 {
     cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
-    drivers->uart.init<VISION_COMMS_TX_UART_PORT, VISION_COMMS_BAUD_RATE>();
+    drivers->uart.init<VISION_COMMS_TX_UART_PORT, uart::BAUD_RATE>();
 }
 
 void VisionComms::initializeUartDelays()
@@ -45,39 +45,39 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
     }
     switch (completeMessage.messageType)
     {
-        case MessageType::TURRET_AIM_DATA:
+        case uart::MessageType::TURRET_AIM_DATA:
         {
             decodeToTurretAimData(completeMessage);
             return;
         }
-        case MessageType::ROBOT_ID:
+        case uart::MessageType::ROBOT_ID:
         {
             sendRobotIdMessage();
             return;
         }
-        case MessageType::ALIVE:
+        case uart::MessageType::ALIVE:
         {
             cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
             return;
         }
-        case MessageType::ODOMETRY:
+        case uart::MessageType::ODOMETRY:
         {
             decodeToOdometeryData(completeMessage);
             return;
         }
 
-        case MessageType::AUTO_PATH:
+        case uart::MessageType::AUTO_PATH:
         {
             decodeToAutoPathData(completeMessage);
             return;
         }
 
-        case MessageType::VISION_LOCALIZATION:
+        case uart::MessageType::VISION_LOCALIZATION:
         {
             decodeToVisionAprilTagLocalization(completeMessage);
             return;
         }
-        case MessageType::FLY_SKY_DATA:
+        case uart::MessageType::FLY_SKY_DATA:
         {
             if (remote != nullptr && !remote->VT13Connected)
             {
@@ -85,7 +85,7 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
             }
             return;
         }
-        case MessageType::VT13_DATA:
+        case uart::MessageType::VT13_DATA:
         {
             if (remote != nullptr && !remote->flySkyConnected)
             {
@@ -104,13 +104,13 @@ bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
     int curreIndex = 0;
     for (size_t i = 0; i < control::turret::NUM_TURRETS; i++)
     {
-        if ((curreIndex + sizeof(TurretAimData) - sizeof(float) * 2 - 2) >
+        if ((curreIndex + sizeof(uart::TurretAimData) - sizeof(float) * 2 - 2) >
             message.header.dataLength)
         {
             return false;  // Not enough data for another turret aim data
         }
 
-        TurretAimData& aimData = lastAimData[i];
+        uart::TurretAimData& aimData = lastAimData[i];
         memcpy(&aimData.yaw, &message.data[curreIndex], sizeof(float));
         curreIndex += sizeof(float);
 
@@ -157,14 +157,14 @@ bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
         return false;
     }
 
-    if (sizeof(OdometryData) > message.header.dataLength)
+    if (sizeof(uart::OdometryData) > message.header.dataLength)
     {
         return false;
     }
 
-    OdometryData cleanData;
+    uart::OdometryData cleanData;
 
-    std::memcpy(&cleanData, message.data, sizeof(OdometryData));
+    std::memcpy(&cleanData, message.data, sizeof(uart::OdometryData));
 
     // chassisOdometry->setGlobalPosition({cleanData.chassis_data.pos_x,
     // cleanData.chassis_data.pos_y});
@@ -203,13 +203,13 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
         return false;
     }
 
-    if (sizeof(VisionComms::AprilTagLocalizationData) > message.header.dataLength)
+    if (sizeof(uart::AprilTagLocalizationData) > message.header.dataLength)
     {
         return false;
     }
 
-    VisionComms::AprilTagLocalizationData localizationData;
-    std::memcpy(&localizationData, message.data, sizeof(VisionComms::AprilTagLocalizationData));
+    uart::AprilTagLocalizationData localizationData;
+    std::memcpy(&localizationData, message.data, sizeof(uart::AprilTagLocalizationData));
     uint32_t currentTime = tap::arch::clock::getTimeMicroseconds();
 
     latency = currentTime - localizationData.timestamp;
@@ -306,7 +306,7 @@ void VisionComms::sendMessage()
 void VisionComms::sendCvRestartMessage()
 {
     DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
-    robotTypeMessage.messageType = MessageType::RESTART_DETECTOR;
+    robotTypeMessage.messageType = uart::MessageType::RESTART_DETECTOR;
     robotTypeMessage.setCRC16();
     drivers->uart.write(
         VISION_COMMS_TX_UART_PORT,
@@ -317,7 +317,7 @@ void VisionComms::sendCvRestartMessage()
 void VisionComms::sendRobotIdMessage()
 {
     DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
-    robotTypeMessage.messageType = MessageType::ROBOT_ID;
+    robotTypeMessage.messageType = uart::MessageType::ROBOT_ID;
     robotTypeMessage.data[0] = static_cast<uint8_t>(drivers->refSerial.getRobotData().robotId);
     robotTypeMessage.setCRC16();
     drivers->uart.write(
@@ -333,11 +333,11 @@ void VisionComms::sendRobotOdometry()
         assert(chassisOdometry != nullptr);
         assert(pitchMotor != nullptr);
 
-        DJISerial::SerialMessage<sizeof(OdometryData)> odometryMessage;
+        DJISerial::SerialMessage<sizeof(uart::OdometryData)> odometryMessage;
 
-        odometryMessage.messageType = MessageType::ODOMETRY;
+        odometryMessage.messageType = uart::MessageType::ODOMETRY;
 
-        OdometryData* data = reinterpret_cast<OdometryData*>(odometryMessage.data);
+        uart::OdometryData* data = reinterpret_cast<uart::OdometryData*>(odometryMessage.data);
 
         modm::Vector2f global_pos = chassisOdometry->getPositionGlobal();
         modm::Vector2f global_vel = chassisOdometry->getVelocityGlobalVision();
@@ -377,7 +377,7 @@ void VisionComms::sendHealthData()
     {
         DJISerial::SerialMessage<sizeof(uint16_t)> message;
 
-        message.messageType = MessageType::HEALTH;
+        message.messageType = uart::MessageType::HEALTH;
 
         // save into the message
         uint16_t hp = static_cast<uint16_t>(drivers->refSerial.getRobotData().currentHp);
