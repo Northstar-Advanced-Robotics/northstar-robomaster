@@ -82,10 +82,6 @@ float LBSpeed;
 float RFSpeed;
 float RBSpeed;
 
-inline float ChassisSubsystem::getTurretYaw()
-{
-    return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
-}
 // Returns the angle the chassis is offset from the turret in radians.
 float ChassisSubsystem::getChassisZeroTurret()
 {

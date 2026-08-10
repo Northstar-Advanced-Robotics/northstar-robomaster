@@ -18,7 +18,7 @@ public:
         modm::Vector<float, 2> startControl;
         modm::Vector<float, 2> endControl;
         float length;
-    } modm_packed;
+    };
 
     CubicBezier(CurveData curveData) : curveData(curveData) {}
 

@@ -263,7 +263,10 @@ private:
     /**
      * @return The turret yaw angle in radians.
      */
-    inline float getTurretYaw();
+    inline float getTurretYaw()
+    {
+        return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
+    }
 
 protected:
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;

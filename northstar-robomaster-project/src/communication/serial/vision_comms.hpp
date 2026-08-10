@@ -11,7 +11,7 @@
 #include "control/turret/constants/turret_constants.hpp"
 
 #include "uart_constants.hpp"
-#include "uart_protocol/protocol.hpp"
+#include "uart_protocol/uart_protocol.hpp"
 
 namespace src::serial
 {
@@ -22,6 +22,15 @@ public:
         tap::communication::serial::Uart::UartPort::Uart1;
     static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_RX_UART_PORT =
         tap::communication::serial::Uart::UartPort::Uart1;
+
+    struct TurretAim {
+        float yaw;
+        float pitch;
+        float distance;
+        tap::communication::serial::RefSerialData::RobotId robotId;
+        float maxErrorYaw;
+        float maxErrorPitch;
+    };
 
     struct RefData
     {
@@ -123,7 +132,7 @@ public:
 
     mockable bool isCvOnline() const;
 
-    mockable inline const uart::TurretAimData& getLastAimData(uint8_t turretID = 0) const
+    mockable inline const TurretAim& getLastAimData(uint8_t turretID = 0) const
     {
         return lastAimData[turretID];
     }
@@ -165,7 +174,7 @@ private:
 
     tap::arch::MilliTimeout cvOfflineTimeout;
 
-    uart::TurretAimData lastAimData[control::turret::NUM_TURRETS] = {};
+    TurretAim lastAimData[control::turret::NUM_TURRETS] = {};
 
     bool aimDataUpdated[control::turret::NUM_TURRETS] = {};
 
