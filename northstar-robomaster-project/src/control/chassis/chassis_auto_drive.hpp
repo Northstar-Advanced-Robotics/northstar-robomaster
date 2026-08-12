@@ -146,9 +146,9 @@ private:
 
     void calculateRotationToFacePoint(modm::Vector<float, 2> localPoint)
     {
-        float desiredWorldAngle = -atan2(localPoint.y, localPoint.x);
+        float desiredWorldAngle = atan2(localPoint.y, localPoint.x);
         float differenceInDesiredFacingRadians =
-            chassis->getDifferenceToTargetAngle((desiredWorldAngle + M_PI_2));
+            chassis->getDifferenceToTargetAngle(desiredWorldAngle);
 
         float rotationFromPID = chassis->chassisSpeedRotationAutoDrivePID(
             tap::algorithms::WrappedFloat(differenceInDesiredFacingRadians, -M_PI_4, M_PI_4)

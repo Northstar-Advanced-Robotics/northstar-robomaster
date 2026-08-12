@@ -9,9 +9,10 @@
 #include "modm/math/geometry/vector.hpp"
 
 /*
-    Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane
-    +X: Right
-    +Y: Forward
+    Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane, matching the
+    right hand rule convention used by ChassisSubsystem.
+    +X: Forward
+    +Y: Left
     +Rotation: CCW
 */
 
@@ -171,8 +172,8 @@ public:
         float mps_RF = motorRPS_RF * RPS_TO_MPS;
         float mps_RB = motorRPS_RB * RPS_TO_MPS;
 
-        float localVelX = (mps_LF + mps_RF - mps_LB - mps_RB) * ONE_OVER_THREE;
-        float localVelY = (mps_LF - mps_RF + mps_LB - mps_RB) * ONE_OVER_THREE;
+        float localVelX = (mps_LF - mps_RF + mps_LB - mps_RB) * ONE_OVER_THREE;
+        float localVelY = (mps_LB + mps_RB - mps_LF - mps_RF) * ONE_OVER_THREE;
 
         velocityLocal.x = localVelX;
         velocityLocal.y = localVelY;
@@ -217,8 +218,8 @@ public:
         float sinR = sinf(globalHeading);
 
         return modm::Vector<float, 2>(
-            local.x * cosR + local.y * sinR,
-            -local.x * sinR + local.y * cosR);
+            local.x * cosR - local.y * sinR,
+            local.x * sinR + local.y * cosR);
     }
 
     float calculateRobotHeading()
