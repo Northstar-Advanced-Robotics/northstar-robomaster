@@ -1,0 +1,138 @@
+# Windows setup: Dev Container + Ozone/J-Link debugging
+
+This guide covers the full path for a Windows machine: cloning the repo into a Dev
+Container **volume** (not a bind mount), building firmware inside the container, and
+getting SEGGER Ozone (on the Windows host) to load the built `.elf` with working
+breakpoints and source navigation.
+
+It exists because the container-volume + Ozone combination hits a non-obvious
+Windows/WSL2/Docker Desktop path-length issue. Each step below explains *why*, not
+just *what*, so future debugging doesn't have to start from scratch.
+
+## Prerequisites
+
+- Docker Desktop, using the WSL2 backend (Settings → General → "Use the WSL 2 based
+  engine")
+- VS Code with the **Dev Containers** extension
+- [SEGGER Ozone](https://www.segger.com/products/debug-probes/j-link/tools/ozone/) and
+  the J-Link software/drivers installed on Windows
+- A J-Link probe connected to the target board
+
+## 1. Clone the repo into a named container volume
+
+In VS Code: Command Palette (<kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>) →
+**Dev Containers: Clone Repository in Named Container Volume...** → enter this repo's
+URL → give the volume a short custom name (e.g. `rmb`).
+
+This clones the repo into a Docker named volume and opens it in the devcontainer
+defined by [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json).
+`postCreateCommand` sets up the Python venv automatically.
+
+Using the **named** variant instead of plain **Clone Repository in Container
+Volume...** matters: the plain version auto-names the volume something like
+`vsc-northstar-robomaster-<64-char-hash>`, and that hash is what pushes the eventual
+Windows-side path over `MAX_PATH` (see step 3). Picking a short name up front avoids
+that problem entirely — no symlinks or drive-letter tricks needed later.
+
+## 2. Build the firmware
+
+Inside the devcontainer terminal:
+
+```
+cd northstar-robomaster-project
+pipenv shell
+scons build robot=TARGET_STANDARD profile=debug
+```
+
+(swap `TARGET_STANDARD` for `TARGET_HERO`, `TARGET_SENTRY`, etc. as needed — see the
+main [README](README.md#building-and-running-via-the-terminal) for all `scons`
+options)
+
+The output `.elf` lands at:
+```
+northstar-robomaster-project/build/hardware-profiling/scons-debug/TARGET_STANDARD/northstar-robomaster-project.elf
+```
+
+## 3. Find the volume's Windows path
+
+Ozone runs on Windows and needs a Windows-visible path to that `.elf` and its source.
+
+Docker Desktop's WSL2 backend stores volumes on a second virtual disk, mounted
+inside the hidden `docker-desktop` WSL distro at:
+
+```
+/mnt/docker-desktop-disk/data/docker/volumes/<volume-name>/_data
+```
+
+Since you chose `<volume-name>` in step 1, you already know this path — no need to
+shell into the container or search for it. From Windows, the same location is
+reachable directly over the network provider as:
+
+```
+\\wsl.localhost\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\<volume-name>\_data
+```
+
+Confirm it resolves (from a normal PowerShell window; the `docker-desktop` distro
+must be running, which it is whenever Docker Desktop is running):
+```powershell
+Test-Path "\\wsl.localhost\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\<volume-name>\_data"
+```
+
+Because `<volume-name>` is short, the full path to any source file stays well under
+Windows' 260-character `MAX_PATH`, e.g.:
+
+```
+\\wsl.localhost\docker-desktop\mnt\docker-desktop-disk\data\docker\volumes\rmb\_data\northstar-robomaster\northstar-robomaster-project\src\communication\can\chassis\chassis_mcb_can_comm.cpp
+```
+
+That's the fix for Ozone's source resolution problem: with the old auto-generated
+hash name, this same path comfortably exceeded `MAX_PATH`, and Ozone's source/symbol
+resolution (which joins a substituted prefix with each relative source path) would
+silently come up empty — no entries in the Functions window, no breakpoints — even
+though `File.Open` on the `.elf` itself worked fine. A short volume name keeps the
+combined path short enough that this never happens, so there's no need for an NTFS
+symlink or a mapped drive letter to work around it.
+
+## 4. Configure the Ozone project
+
+Create/edit your `.jdebug` project file with:
+
+```
+Project.AddPathSubstitute ("/workspaces/northstar-robomaster", "//wsl.localhost/docker-desktop/mnt/docker-desktop-disk/data/docker/volumes/<volume-name>/_data/northstar-robomaster");
+
+File.Open ("//wsl.localhost/docker-desktop/mnt/docker-desktop-disk/data/docker/volumes/<volume-name>/_data/northstar-robomaster/northstar-robomaster-project/build/hardware-profiling/scons-debug/TARGET_STANDARD/northstar-robomaster-project.elf");
+```
+
+The substitution's *old* path (`/workspaces/northstar-robomaster`) matches the
+`comp_dir` baked into the DWARF debug info at compile time — you can confirm this
+for any `.elf` from inside the devcontainer with:
+
+```
+arm-none-eabi-readelf --debug-dump=info <elf-file> | grep DW_AT_comp_dir | head -1
+```
+
+Reload the project in Ozone. The Functions window should now populate, and
+breakpoints set in source should bind and hit correctly.
+
+## Troubleshooting
+
+- **`Error (7): File could not be opened for reading`** on `File.Open` — the
+  `docker-desktop` distro was likely still starting up (e.g. right after waking the
+  PC or starting Docker Desktop). Check with `wsl --list --running` and `Test-Path`
+  on the target file before retrying in Ozone; it typically resolves within a few
+  seconds once Docker Desktop is fully up.
+- **Functions window still empty** — double check the `AddPathSubstitute` old/new
+  paths exactly match (no trailing slash mismatches, correct volume name), and that
+  you fully closed and reopened the `.jdebug` project rather than just saving it. If
+  the volume name is longer than a handful of characters (or the repo gains deeply
+  nested source paths), you may be back over `MAX_PATH` — shortening the volume name
+  is the fix.
+- **`arm-none-eabi-gdb: error while loading shared libraries: libncurses.so.5`** when
+  trying to inspect an `.elf` from inside the devcontainer — the prebuilt ARM
+  toolchain's `gdb` needs the older `libncurses5`, not installed by default:
+  ```
+  sudo apt-get update && sudo apt-get install -y libncurses5
+  ```
+  Or skip `gdb` and use `arm-none-eabi-readelf --debug-dump=info` instead, which has
+  no such dependency.
+</content>

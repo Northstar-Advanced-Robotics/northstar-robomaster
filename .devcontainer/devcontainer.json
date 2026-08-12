@@ -8,11 +8,14 @@
       "extensions": [
         "ms-vscode.cpptools",
         "ms-python.python",
-        "marus25.cortex-debug"
+        "marus25.cortex-debug",
+        "eamodio.gitlens",
+				"xaver.clang-format"
       ],
       "settings": {
         "C_Cpp.default.compilerPath": "/opt/gcc-arm/bin/arm-none-eabi-gcc",
-        "C_Cpp.default.intelliSenseMode": "linux-gcc-arm"
+        "C_Cpp.default.intelliSenseMode": "linux-gcc-arm",
+        "editor.formatOnSave": true
       }
     }
   },
