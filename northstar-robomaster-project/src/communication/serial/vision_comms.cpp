@@ -17,7 +17,7 @@ VisionComms::~VisionComms() {}
 void VisionComms::initializeCV()
 {
     cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
-    drivers->uart.init<VISION_COMMS_TX_UART_PORT, VISION_COMMS_BAUD_RATE>();
+    drivers->uart.init<VISION_COMMS_TX_UART_PORT, uart::BAUD_RATE>();
 }
 
 void VisionComms::initializeUartDelays()
@@ -43,41 +43,41 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
             remote->VT13Connected = false;
         }
     }
-    switch (completeMessage.messageType)
+    switch (static_cast<uart::Message>(completeMessage.messageType))
     {
-        case MessageType::TURRET_AIM_DATA:
+        case uart::Message::TURRET_AIM_DATA:
         {
             decodeToTurretAimData(completeMessage);
             return;
         }
-        case MessageType::ROBOT_ID:
+        case uart::Message::ROBOT_ID:
         {
             sendRobotIdMessage();
             return;
         }
-        case MessageType::ALIVE:
+        case uart::Message::ALIVE:
         {
             cvOfflineTimeout.restart(TIME_OFFLINE_CV_AIM_DATA_MS);
             return;
         }
-        case MessageType::ODOMETRY:
+        case uart::Message::ODOMETRY:
         {
             decodeToOdometeryData(completeMessage);
             return;
         }
 
-        case MessageType::AUTO_PATH:
+        case uart::Message::AUTO_PATH:
         {
             decodeToAutoPathData(completeMessage);
             return;
         }
 
-        case MessageType::VISION_LOCALIZATION:
+        case uart::Message::VISION_LOCALIZATION:
         {
             decodeToVisionAprilTagLocalization(completeMessage);
             return;
         }
-        case MessageType::FLY_SKY_DATA:
+        case uart::Message::FLY_SKY_DATA:
         {
             if (remote != nullptr && !remote->VT13Connected)
             {
@@ -85,7 +85,7 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
             }
             return;
         }
-        case MessageType::VT13_DATA:
+        case uart::Message::VT13_DATA:
         {
             if (remote != nullptr && !remote->flySkyConnected)
             {
@@ -101,36 +101,28 @@ void VisionComms::messageReceiveCallback(const ReceivedSerialMessage& completeMe
 
 bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
 {
-    int curreIndex = 0;
     for (size_t i = 0; i < control::turret::NUM_TURRETS; i++)
     {
-        if ((curreIndex + sizeof(TurretAimData) - sizeof(float) * 2 - 2) >
-            message.header.dataLength)
+        if ((i + 1) * sizeof(uart::TurretAimData) > message.header.dataLength)
         {
             return false;  // Not enough data for another turret aim data
         }
 
-        TurretAimData& aimData = lastAimData[i];
-        memcpy(&aimData.yaw, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
+        uart::TurretAimData msg = {};
+        std::memcpy(
+            &msg,
+            message.data + i * sizeof(uart::TurretAimData),
+            sizeof(uart::TurretAimData));
 
-        memcpy(&aimData.pitch, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
-
-        if (aimData.yaw == 0 && aimData.pitch == 0)
-        {
-            aimDataUpdated[i] = false;
-        }
-        else
-        {
-            aimDataUpdated[i] = true;
-        }
-
-        memcpy(&aimData.distance, &message.data[curreIndex], sizeof(float));
-        curreIndex += sizeof(float);
-
-        memcpy(&aimData.robotId, &message.data[curreIndex], sizeof(aimData.robotId));
-        curreIndex += sizeof(aimData.robotId);
+        TurretAim& aimData = lastAimData[i];
+        aimData.yaw = msg.yaw;
+        aimData.pitch = msg.pitch;
+        aimData.distance = msg.distance;
+        aimData.robotId =
+            static_cast<tap::communication::serial::RefSerialData::RobotId>(msg.robot_id);
+        aimData.maxErrorYaw = 0.0f;
+        aimData.maxErrorPitch = 0.0f;
+        aimDataUpdated[i] = !(aimData.yaw == 0.0f && aimData.pitch == 0.0f);
 
         if (aimData.distance != 0)
         {
@@ -141,9 +133,10 @@ bool VisionComms::decodeToTurretAimData(const ReceivedSerialMessage& message)
 #ifdef TARGET_SENTRY
                 aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance);
                 aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance);
-#endif
+#else
                 aimData.maxErrorYaw = atan((dims.width / 2) / aimData.distance) * 1.5;
                 aimData.maxErrorPitch = atan((dims.height / 2) / aimData.distance) * 1.5;
+#endif
             }
         }
     }
@@ -157,14 +150,14 @@ bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
         return false;
     }
 
-    if (sizeof(OdometryData) > message.header.dataLength)
+    if (sizeof(uart::OdometryData) > message.header.dataLength)
     {
         return false;
     }
 
-    OdometryData cleanData;
+    uart::OdometryData cleanData;
 
-    std::memcpy(&cleanData, message.data, sizeof(OdometryData));
+    std::memcpy(&cleanData, message.data, sizeof(uart::OdometryData));
 
     // chassisOdometry->setGlobalPosition({cleanData.chassis_data.pos_x,
     // cleanData.chassis_data.pos_y});
@@ -179,16 +172,22 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
         return false;
     }
 
-    if (sizeof(CubicBezier::CurveData) > message.header.dataLength)
+    if (sizeof(uart::AutopathData) > message.header.dataLength)
     {
         return false;
     }
 
-    CubicBezier::CurveData wireData;
+    uart::AutopathData msg;
+    std::memcpy(&msg, message.data, sizeof(uart::AutopathData));
 
-    std::memcpy(&wireData, message.data, sizeof(CubicBezier::CurveData));
-
-    CubicBezier* newCurve = new CubicBezier(wireData);
+    // done this way to decouple the uart protocol from application struct
+    CubicBezier::CurveData data = {
+        .start = {msg.start[0], msg.start[1]},
+        .end = {msg.end[0], msg.end[1]},
+        .startControl = {msg.start_control[0], msg.start_control[1]},
+        .endControl = {msg.end_control[0], msg.end_control[1]},
+        .length = msg.length};
+    CubicBezier* newCurve = new CubicBezier(data);
 
     chassisAutoDrive->resetPath();
     chassisAutoDrive->setCurve(newCurve);
@@ -203,21 +202,21 @@ bool VisionComms::decodeToVisionAprilTagLocalization(const ReceivedSerialMessage
         return false;
     }
 
-    if (sizeof(VisionComms::AprilTagLocalizationData) > message.header.dataLength)
+    if (sizeof(uart::AprilTagLocalizationData) > message.header.dataLength)
     {
         return false;
     }
 
-    VisionComms::AprilTagLocalizationData localizationData;
-    std::memcpy(&localizationData, message.data, sizeof(VisionComms::AprilTagLocalizationData));
+    uart::AprilTagLocalizationData localizationData;
+    std::memcpy(&localizationData, message.data, sizeof(uart::AprilTagLocalizationData));
     uint32_t currentTime = tap::arch::clock::getTimeMicroseconds();
 
     latency = currentTime - localizationData.timestamp;
 
     chassisOdometry->updateOdometryWithVisionData(
         localizationData.timestamp,
-        localizationData.posX,
-        localizationData.posY,
+        localizationData.pos_x,
+        localizationData.pos_y,
         localizationData.heading);
 
     return true;
@@ -306,7 +305,7 @@ void VisionComms::sendMessage()
 void VisionComms::sendCvRestartMessage()
 {
     DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
-    robotTypeMessage.messageType = MessageType::RESTART_DETECTOR;
+    robotTypeMessage.messageType = static_cast<uint16_t>(uart::Message::RESTART_DETECTOR);
     robotTypeMessage.setCRC16();
     drivers->uart.write(
         VISION_COMMS_TX_UART_PORT,
@@ -316,9 +315,12 @@ void VisionComms::sendCvRestartMessage()
 
 void VisionComms::sendRobotIdMessage()
 {
-    DJISerial::SerialMessage<sizeof(uint8_t)> robotTypeMessage;
-    robotTypeMessage.messageType = MessageType::ROBOT_ID;
-    robotTypeMessage.data[0] = static_cast<uint8_t>(drivers->refSerial.getRobotData().robotId);
+    DJISerial::SerialMessage<sizeof(uart::RobotIdData)> robotTypeMessage;
+    robotTypeMessage.messageType = static_cast<uint16_t>(uart::Message::ROBOT_ID);
+
+    auto msg = reinterpret_cast<uart::RobotIdData*>(robotTypeMessage.data);
+    msg->robot_id = static_cast<uint8_t>(drivers->refSerial.getRobotData().robotId);
+
     robotTypeMessage.setCRC16();
     drivers->uart.write(
         VISION_COMMS_TX_UART_PORT,
@@ -333,11 +335,11 @@ void VisionComms::sendRobotOdometry()
         assert(chassisOdometry != nullptr);
         assert(pitchMotor != nullptr);
 
-        DJISerial::SerialMessage<sizeof(OdometryData)> odometryMessage;
+        DJISerial::SerialMessage<sizeof(uart::OdometryData)> odometryMessage;
 
-        odometryMessage.messageType = MessageType::ODOMETRY;
+        odometryMessage.messageType = static_cast<uint16_t>(uart::Message::ODOMETRY);
 
-        OdometryData* data = reinterpret_cast<OdometryData*>(odometryMessage.data);
+        uart::OdometryData* data = reinterpret_cast<uart::OdometryData*>(odometryMessage.data);
 
         modm::Vector2f global_pos = chassisOdometry->getPositionGlobal();
         modm::Vector2f global_vel = chassisOdometry->getVelocityGlobalVision();
@@ -375,13 +377,11 @@ void VisionComms::sendHealthData()
 {
     if (sendHealthMsgTimeout.execute())
     {
-        DJISerial::SerialMessage<sizeof(uint16_t)> message;
+        DJISerial::SerialMessage<sizeof(uart::HealthData)> message;
+        message.messageType = static_cast<uint16_t>(uart::Message::HEALTH);
 
-        message.messageType = MessageType::HEALTH;
-
-        // save into the message
-        uint16_t hp = static_cast<uint16_t>(drivers->refSerial.getRobotData().currentHp);
-        std::memcpy(&message.data[0], &hp, sizeof(hp));
+        auto msg = reinterpret_cast<uart::HealthData*>(message.data);
+        msg->health = static_cast<uint16_t>(drivers->refSerial.getRobotData().currentHp);
 
         message.setCRC16();
         drivers->uart.write(
