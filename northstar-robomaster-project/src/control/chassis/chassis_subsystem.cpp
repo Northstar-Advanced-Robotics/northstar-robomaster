@@ -300,6 +300,8 @@ void ChassisSubsystem::driveBasedOnHeading(
 }
 
 modm::Vector2f debugGlobalPose;
+modm::Vector2f debugGlobalvelocity;
+modm::Vector2f debugLocalvelocity;
 
 void ChassisSubsystem::refresh()
 {
@@ -325,5 +327,7 @@ void ChassisSubsystem::refresh()
             motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
     }
     debugGlobalPose = chassisOdometry->getPositionGlobal();
+    debugGlobalvelocity = chassisOdometry->getVelocityGlobal();
+    debugLocalvelocity = chassisOdometry->getVelocityLocal();
 }
 }  // namespace src::chassis
