@@ -1,5 +1,4 @@
-[![pipeline status](https://gitlab.com/aruw/controls/NorthStarFleet2025/badges/develop/pipeline.svg)](https://gitlab.com/aruw/controls/NorthStarFleet2025/-/commits/develop)
-
+Follow the [Northstar specific setup](https://github.com/Northstar-Advanced-Robotics/resources) for controls before going further.
 
 ## Resources
 
@@ -10,62 +9,6 @@
 - The [generated API documentation for Taproot](https://aruw.gitlab.io/controls/taproot/)
 - The [modm website](https://modm.io/) and associated documentation
 
-## New user guide
-
-### Setting up a development environment
-
-If you want the easiest setup experience and **_do not_ require deploying code to hardware**,
-consider developing within the provided [Docker container](https://gitlab.com/aruw/controls/taproot/-/wikis/Docker-Container-Setup).
-
-Otherwise, follow the guide appropriate for your operating system.
-- Linux
-  - Debian: https://gitlab.com/aruw/controls/taproot/-/wikis/Debian-Linux-Setup
-  - Fedora: https://gitlab.com/aruw/controls/taproot/-/wikis/Fedora-Linux-Setup
-  - Other: follow one of the above guides, substituting your distribution's package names in place
-    of Debian or Fedora packages.
-- macOS: https://gitlab.com/aruw/controls/taproot/-/wikis/macOS-Setup
-- Windows: https://gitlab.com/aruw/controls/taproot/-/wikis/Windows-Setup
-
-Finally, install `pipenv` and set up the build tools:
-
-```
-pip3 install pipenv
-cd northstar-robomaster-project/
-pipenv install
-```
-
-### Getting started with this repo
-
-_Make sure you have followed the above setup instructions._
-
-Run the following to clone this repository:
-
-```
-git clone --recursive https://github.com/GOFIRST-Robotics/RoboMaster2025NorthStar.git
-```
-
-If you use the Docker container, or have already cloned the repository yourself, you should instead
-run:
-
-```
-git submodule update --init --recursive
-```
-
-Now, `cd` into the project directory (whatever folder name you created to store the project), activate the virtualenv, and run some builds:
-
-```
-cd project-directory/northstar-robomaster-project
-pipenv shell
-# Build for hardware
-scons build
-# Run automated tests
-scons run-tests
-```
-
-### Returning to the development environment
-
-**You will need to run `pipenv shell` from this directory _every time_ you open a new terminal,
-before using `scons` or `lbuild`.**
 
 ## Workflow guide
 
@@ -80,7 +23,7 @@ for getting around VSCode. There are many shortcuts that make programming faster
 _If you would like to use the terminal instead, see the section "Building and running via the
 terminal" below._
 
-1. Make sure you have VSCode opened in the folder `NorthStarFleet2025` (**not
+1. Make sure you have VSCode opened in the folder `northstar-robomaster` (**not
    `northstar-robomaster-project`**)
 2. Connect an ST-Link to the RoboMaster Development Board and your computer.
 3. In VSCode, open the Command Palette (<kbd>Ctrl</kbd>+<kbd>shift</kbd>+<kbd>P</kbd>)
@@ -92,7 +35,7 @@ terminal" below._
 
 ### Debugging with an ST-Link
 
-1. Open the folder `aruw-northstar-robomaster-project` in VSCode. Hit the debug tab on the left side or type
+1. Open the folder `northstar-robomaster-project` in VSCode. Hit the debug tab on the left side or type
    <kbd>Ctrl</kbd>+<kbd>shift</kbd>+<kbd>D</kbd>.
 2. Hit the green play arrow on the left top of the screen.
 3. See [this
