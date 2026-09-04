@@ -4,6 +4,7 @@ ARG DEBIAN_FRONTEND=noninteractive
 RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 python3-pip python3.11-venv \
     build-essential git wget xz-utils ca-certificates sudo openssh-client \
+    doxygen graphviz \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH="$(uname -m)" \
@@ -20,7 +21,8 @@ RUN ARCH="$(uname -m)" \
     
 ENV PATH="/opt/gcc-arm/bin:${PATH}"
 
-RUN pip3 install --no-cache-dir pipenv clang-format==18.1.8
+RUN pip3 install --no-cache-dir pipenv clang-format==18.1.8 \
+    sphinx breathe exhale sphinx-rtd-theme
 
 RUN git config --system core.autocrlf false \
     && git config --system core.eol lf \
