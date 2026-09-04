@@ -17,3 +17,6 @@ docs/doxyoutput
 .sconsign
 docs/generated/
 docs/doxygen-awesome-css/
+docs/_build/
+docs/doxyoutput/
+docs/api/

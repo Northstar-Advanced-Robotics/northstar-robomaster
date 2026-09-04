@@ -30,4 +30,8 @@ RUN git config --system core.autocrlf false \
 
 RUN useradd -m -s /bin/bash vscode \
     && echo "vscode ALL=(ALL) NOPASSWD:ALL" > /etc/sudoers.d/vscode
+
+ENV LANG=C.UTF-8
+ENV LC_ALL=C.UTF-8
+
 USER vscode
