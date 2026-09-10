@@ -26,7 +26,7 @@ void ChassisFieldCommand::execute()
         operatorInterface->getDrivetrainHorizontalTranslation());
     chassis->setVelocityFieldDrive(
         normInput.first,
-        -normInput.second,
+        normInput.second,
         operatorInterface->getDrivetrainRotationalTranslation());
 }
 

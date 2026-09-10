@@ -41,7 +41,7 @@ void ChassisOrientDriveCommand::execute()
     modm::Pair<float, float> normInput = src::chassis::getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
-    chassis->setVelocityTurretDrive(normInput.first, -normInput.second, rotationalValue);
+    chassis->setVelocityTurretDrive(normInput.first, normInput.second, rotationalValue);
 }
 
 void ChassisOrientDriveCommand::end([[maybe_unused]] bool interrupted)

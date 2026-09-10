@@ -123,7 +123,8 @@ void setDefaultTestCommands(src::testbed::Drivers *drivers)
 
 void startTestCommands(src::testbed::Drivers *drivers)
 {
-    drivers->bmi088.setMountingTransform(tap::algorithms::transforms::Transform(0, 0, 0, 0, 0, 0));
+    drivers->bmi088.setMountingTransform(
+        tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 
 void registerTestIoMappings(src::testbed::Drivers *drivers)
@@ -139,15 +140,14 @@ void registerTestIoMappings(src::testbed::Drivers *drivers)
     // leftSwitchUpRunFlywheel
 #endif
 #ifdef USING_FLYWHEEL
-    drivers->commandMapper.addMap(&fPressed);
+    // fPressedRunFlywheel
 #endif
 #ifdef USING_TURRET
-    drivers->commandMapper.addMap(&xPressed);
-    drivers->commandMapper.addMap(&turretTestCommandMapping);
+    // xPressedCvControl
+    // leftSwitchDownTurretTest
 #endif  // USING_TURRET
-    // drivers->commandMapper.addMap(&ctrlCPressed);
 #ifdef USING_CHASSIS
-    drivers->commandMapper.addMap(&bPressed);
+    // bPressedBeyblade
 #endif
 }
 }  // namespace testbed_control

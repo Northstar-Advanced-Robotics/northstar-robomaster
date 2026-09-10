@@ -1,3 +1,5 @@
+#ifdef USING_FLYWHEEL
+
 #ifndef USING_FLYWHEEL_HPP_
 #define USING_FLYWHEEL_HPP_
 
@@ -6,7 +8,6 @@
 using namespace tap::control;
 using namespace src::control::flywheel;
 
-#ifdef USING_FLYWHEEL
 FlywheelSubsystem flywheel(
     drivers(),
     LEFT_MOTOR_ID,
@@ -25,10 +26,9 @@ FlywheelSubsystem flywheel(
 FlywheelRunCommand flywheelRunCommand(&flywheel);
 
 // flywheel mappings
-ToggleCommandMapping fPressed(
-    drivers(),
-    {&flywheelRunCommand},
-    RemoteMapState(RemoteMapState({tap::communication::serial::Remote::Key::F})));
+Trigger fPressedRunFlywheel =
+    TriggerHelpers::button(drivers(), tap::communication::serial::Remote::Key::F)
+        .toggleOnTrue(&flywheelRunCommand);
 #endif
 
 #endif  // USING_FLYWHEEL_HPP_

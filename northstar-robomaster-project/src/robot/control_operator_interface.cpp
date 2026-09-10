@@ -42,7 +42,7 @@ float ControlOperatorInterface::getTurretYawInput()
 {
     float input;
 
-    input = drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL) * REMOTE_TURRET_SCALAR +
+    input = -drivers->remote.getChannel(Remote::Channel::RIGHT_HORIZONTAL) * REMOTE_TURRET_SCALAR +
             static_cast<float>(limitVal<int16_t>(
                 drivers->remote.getMouseX(),
                 -USER_MOUSE_YAW_MAX,
@@ -72,7 +72,9 @@ float ControlOperatorInterface::getTurretPitchInput()
     return 0;
 }
 
-// Returns a MPS scaled by max chassis speed per the power limit
+/** 
+ * Returns a MPS scaled by max chassis speed per the power limit
+ */
 float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
@@ -86,7 +88,7 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     if (prevUpdateCounterY != updateCounter)
     {
         chassisYInput.update(
-            drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
+            -drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
             currTime);
         prevUpdateCounterY = updateCounter;
     }
@@ -96,24 +98,24 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     if (drivers->remote.keyPressed(Remote::Key::A) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output = -CHASSIS_WALK_SPEED_MPS;
+        output = CHASSIS_WALK_SPEED_MPS;
     }
     else if (
         drivers->remote.keyPressed(Remote::Key::A) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output = -maxWheelSpeedMPS;
+        output = maxWheelSpeedMPS;
     }
     if (drivers->remote.keyPressed(Remote::Key::D) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output += CHASSIS_WALK_SPEED_MPS;
+        output -= CHASSIS_WALK_SPEED_MPS;
     }
     else if (
         drivers->remote.keyPressed(Remote::Key::D) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output += maxWheelSpeedMPS;
+        output -= maxWheelSpeedMPS;
     }
 
     output = limitVal<float>(
@@ -124,7 +126,9 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     return output;
 }
 
-// Returns a MPS scaled by max chassis speed per the power limit
+/** 
+ * Returns a MPS scaled by max chassis speed per the power limit
+ */
 float ControlOperatorInterface::getDrivetrainVerticalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
@@ -182,22 +186,22 @@ float ControlOperatorInterface::getDrivetrainRotationalTranslation()
     // if (drivers->remote.keyPressed(Remote::Key::Q) &&
     // !drivers->remote.keyPressed(Remote::Key::SHIFT))
     // {
-    //     return -0.3f;
+    //     return 0.3f;
     // }
     // else if (drivers->remote.keyPressed(Remote::Key::Q) &&
     // drivers->remote.keyPressed(Remote::Key::SHIFT))
     // {
-    //     return -0.6f;
+    //     return 0.6f;
     // }
     // else if (drivers->remote.keyPressed(Remote::Key::E) &&
     // !drivers->remote.keyPressed(Remote::Key::SHIFT))
     // {
-    //     return 0.3f;
+    //     return -0.3f;
     // }
     // else if (drivers->remote.keyPressed(Remote::Key::E) &&
     // drivers->remote.keyPressed(Remote::Key::SHIFT))
     // {
-    //     return 0.6f;
+    //     return -0.6f;
     // }
     // else
     // {

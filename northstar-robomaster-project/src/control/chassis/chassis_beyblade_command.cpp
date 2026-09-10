@@ -56,7 +56,7 @@ void ChassisBeybladeCommand::execute()
     {
         chassis->isBeybladingOnly = false;
     }
-    chassis->setVelocityTurretDrive(verticalSpeed, -horizontalSpeed, calcedRot);
+    chassis->setVelocityTurretDrive(verticalSpeed, horizontalSpeed, calcedRot);
 }
 
 void ChassisBeybladeCommand::end([[maybe_unused]] bool interrupted)

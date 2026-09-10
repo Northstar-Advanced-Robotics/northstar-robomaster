@@ -1,3 +1,5 @@
+#if defined(USING_TURRET) && !defined(USING_REV)
+
 #ifndef USING_TURRET_HPP_
 #define USING_TURRET_HPP_
 
@@ -7,7 +9,6 @@ using namespace tap::control;
 using namespace src::control::turret;
 using namespace tap::motor;
 
-#if defined(USING_TURRET) && !defined(USING_REV)
 
 // turret subsystem
 tap::motor::DjiMotor pitchMotor(
@@ -131,17 +132,15 @@ test::TurretTestCommand turretTestCommand(
 //     USER_YAW_INPUT_SCALAR,
 //     USER_PITCH_INPUT_SCALAR);
 
-HoldCommandMapping xPressed(
-    drivers(),
-    {&turretCVControlCommand},
-    RemoteMapState(RemoteMapState({tap::communication::serial::Remote::Key::X})));
+Trigger xPressedCvControl =
+    TriggerHelpers::button(drivers(), tap::communication::serial::Remote::Key::X)
+        .whileTrue(&turretCVControlCommand);
 
-PressCommandMapping turretTestCommandMapping(
-    drivers(),
-    {&turretTestCommand},
-    RemoteMapState(RemoteMapState(
-        {tap::communication::serial::Remote::Switch::LEFT_SWITCH,
-         tap::communication::serial::Remote::SwitchState::DOWN})));
+Trigger leftSwitchDownTurretTest = TriggerHelpers::switchState(
+                                       drivers(),
+                                       tap::communication::serial::Remote::Switch::LEFT_SWITCH,
+                                       tap::communication::serial::Remote::SwitchState::DOWN)
+                                       .onTrue(&turretTestCommand);
 
 #endif
 

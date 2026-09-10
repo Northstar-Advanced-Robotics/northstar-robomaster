@@ -18,7 +18,7 @@
 import os
 from os.path import abspath, join
 
-from build_tools import parse_args
+from build_tools import extract_remote_type, parse_args
 from SCons.Script import *
 
 # Define project settings and build paths
@@ -35,10 +35,34 @@ args = parse_args.parse_args()
 
 # Define a new SCons environment and set up basic build variables
 env = DefaultEnvironment(ENV=os.environ)
-env["CONFIG_BUILD_BASE"] = abspath(join(BUILD_PATH, args["TARGET_ENV"]))
+
+# Every argument that changes compile flags has to be part of the build path. If it isn't,
+# two different flag sets share one set of object files, and switching between them forces a
+# full rebuild each way instead of just switching directories.
+#
+# "profiling" adds -DRUN_WITH_PROFILING to the *global* environment (see taproot/SConscript),
+# so it affects taproot and modm as well as src -- it has to split the tree at the very top,
+# above the shared libtaproot.a. The default (false) keeps the historical path so existing
+# launch configs and scripts are unaffected.
+build_env_dir = args["TARGET_ENV"]
+if args["PROFILING"] == "true":
+    build_env_dir += "-profiling"
+
+env["CONFIG_BUILD_BASE"] = abspath(join(BUILD_PATH, build_env_dir))
 env["CONFIG_PROJECT_NAME"] = PROJECT_NAME
 env["CONFIG_ARTIFACT_PATH"] = join(env["CONFIG_BUILD_BASE"], "artifact")
 env["CONFIG_PROFILE"] = args["BUILD_PROFILE"]
+
+# Speed up incremental builds, especially when switching between robot types (each robot
+# already gets its own object directory, so switching back to a robot you have built before
+# should do no work at all -- these options make SCons cheaper at *proving* that).
+#   Decider: only re-hash a file's contents when its timestamp changed, instead of hashing
+#            every source file on every build.
+#   implicit_cache: reuse the cached #include scan results instead of re-scanning every header.
+#   max_drift: after 1 second, treat a file's content signature as stable enough to cache.
+env.Decider("MD5-timestamp")
+SetOption("implicit_cache", 1)
+SetOption("max_drift", 1)
 
 
 env.AppendUnique(
@@ -72,10 +96,17 @@ if args["TARGET_ENV"] == "tests":
 
 # Now we can add the src and test.
 # We modify the "BUILDPATH" environment variable to have the code for each robot have its own directory.
+#
+# "remote" only adds a -D to src (see src/SConscript), not to taproot, so splitting the
+# per-robot object directory is enough. The default remote keeps the historical path.
+robot_build_dir = args["ROBOT_TYPE"]
+if args["REMOTE_TYPE"] != extract_remote_type.DEFAULT_REMOTE:
+    robot_build_dir += "-" + args["REMOTE_TYPE"]
+
 env["BUILDPATH"] = join(
     env["CONFIG_BUILD_BASE"],
     "scons-" + ARGUMENTS.get("profile", "release"),
-    args["ROBOT_TYPE"],
+    robot_build_dir,
 )
 env.SConscript(dirs=[SRC_PATH, TEST_PATH], exports=["env", "args", "sources"])
 env.Append(
