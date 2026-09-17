@@ -104,8 +104,10 @@ private:
     governor::CvOnTargetGovernor &cvOnTargetGovernor;
 #ifdef TARGET_SENTRY
     LaunchMode launchMode = LIMITED_10HZ;
-#else
+#elif TARGET_STANDARD
     LaunchMode launchMode = LIMITED_20HZ;
+#else
+    LaunchMode launchMode = SINGLE;
 #endif
     std::optional<ConstantVelocityAgitatorCommand *> command;
 
