@@ -95,7 +95,7 @@ static constexpr float STATIC_FRICTION_FF_VELOCITY_DEADZONE = 0.05f;  // rad/s
 static constexpr float STATIC_FRICTION_FF_ERROR_DEADZONE = 0.01f;     // rad
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 20.0f,
+    .kp = 18.0f,
     .ki = 0.0f,
     .kd = 0.05f,
     .maxICumulative = 0.0f,
@@ -123,7 +123,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
 // };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 1100.0f,
+    .kp = 950.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1000.0f,

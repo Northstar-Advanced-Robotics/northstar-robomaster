@@ -105,7 +105,7 @@ private:
 #ifdef TARGET_SENTRY
     LaunchMode launchMode = LIMITED_10HZ;
 #else
-    LaunchMode launchMode = SINGLE;
+    LaunchMode launchMode = LIMITED_20HZ;
 #endif
     std::optional<ConstantVelocityAgitatorCommand *> command;
 
