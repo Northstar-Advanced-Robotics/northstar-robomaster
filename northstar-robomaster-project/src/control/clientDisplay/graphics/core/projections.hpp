@@ -16,9 +16,10 @@ namespace src::control::client_display::graphics
  * `robotSpace -> pivotSpace -> vtmSpace -> screenSpace`, with `barrelSpace` as a side branch used
  * when reasoning about where a shot leaves the barrel rather than where the camera is.
  *
- * Every space is right-handed with **+X right, +Y forward, +Z up**, matching `ChassisOdometry`
- * rather than `ChassisSubsystem`. All offsets are in meters and are robot-specific, selected below
- * by build target.
+ * Every space is right-handed with **+X right, +Y forward, +Z up**. This is **not** the chassis
+ * frame (+X forward, +Y left) that `ChassisSubsystem` and `ChassisOdometry` share, so anything taken
+ * from them must be converted before entering these transforms. All offsets are in meters and are
+ * robot-specific, selected below by build target.
  *
  * Used by `LaneAssistLines` and `PeekingLines`.
  */

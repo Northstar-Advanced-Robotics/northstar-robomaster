@@ -45,15 +45,20 @@ Input reaches commands through ``ControlOperatorInterface``, never from the remo
 Coordinate frames
 -----------------
 
-Two right-handed frames are in use, rotated 90 degrees from each other. Mixing them up is the
-easiest way to introduce a sign bug:
+``ChassisSubsystem`` and ``ChassisOdometry`` share one right-handed frame: **+X forward, +Y left**,
+headings counterclockwise positive. Odometry output can be handed to the chassis unchanged --
+``StateMachineSubsystem`` calls ``setVelocityFieldDrive(vel.x, vel.y, rot)`` with no axis swap.
 
-- ``ChassisSubsystem`` -- the canonical frame. **+X forward, +Y left**, +rotation counterclockwise.
-- ``ChassisOdometry`` -- **+X right, +Y forward**, +rotation counterclockwise.
+One exception is the easiest way to introduce a sign bug: the ``rotational`` argument of the chassis
+drive methods is **clockwise** positive, even though headings, ``getChassisYaw()`` and the measured
+``getChassisRotationSpeed()`` are counterclockwise positive. Negate a counterclockwise quantity
+before passing it in as ``rotational``.
 
-Anything crossing between them must be converted; ``StateMachineSubsystem`` does this as
-``setVelocityFieldDrive(vel.y, -vel.x, rot)``. Angles are radians unless a comment says otherwise,
-and wheel speeds are motor-shaft RPM, not wheel RPM.
+The HUD's ``Projections`` space is separate again (+X right, +Y forward, +Z up) and must be
+converted into.
+
+Angles are radians unless a comment says otherwise, and wheel speeds are motor-shaft RPM, not wheel
+RPM.
 
 Where to start reading
 ----------------------

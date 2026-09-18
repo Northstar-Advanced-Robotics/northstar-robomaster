@@ -60,10 +60,18 @@ struct ChassisConfig
  *
  * - **+X is forward**
  * - **+Y is left**
- * - **+rotation is counterclockwise** seen from above
+ * - **+heading is counterclockwise** seen from above
  *
- * Beware that `ChassisOdometry` reports in a *different* right-handed frame (+X right, +Y forward),
- * so values crossing between the two must be converted. See `ChassisOdometry` for the mapping.
+ * `ChassisOdometry` reports in this same frame, so its positions and velocities can be passed to
+ * the drive methods as-is, with no axis swap.
+ *
+ * @warning **The `rotational` argument of the drive methods is clockwise positive**, the opposite
+ *      of the heading convention above. A positive value commands all four motors positive; the
+ *      right-side motors are mirrored, so this pushes the left side forward and the right side
+ *      back -- a clockwise pivot. Headings, `getChassisYaw`, `getDifferenceToTargetAngle`, and
+ *      the *measured* `getChassisRotationSpeed` are all counterclockwise positive, so a
+ *      counterclockwise quantity must be negated before it is passed in as `rotational`. `ChassisOrientDriveCommand` gets
+ *      this right by feeding in `getChassisZeroTurret()`, which is already the clockwise error.
  *
  * Translation is never interpreted in this frame directly -- every drive method takes a heading and
  * rotates the request into it, which is what makes turret-relative and field-relative driving the
@@ -120,8 +128,8 @@ public:
      *
      * @param[in] forward Desired velocity along the turret's forward axis, in m/s.
      * @param[in] sideways Desired velocity to the turret's left, in m/s.
-     * @param[in] rotational Desired rotational velocity, in radians/second, counterclockwise
-     *      positive.
+     * @param[in] rotational Desired rotational velocity, in radians/second, **clockwise**
+     *      positive. See the class-level warning.
      */
     mockable void setVelocityTurretDrive(float forward, float sideways, float rotational);
 
@@ -130,12 +138,17 @@ public:
      *
      * "Forward" is a fixed direction down the field regardless of how the chassis or turret are
      * oriented, which keeps driving intuitive when the operator loses track of the robot's facing.
-     * The field direction is the chassis IMU's yaw origin, fixed at calibration.
+     * The field direction is the chassis IMU's yaw origin, fixed at calibration. Implemented by
+     * passing `-getChassisYaw()` as the heading, which rotates the field-frame request back into
+     * the chassis frame.
+     *
+     * Takes the same frame `ChassisOdometry` reports in, so odometry-derived velocities can be
+     * passed straight through.
      *
      * @param[in] forward Desired velocity along the field's forward axis, in m/s.
      * @param[in] sideways Desired velocity to the field's left, in m/s.
-     * @param[in] rotational Desired rotational velocity, in radians/second, counterclockwise
-     *      positive.
+     * @param[in] rotational Desired rotational velocity, in radians/second, **clockwise**
+     *      positive. See the class-level warning.
      */
     mockable void setVelocityFieldDrive(float forward, float sideways, float rotational);
 
@@ -148,7 +161,7 @@ public:
      *
      * @param[in] forwards Desired forward velocity in the frame named by `heading`, in m/s.
      * @param[in] sideways Desired leftward velocity in the frame named by `heading`, in m/s.
-     * @param[in] rotational Desired rotational velocity, in radians/second, counterclockwise
+     * @param[in] rotational Desired rotational velocity, in radians/second, **clockwise**
      *      positive. Not affected by `heading`.
      * @param[in] heading The angle, in radians, that the translation request is expressed relative
      *      to: 0 means it is already in the chassis frame, and larger values rotate it
@@ -162,7 +175,9 @@ public:
      * Proportional on the angle error, derivative on the IMU's measured yaw rate. Errors under 3
      * degrees are treated as zero, so the chassis settles instead of hunting.
      *
-     * @param[in] angleOffset How far the chassis is from the target angle, in radians.
+     * @param[in] angleOffset How far the chassis is from the target angle, in radians. The output
+     *      follows this sign, so pass the **clockwise** error (as `getChassisZeroTurret` returns)
+     *      to get a value usable as `rotational`.
      * @return The rotational velocity to command, in radians/second, clamped to
      *      `CHASSIS_ROTATION_MAX_VEL`. Zero inside the deadzone.
      */
@@ -174,9 +189,17 @@ public:
      * Same shape as `chassisSpeedRotationPID` but tuned harder and with no deadzone, and it takes
      * its derivative from the wheel-derived rotation speed rather than the IMU.
      *
-     * @param[in] angleOffset How far the chassis is from the target angle, in radians.
-     * @return The rotational velocity to command, in radians/second, clamped to
-     *      `CHASSIS_ROTATION_MAX_VEL`.
+     * @warning The derivative term is `-getChassisRotationSpeed()`, which is counterclockwise
+     *      positive, so this controller is only consistent when `angleOffset` is the
+     *      **counterclockwise** error -- and its output is then counterclockwise positive, the
+     *      opposite of what `rotational` expects. Negate the whole output (not just the input,
+     *      which would flip P but not D) before driving with it. `ChassisAutoDrive` currently does
+     *      not; see its `calculateRotationToFacePoint`.
+     *
+     * @param[in] angleOffset How far the chassis is from the target angle, in radians,
+     *      counterclockwise positive.
+     * @return The rotational velocity to command, in radians/second, counterclockwise positive,
+     *      clamped to `CHASSIS_ROTATION_MAX_VEL`.
      */
     float chassisSpeedRotationAutoDrivePID(float angleOffset);
 
@@ -190,8 +213,8 @@ public:
      *      from the ramped setpoints when no odometry is attached) rather than from this argument,
      *      so passing a different value here changes nothing.
      * @param[in] sideways Ignored, as above.
-     * @return The largest rotational velocity the chassis can still produce, in radians/second.
-     *      Never negative.
+     * @return The largest rotational speed the chassis can still produce, in radians/second.
+     *      A magnitude: never negative, and valid in either direction.
      */
     float calculateMaxRotationSpeed(float forward, float sideways);
 
@@ -204,8 +227,10 @@ public:
 
     /**
      * @return The angle from the chassis' forward axis to the turret's, in radians, wrapped to
-     *      (-pi, pi]. Zero when the turret points straight ahead. Used to square the chassis up
-     *      with the turret.
+     *      (-pi, pi], measured **clockwise** (it is the negated turret yaw). Zero when the turret
+     *      points straight ahead. Because it is clockwise, it can be fed through
+     *      `chassisSpeedRotationPID` and passed as `rotational` directly, which is how
+     *      `ChassisOrientDriveCommand` squares the chassis up with the turret.
      */
     float getChassisZeroTurret();
 

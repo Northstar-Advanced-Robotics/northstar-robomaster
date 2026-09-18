@@ -30,17 +30,15 @@ namespace src::chassis
  * vision computer's AprilTag localization are folded in as an offset rather than by overwriting
  * the pose; see `updateOdometryWithVisionData`.
  *
- * All poses use the 2D convention documented at the top of this file: +X right, +Y forward,
+ * All poses use the 2D convention documented at the top of this file: +X forward, +Y left,
  * positive rotation counterclockwise.
  *
- * @warning This is **not** the frame `ChassisSubsystem` uses. That class is the canonical one and
- *      is +X forward, +Y left; both are right-handed, but rotated 90 degrees apart. Anything
- *      crossing between them must be converted -- see `state_machine_subsystem.cpp`, which feeds
- *      auto-drive output to the chassis as `setVelocityFieldDrive(vel.y, -vel.x, rot)`.
- *
- * @todo Migrate this class to the `ChassisSubsystem` frame so the codebase has a single convention
- *      and these conversions can go away. Until then, treat the swap above as required at every
- *      boundary.
+ * @note This is the same frame `ChassisSubsystem` uses, as of the coordinate frame refactor.
+ *      Velocities and positions pass between the two classes unchanged -- see
+ *      `state_machine_subsystem.cpp`, which hands auto-drive output straight to
+ *      `setVelocityFieldDrive(vel.x, vel.y, rot)` with no axis swap. Older code that swapped or
+ *      negated axes at this boundary was correcting for a frame mismatch that no longer exists,
+ *      and is now a bug.
  */
 class ChassisOdometry
 {
@@ -69,20 +67,27 @@ class ChassisOdometry
 
     /// Velocity in the field frame, in meters/second.
     modm::Vector<float, 2> velocityGlobal;
+    /// Velocity in the chassis' own frame, in meters/second, straight out of the wheel kinematics.
     modm::Vector<float, 2> velocityLocal;
     /// `velocityLocal` after low-pass filtering with `VELOCITY_SMOOTHING_ALPHA`.
+    /// @warning Never written. `updateOdometry` does not assign it and `vectorLowPassFilter` is
+    ///      never called, so this stays zero for the lifetime of the object.
     modm::Vector<float, 2> velocitySmoothedLocal;
     /// Field-frame velocity lifted into three dimensions using the IMU's full orientation, so that
     /// driving up a ramp is not reported as pure horizontal motion.
+    /// @warning Never written. `flatLocalVelTo3dGlobalVel` is never called, so this stays zero.
     modm::Vector<float, 3> velocity3dGlobal;
     /// Position extrapolated forward in time, used to lead a moving target.
+    /// @warning Never written. The extrapolation was never implemented; this stays zero.
     modm::Vector<float, 2> positionProjectedGlobal;
     /// Velocity extrapolated forward in time, paired with `positionProjectedGlobal`.
+    /// @warning Never written, as above.
     modm::Vector<float, 2> velocityProjectedGlobal;
 
     // radians
     /// Rotation in radians between the IMU's yaw reference and the field frame, set by the most
-    /// recent vision localization fix.
+    /// recent vision localization fix. This is the **only** channel through which vision corrects
+    /// heading; see `updateOdometryWithVisionData`.
     float globalImuRotationOffset;
 
     /// Timestamp of the previous update, in microseconds. Zero before the first update, which is
@@ -122,7 +127,8 @@ class ChassisOdometry
     int bufferIndex = 0;
 
     /// Correction added to the dead-reckoned pose to place it in the field frame, updated by
-    /// vision localization.
+    /// vision localization. Only `x` and `y` are used; `theta` is held at zero because heading is
+    /// corrected through `globalImuRotationOffset` instead.
     Pose global_offset;
     /// The dead-reckoned pose plus `global_offset`, i.e. the robot's best-estimate field pose.
     Pose finalPositionGlobal;
@@ -156,12 +162,17 @@ public:
     }
     /// @return Velocity in the field frame, in meters/second.
     modm::Vector<float, 2> getVelocityGlobal() { return velocityGlobal; }
+    /// @return Velocity in the chassis' own frame, in meters/second.
     modm::Vector<float, 2> getVelocityLocal() { return velocityLocal; }
     /// @return The field-frame position extrapolated forward in time, in meters.
+    /// @warning Always returns zero -- `positionProjectedGlobal` is never written. Do not build on
+    ///      this without implementing the extrapolation first.
     modm::Vector<float, 2> getPositionProjectedGlobal() { return positionProjectedGlobal; }
     /// @return The field-frame velocity extrapolated forward in time, in meters/second.
+    /// @warning Always returns zero, as above.
     modm::Vector<float, 2> getVelocityProjectedGlobal() { return velocityProjectedGlobal; }
     /// @return Field-frame velocity in three dimensions, in meters/second.
+    /// @warning Always returns zero -- `velocity3dGlobal` is never written.
     modm::Vector<float, 3> getVelocity3dGlobal() { return velocity3dGlobal; }
     /// @return The chassis' heading in the field frame, in radians, counterclockwise positive.
     float getRotation() { return finalPositionGlobal.theta; }
@@ -183,17 +194,27 @@ public:
     /**
      * Folds an absolute pose fix from the vision computer into the odometry.
      *
-     * The fix describes the robot as it was at `timestamp`, so the dead-reckoned pose from that
-     * instant is looked up in the history buffer and the difference is stored as `global_offset`.
+     * The fix describes the robot as it was at `timestamp`, so the odometry sample from that
+     * instant is looked up in the history buffer and the correction is computed against it.
      * Correcting by an offset rather than overwriting the pose means the correction does not
      * discard motion accumulated since the frame was captured, and does not make the pose jump
      * backwards.
      *
+     * Position and heading are corrected through two separate channels:
+     *
+     * - **Position** goes into `global_offset.x`/`.y`, added on top of the dead-reckoned pose.
+     * - **Heading** goes into `globalImuRotationOffset`, the rotation from the IMU's yaw origin to
+     *   the field frame. `calculateRobotHeading` applies it, so it also rotates every subsequent
+     *   velocity integrated into position. `global_offset.theta` is deliberately left at zero so
+     *   the heading correction is not applied twice.
+     *
      * @param[in] timestamp When the vision frame was captured, in microseconds on this board's
      *      clock.
-     * @param[in] posX The measured field-frame x position, in meters.
-     * @param[in] posY The measured field-frame y position, in meters.
-     * @param[in] heading The measured field-frame heading, in radians.
+     * @param[in] posX The measured field-frame x (forward) position, in meters.
+     * @param[in] posY The measured field-frame y (left) position, in meters.
+     * @param[in] heading The measured field-frame heading of the **turret** (the camera and the IMU
+     *      both ride on it), in radians, counterclockwise positive. Not the chassis heading:
+     *      `calculateRobotHeading` subtracts the turret's yaw to recover that.
      */
     void updateOdometryWithVisionData(uint32_t timestamp, float posX, float posY, float heading)
     {
@@ -207,6 +228,12 @@ public:
         global_offset.theta = 0;
     }
 
+    /**
+     * Finds the retained odometry sample closest in time to a given instant.
+     *
+     * @param[in] target_timestamp_us The instant of interest, in microseconds.
+     * @return The nearest sample, or the current pose if the buffer holds nothing closer.
+     */
     OdomMsg get_historical_data(uint32_t target_timestamp_us)
     {
         OdomMsg closest_entry;
@@ -308,12 +335,13 @@ public:
     /**
      * Rotates a vector from the chassis frame into the field frame.
      *
-     * The rotation applied is by **-`globalHeading`**, not +`globalHeading`, which follows from
-     * this class' heading being measured clockwise-positive in its own axis convention. Getting
-     * this sign wrong is the classic way to make odometry drift sideways while turning.
+     * A standard counterclockwise rotation by `+globalHeading`, matching the counterclockwise
+     * positive heading from `calculateRobotHeading`. Getting this sign wrong is the classic way to
+     * make odometry drift sideways while turning.
      *
-     * @param[in] local The vector in chassis-frame coordinates.
-     * @param[in] globalHeading The chassis' heading in the field frame, in radians.
+     * @param[in] local The vector in chassis-frame coordinates (+X forward, +Y left).
+     * @param[in] globalHeading The chassis' heading in the field frame, in radians,
+     *      counterclockwise positive.
      * @return The same vector in field-frame coordinates.
      */
     modm::Vector<float, 2> convertLocalToGlobal(
@@ -329,9 +357,11 @@ public:
     }
 
     /**
-     * @return The chassis' heading in radians. The IMU sits on the turret, so the turret's yaw
-     *      relative to the chassis is subtracted out, and the vision rotation offset is added to
-     *      place the result in the field frame.
+     * @return The chassis' heading in the field frame, in radians, counterclockwise positive. The
+     *      IMU sits on the turret, so the turret's yaw relative to the chassis is subtracted out,
+     *      and the vision rotation offset is added to place the result in the field frame. Before
+     *      the first vision fix the offset is zero and this matches
+     *      `ChassisSubsystem::getChassisYaw`.
      */
     float calculateRobotHeading()
     {
