@@ -87,10 +87,7 @@ inline float ChassisSubsystem::getTurretYaw()
     return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
 // Returns the angle the chassis is offset from the turret in radians.
-float ChassisSubsystem::getChassisZeroTurret()
-{
-    return modm::Angle::normalize(-getTurretYaw());
-}
+float ChassisSubsystem::getChassisZeroTurret() { return modm::Angle::normalize(-getTurretYaw()); }
 
 float ChassisSubsystem::getChassisRotationSpeed()
 {
@@ -134,7 +131,7 @@ void ChassisSubsystem::setVelocityTurretDrive(float forward, float sideways, flo
 
 void ChassisSubsystem::setVelocityFieldDrive(float forward, float sideways, float rotational)
 {
-    float robotHeading = getChassisYaw();
+    float robotHeading = -getChassisYaw();
     driveBasedOnHeading(forward, sideways, rotational, robotHeading);
 }
 
@@ -302,9 +299,14 @@ void ChassisSubsystem::driveBasedOnHeading(
     desiredOutput[RB] = RBSpeed * scale;
 }
 
+modm::Vector2f debugGlobalPose;
+modm::Vector2f debugGlobalvelocity;
+modm::Vector2f debugLocalvelocity;
+
 void ChassisSubsystem::refresh()
 {
-    auto runPid = [](Pid& pid, Motor& motor, float desiredOutput) {
+    auto runPid = [](Pid& pid, Motor& motor, float desiredOutput)
+    {
         pid.update(
             desiredOutput -
             motor.getEncoder()->getVelocity() * 60.0f / M_TWOPI / CHASSIS_GEAR_RATIO);
@@ -324,5 +326,8 @@ void ChassisSubsystem::refresh()
             motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
             motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
     }
+    debugGlobalPose = chassisOdometry->getPositionGlobal();
+    debugGlobalvelocity = chassisOdometry->getVelocityGlobal();
+    debugLocalvelocity = chassisOdometry->getVelocityLocal();
 }
 }  // namespace src::chassis

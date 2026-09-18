@@ -61,8 +61,8 @@
 // cv
 #include "control/agitator/multi_shot_cv_command_mapping.hpp"
 #include "control/governor/cv_on_target_governor.hpp"
-#include "control/turret/cv/turret_cv_targeting_toggle_command.hpp"
 #include "control/turret/cv/turret_cv_control_command.hpp"
+#include "control/turret/cv/turret_cv_targeting_toggle_command.hpp"
 
 // flywheel
 #include "control/flywheel/dji_two_flywheel_subsystem.hpp"
@@ -508,9 +508,8 @@ Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
           Remote::Switch::LEFT_SWITCH,
           Remote::SwitchState::MID)) &&
      Trigger(drivers(), []() { return imuCalibratingGovernor.isReady(); }) &&
-     Trigger(drivers(), []() {
-         return !matchRunningGovernor.isReady();
-     })).whileTrue(&chassisOrientDriveCommand);
+     Trigger(drivers(), []() { return !matchRunningGovernor.isReady(); }))
+        .whileTrue(&chassisOrientDriveCommand);
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 

@@ -9,9 +9,10 @@
 #include "modm/math/geometry/vector.hpp"
 
 /*
-    Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane
-    +X: Right
-    +Y: Forward
+    Chassis Odometry uses a 2D coordinate system, using the ground as the XY plane, matching the
+    right hand rule convention used by ChassisSubsystem.
+    +X: Forward
+    +Y: Left
     +Rotation: CCW
 */
 
@@ -68,10 +69,6 @@ class ChassisOdometry
 
     /// Velocity in the field frame, in meters/second.
     modm::Vector<float, 2> velocityGlobal;
-    /// Velocity in the vision computer's field frame, which differs from `velocityGlobal` by the
-    /// rotation offset established at the last localization fix.
-    modm::Vector<float, 2> velocityGlobalVision;
-    /// Velocity in the chassis' own frame, in meters/second, straight out of the wheel kinematics.
     modm::Vector<float, 2> velocityLocal;
     /// `velocityLocal` after low-pass filtering with `VELOCITY_SMOOTHING_ALPHA`.
     modm::Vector<float, 2> velocitySmoothedLocal;
@@ -159,9 +156,6 @@ public:
     }
     /// @return Velocity in the field frame, in meters/second.
     modm::Vector<float, 2> getVelocityGlobal() { return velocityGlobal; }
-    /// @return Velocity in the vision computer's field frame, in meters/second.
-    modm::Vector<float, 2> getVelocityGlobalVision() { return velocityGlobalVision; }
-    /// @return Velocity in the chassis' own frame, in meters/second.
     modm::Vector<float, 2> getVelocityLocal() { return velocityLocal; }
     /// @return The field-frame position extrapolated forward in time, in meters.
     modm::Vector<float, 2> getPositionProjectedGlobal() { return positionProjectedGlobal; }
@@ -182,7 +176,6 @@ public:
         mcbGlobalPose = {0, 0, 0};
         global_offset = {0, 0, 0};
         velocityGlobal = modm::Vector<float, 2>(0, 0);
-        velocityGlobalVision = modm::Vector<float, 2>(0, 0);
         velocityLocal = modm::Vector<float, 2>(0, 0);
         globalImuRotationOffset = 0;
     }
@@ -207,25 +200,13 @@ public:
         OdomMsg historical_data = get_historical_data(timestamp);
 
         globalImuRotationOffset =
-            tap::algorithms::Angle(-heading - historical_data.imu_yaw + M_PI_2).getWrappedValue();
-
-        float vision_chassis_heading =
-            tap::algorithms::Angle(-heading + M_PI_2 - historical_data.turret_yaw)
-                .getWrappedValue();
+            tap::algorithms::Angle(heading - historical_data.imu_yaw).getWrappedValue();
 
         global_offset.x = posX - historical_data.local_pose.x;
         global_offset.y = posY - historical_data.local_pose.y;
-        global_offset.theta =
-            tap::algorithms::Angle(vision_chassis_heading - historical_data.local_pose.theta)
-                .getWrappedValue();
+        global_offset.theta = 0;
     }
 
-    /**
-     * Finds the retained odometry sample closest in time to a given instant.
-     *
-     * @param[in] target_timestamp_us The instant of interest, in microseconds.
-     * @return The nearest sample, or the current pose if the buffer holds nothing closer.
-     */
     OdomMsg get_historical_data(uint32_t target_timestamp_us)
     {
         OdomMsg closest_entry;
@@ -288,8 +269,8 @@ public:
         float mps_RF = motorRPS_RF * RPS_TO_MPS;
         float mps_RB = motorRPS_RB * RPS_TO_MPS;
 
-        float localVelX = (mps_LF + mps_RF - mps_LB - mps_RB) * ONE_OVER_THREE;
-        float localVelY = (mps_LF - mps_RF + mps_LB - mps_RB) * ONE_OVER_THREE;
+        float localVelX = (mps_LF - mps_RF + mps_LB - mps_RB) * ONE_OVER_THREE;
+        float localVelY = (mps_LB + mps_RB - mps_LF - mps_RF) * ONE_OVER_THREE;
 
         velocityLocal.x = localVelX;
         velocityLocal.y = localVelY;
@@ -305,8 +286,6 @@ public:
         //     tap::algorithms::Angle(mcbGlobalPose.theta - prevTheta).getWrappedValue() * 0.5f;
 
         velocityGlobal = convertLocalToGlobal(velocityLocal, mcbGlobalPose.theta);
-
-        velocityGlobalVision = velocityGlobal.rotate(globalImuRotationOffset);
 
         mcbGlobalPose.x += velocityGlobal.x * deltaTimeSeconds;
         mcbGlobalPose.y += velocityGlobal.y * deltaTimeSeconds;
@@ -345,8 +324,8 @@ public:
         float sinR = sinf(globalHeading);
 
         return modm::Vector<float, 2>(
-            local.x * cosR + local.y * sinR,
-            -local.x * sinR + local.y * cosR);
+            local.x * cosR - local.y * sinR,
+            local.x * sinR + local.y * cosR);
     }
 
     /**
