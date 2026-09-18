@@ -11,33 +11,25 @@
 #include "control/turret/constants/turret_constants.hpp"
 
 #include "uart_constants.hpp"
+#include "uart_protocol/uart_protocol.hpp"
 
 namespace src::serial
 {
 class VisionComms : public tap::communication::serial::DJISerial
 {
 public:
-    static constexpr size_t VISION_COMMS_BAUD_RATE = 115'200;
-
     static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_TX_UART_PORT =
         tap::communication::serial::Uart::UartPort::Uart1;
     static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_RX_UART_PORT =
         tap::communication::serial::Uart::UartPort::Uart1;
 
-    enum MessageType : uint16_t
-    {
-        TURRET_AIM_DATA = 1,
-        ROBOT_ID = 2,
-        ALIVE = 3,
-        ODOMETRY = 4,
-        AUTO_PATH = 5,
-        // REF_DATA = 6
-        HEALTH = 6,
-        REF_TURRET_DATA = 7,
-        VISION_LOCALIZATION = 8,
-        FLY_SKY_DATA = 9,
-        VT13_DATA = 10,
-        RESTART_DETECTOR = 11
+    struct TurretAim {
+        float yaw;
+        float pitch;
+        float distance;
+        tap::communication::serial::RefSerialData::RobotId robotId;
+        float maxErrorYaw;
+        float maxErrorPitch;
     };
 
     struct RefData
@@ -103,45 +95,6 @@ public:
         // custom_data;
     };
 
-    struct TurretOdometryData
-    {
-        float pitch;
-        float yaw;
-        float roll;
-
-        // float pitch_vel;
-        float yaw_vel;
-        // float roll_vel;
-
-    } modm_packed;
-
-    struct ChassisOdometryData
-    {
-        // float pos_x;
-        // float pos_y;
-        // float pos_z;
-
-        float vel_x;
-        float vel_y;
-        // float vel_z;
-
-    } modm_packed;
-
-    struct OdometryData
-    {
-        uint32_t timestamp;
-        ChassisOdometryData chassis_data;
-        TurretOdometryData turret_data;
-    } modm_packed;
-
-    struct AprilTagLocalizationData
-    {
-        float posX;
-        float posY;
-        float heading;
-        uint32_t timestamp;
-    } modm_packed;
-
     src::chassis::ChassisOdometry* chassisOdometry;
 
     src::chassis::ChassisAutoDrive* chassisAutoDrive;
@@ -154,16 +107,6 @@ public:
     uint16_t REMOTE_TIMEOUT = 1000;
 
     tap::motor::DjiMotor* pitchMotor;
-
-    struct TurretAimData
-    {
-        float yaw;
-        float pitch;
-        float distance;
-        tap::communication::serial::RefSerialData::RobotId robotId;
-        float maxErrorYaw;
-        float maxErrorPitch;
-    };
 
     struct PlateDims
     {
@@ -189,7 +132,7 @@ public:
 
     mockable bool isCvOnline() const;
 
-    mockable inline const TurretAimData& getLastAimData(uint8_t turretID = 0) const
+    mockable inline const TurretAim& getLastAimData(uint8_t turretID = 0) const
     {
         return lastAimData[turretID];
     }
@@ -231,7 +174,7 @@ private:
 
     tap::arch::MilliTimeout cvOfflineTimeout;
 
-    TurretAimData lastAimData[control::turret::NUM_TURRETS] = {};
+    TurretAim lastAimData[control::turret::NUM_TURRETS] = {};
 
     bool aimDataUpdated[control::turret::NUM_TURRETS] = {};
 
