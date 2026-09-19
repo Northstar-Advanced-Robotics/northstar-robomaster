@@ -22,6 +22,30 @@ Microsoft provides a [helpful
 website](https://code.visualstudio.com/docs/getstarted/tips-and-tricks) with a number of shortcuts
 for getting around VSCode. There are many shortcuts that make programming faster.
 
+### Installing your own VSCode extensions
+
+The extensions listed in [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)
+are the ones everyone gets. Rebuilding the container wipes anything else you installed by
+hand, so to add an extension just for yourself, run this from the repo root inside the
+container:
+
+```
+.devcontainer/install-personal-extensions.sh --add <extension-id>
+```
+
+That installs it and records its ID in `.devcontainer/personal-extensions.txt`, which is
+gitignored — it is yours alone, and nobody else gets what you put in it. From then on the
+extension is reinstalled automatically whenever VSCode attaches to the container, including
+after **Dev Containers: Rebuild Container**. Pass several IDs at once if you like, and run
+the script with `--help` for a reminder.
+
+An extension's ID is shown on its Marketplace page, or in the Extensions view: right-click
+the extension and choose **Copy Extension ID**.
+
+Only the extension itself comes back after a rebuild — its settings and any sign-in state
+live in the container's filesystem and are reset. If an extension is useful to the whole
+team, add it to `devcontainer.json` instead of your personal list.
+
 ### Building code and programming the RoboMaster Development Board
 
 _If you would like to use the terminal instead, see the section "Building and running via the

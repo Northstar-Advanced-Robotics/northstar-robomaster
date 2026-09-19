@@ -10,7 +10,8 @@
         "ms-python.python",
         "marus25.cortex-debug",
         "eamodio.gitlens",
-				"xaver.clang-format"
+				"xaver.clang-format",
+        "cschlosser.doxdocgen"
       ],
       "settings": {
         "C_Cpp.default.compilerPath": "/opt/gcc-arm/bin/arm-none-eabi-gcc",
@@ -20,5 +21,6 @@
     }
   },
   "postCreateCommand": "cd northstar-robomaster-project && pipenv install --dev --python /usr/bin/python3.11",
+  "postAttachCommand": "bash .devcontainer/install-personal-extensions.sh",
   "remoteUser": "vscode"
 }
