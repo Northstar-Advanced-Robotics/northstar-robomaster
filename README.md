@@ -69,6 +69,34 @@ Paste the snippets yourself. To undo a scaffold, delete the directory it made.
 New `.cpp` files are picked up by the build automatically — `src/SConscript`
 globs, so there is no build file to edit.
 
+### Installing your own VSCode extensions
+
+The extensions listed in [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)
+are the ones everyone gets. Rebuilding the container wipes anything else you installed by
+hand, so to add an extension just for yourself, run this from the repo root inside the
+container:
+
+```
+.devcontainer/install-personal-extensions.sh --add <extension-id>
+```
+
+That installs it and records its ID in `.devcontainer/personal-extensions.txt`, which is
+gitignored — it is yours alone, and nobody else gets what you put in it. From then on the
+extension is reinstalled automatically whenever VSCode attaches to the container, including
+after **Dev Containers: Rebuild Container**. Pass several IDs at once if you like, and run
+the script with `--help` for a reminder.
+
+An extension's ID is shown on its Marketplace page, or in the Extensions view: right-click
+the extension and choose **Copy Extension ID**.
+
+Only the extension itself comes back after a rebuild — its settings and any sign-in state
+live in the container's filesystem and are reset. If an extension is useful to the whole
+team, add it to `devcontainer.json` instead of your personal list.
+
+The **New Subsystem** / **New Command** buttons are not affected by this: that
+extension lives in the repo at `tools/vscode-northstar-scaffold` and is re-linked
+by `scripts/install-extension.sh` on every attach, so a rebuild restores it too.
+
 ### Building code and programming the RoboMaster Development Board
 
 _If you would like to use the terminal instead, see the section "Building and running via the

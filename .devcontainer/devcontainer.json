@@ -10,7 +10,8 @@
         "ms-python.python",
         "marus25.cortex-debug",
         "eamodio.gitlens",
-				"xaver.clang-format"
+				"xaver.clang-format",
+        "cschlosser.doxdocgen"
       ],
       "settings": {
         "C_Cpp.default.compilerPath": "/opt/gcc-arm/bin/arm-none-eabi-gcc",
@@ -20,5 +21,6 @@
     }
   },
   "postCreateCommand": "bash scripts/postcreate.sh",
+  "postAttachCommand": "bash .devcontainer/install-personal-extensions.sh; bash scripts/install-extension.sh --quiet",
   "remoteUser": "vscode"
 }

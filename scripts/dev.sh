@@ -22,7 +22,8 @@ BUILD_CONTEXT=".devcontainer"
 # Mirrors "remoteUser" in devcontainer.json.
 CONTAINER_USER="vscode"
 
-# Mirrors the directory in "postCreateCommand".
+# Mirrors the directory used by scripts/postcreate.sh, which devcontainer.json
+# runs as "postCreateCommand".
 PROJECT_DIR="northstar-robomaster-project"
 
 # --- repo-specific flags ---------------------------------------------------

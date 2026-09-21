@@ -15,3 +15,5 @@ docs/_build
 docs/api
 docs/doxyoutput
 .sconsign
+
+.devcontainer/personal-extensions.txt
