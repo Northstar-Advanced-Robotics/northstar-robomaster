@@ -1,0 +1,33 @@
+#ifndef ${guard}
+#define ${guard}
+
+#include "tap/control/subsystem.hpp"
+#include "tap/drivers.hpp"
+
+namespace ${namespace}
+{
+class ${class_name} : public tap::control::Subsystem
+{
+public:
+    explicit ${class_name}(tap::Drivers* drivers) : tap::control::Subsystem(drivers) {}
+
+    void initialize() override
+    {
+        // TODO: initialize the hardware this subsystem owns.
+    }
+
+    void refresh() override
+    {
+        // TODO: periodic control loop. Runs every scheduler tick.
+    }
+
+    void refreshSafeDisconnect() override {}
+
+    const char* getName() const override { return "${display_name}"; }
+
+private:
+    // TODO: hardware handles, setpoints and state go here.
+};
+}  // namespace ${namespace}
+
+#endif  // ${guard}

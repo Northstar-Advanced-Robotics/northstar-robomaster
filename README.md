@@ -22,6 +22,53 @@ Microsoft provides a [helpful
 website](https://code.visualstudio.com/docs/getstarted/tips-and-tricks) with a number of shortcuts
 for getting around VSCode. There are many shortcuts that make programming faster.
 
+### Adding a new subsystem or command
+
+Don't copy-paste an existing one. Use the scaffolder — it gets the include
+guard, namespace, base class and overrides right, formats the result with
+`clang-format`, and then tells you exactly what to add to the robot's control
+file.
+
+**With the buttons** (installed by the devcontainer; see
+`tools/vscode-northstar-scaffold/README.md` if they're missing): click
+**New Subsystem** or **New Command** in the status bar, or use the Command
+Palette and search for `NorthStar: New Subsystem`.
+
+**With a task:** Command Palette → `Tasks: Run Task` → `Scaffold - New Subsystem`.
+
+**From the terminal**, run from the repo root (not `northstar-robomaster-project`):
+
+```bash
+python3 scripts/scaffold subsystem Flywheel --robots standard
+python3 scripts/scaffold command SpinUp --requires FlywheelSubsystem --robots standard
+python3 scripts/scaffold --help
+```
+
+`--robots` takes a comma-separated list, or `all`, or `none`. The generated
+files are shared by every robot — it's the per-robot registration that differs,
+so you get one checklist per robot you name:
+
+```bash
+python3 scripts/scaffold subsystem Flywheel --robots standard,hero,sentry
+python3 scripts/scaffold subsystem Flywheel --robots all
+```
+
+The buttons give you a checkbox picker for this; the task asks for the list as
+text.
+
+`Flywheel`, `flywheel_subsystem` and `FlywheelSubsystem` all produce the same
+thing, so type whichever you were going to type.
+
+The scaffolder **only ever creates new files** — it never edits
+`*_control.cpp`. It reads those files to work out where things go and prints a
+numbered checklist with real line numbers and the correct registration function
+name for that robot (they differ: `registerStandardSubsystems`, but
+`registerTestSubsystems` on testbed and `registerSoldierSubsystems` on turret).
+Paste the snippets yourself. To undo a scaffold, delete the directory it made.
+
+New `.cpp` files are picked up by the build automatically — `src/SConscript`
+globs, so there is no build file to edit.
+
 ### Building code and programming the RoboMaster Development Board
 
 _If you would like to use the terminal instead, see the section "Building and running via the

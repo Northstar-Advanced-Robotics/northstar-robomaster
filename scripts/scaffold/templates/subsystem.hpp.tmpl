@@ -1,0 +1,31 @@
+#ifndef ${guard}
+#define ${guard}
+
+#include "tap/control/subsystem.hpp"
+
+namespace tap
+{
+class Drivers;
+}
+
+namespace ${namespace}
+{
+class ${class_name} : public tap::control::Subsystem
+{
+public:
+    explicit ${class_name}(tap::Drivers* drivers);
+
+    void initialize() override;
+
+    void refresh() override;
+
+    void refreshSafeDisconnect() override {}
+
+    const char* getName() const override { return "${display_name}"; }
+
+private:
+    // TODO: hardware handles, setpoints and state go here.
+};
+}  // namespace ${namespace}
+
+#endif  // ${guard}

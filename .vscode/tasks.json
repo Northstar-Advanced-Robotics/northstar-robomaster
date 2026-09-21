@@ -395,6 +395,64 @@
             "options": {
                 "cwd": "${workspaceRoot}/northstar-robomaster-project"
             }
+        },
+        {
+            "label": "Scaffold - New Subsystem",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 scripts/scaffold subsystem '${input:scaffoldName}' --dir '${input:scaffoldDir}' --robots ${input:scaffoldRobot}",
+            "group": "none",
+            "problemMatcher": [],
+            // NOTE: unlike the build tasks, this one runs from the repo root --
+            // the scaffolder lives above northstar-robomaster-project.
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        },
+        {
+            "label": "Scaffold - New Command",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 scripts/scaffold command '${input:scaffoldName}' --requires '${input:scaffoldRequires}' --dir '${input:scaffoldDir}' --robots ${input:scaffoldRobot}",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        }
+    ],
+    // Used by the Scaffold tasks above. The NorthStar Scaffold extension gives
+    // a nicer wizard for the same thing (status bar, or Ctrl+Shift+P ->
+    // "NorthStar: New Subsystem"); these tasks are the no-install fallback.
+    "inputs": [
+        {
+            "id": "scaffoldName",
+            "type": "promptString",
+            "description": "Name -- \"Flywheel\", \"flywheel_subsystem\" and \"FlywheelSubsystem\" all work"
+        },
+        {
+            "id": "scaffoldDir",
+            "type": "promptString",
+            "description": "Feature directory under src/control/ (leave blank to derive it from the name)",
+            "default": ""
+        },
+        {
+            "id": "scaffoldRequires",
+            "type": "promptString",
+            "description": "Subsystem class this command requires, e.g. ChassisSubsystem"
+        },
+        {
+            // A pickString cannot multi-select, so this is a free-text list.
+            // The scaffolder validates it and names the valid values on a typo.
+            // The NorthStar Scaffold extension offers a real checkbox picker.
+            "id": "scaffoldRobot",
+            "type": "promptString",
+            "description": "Wiring checklist for which robots? Comma-separated (standard, hero, sentry, turret, testbed), or 'all', or 'none'",
+            "default": "standard"
         }
     ]
 }

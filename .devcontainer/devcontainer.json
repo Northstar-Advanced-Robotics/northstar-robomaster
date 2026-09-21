@@ -19,6 +19,6 @@
       }
     }
   },
-  "postCreateCommand": "cd northstar-robomaster-project && pipenv install --dev --python /usr/bin/python3.11",
+  "postCreateCommand": "bash scripts/postcreate.sh",
   "remoteUser": "vscode"
 }

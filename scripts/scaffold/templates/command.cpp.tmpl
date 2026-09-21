@@ -1,0 +1,31 @@
+#include "${stem}.hpp"
+
+namespace ${namespace}
+{
+${class_name}::${class_name}(${requires_class}* ${requires_instance})
+    : ${requires_instance}(${requires_instance})
+{
+    addSubsystemRequirement(${requires_instance});
+}
+
+void ${class_name}::initialize()
+{
+    // TODO: reset state. Runs once each time this command is scheduled.
+}
+
+void ${class_name}::execute()
+{
+    // TODO: do the work. Runs every scheduler tick while scheduled.
+}
+
+void ${class_name}::end([[maybe_unused]] bool interrupted)
+{
+    // TODO: leave ${requires_instance} in a safe state.
+}
+
+bool ${class_name}::isFinished() const
+{
+    // TODO: return true once this command should stop running.
+    return false;
+}
+}  // namespace ${namespace}
