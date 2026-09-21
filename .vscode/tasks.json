@@ -402,7 +402,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "python3 scripts/scaffold subsystem '${input:scaffoldName}' --dir '${input:scaffoldDir}' --robots ${input:scaffoldRobot}",
+            "command": "python3 scripts/scaffold subsystem '${input:scaffoldName}' --dir '${input:scaffoldDir}' --robots '${input:scaffoldRobot}'",
             "group": "none",
             "problemMatcher": [],
             // NOTE: unlike the build tasks, this one runs from the repo root --
@@ -417,7 +417,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "python3 scripts/scaffold command '${input:scaffoldName}' --requires '${input:scaffoldRequires}' --dir '${input:scaffoldDir}' --robots ${input:scaffoldRobot}",
+            "command": "python3 scripts/scaffold command '${input:scaffoldName}' --requires '${input:scaffoldRequires}' --dir '${input:scaffoldDir}' --robots '${input:scaffoldRobot}'",
             "group": "none",
             "problemMatcher": [],
             "options": {
