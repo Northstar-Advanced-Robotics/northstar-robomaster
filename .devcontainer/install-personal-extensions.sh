@@ -36,9 +36,20 @@ right-click the extension -> Copy Extension ID.
 USAGE
 }
 
-require_code() {
-    if ! command -v code >/dev/null 2>&1; then
-        echo "personal extensions: 'code' CLI not on PATH" >&2
+# Sets CLI to the command that installs extensions. postAttachCommand runs in a
+# bare environment: `code` is not on PATH there, and even when it is it refuses
+# to run without the VSCODE_IPC_HOOK_CLI that only VS Code terminals have. The
+# server's own code-server binary needs neither, so prefer it and keep `code`
+# as the fallback. ~/.vscode-server/bin/<commit> is a link to the running server.
+find_cli() {
+    local server
+    server="$(ls -dt "$HOME"/.vscode-server/bin/*/bin/code-server 2>/dev/null | head -1)"
+    if [ -n "$server" ] && [ -x "$server" ]; then
+        CLI=("$server")
+    elif command -v code >/dev/null 2>&1; then
+        CLI=(code)
+    else
+        echo "personal extensions: neither the VS Code server CLI nor 'code' was found" >&2
         return 1
     fi
 }
@@ -87,15 +98,15 @@ cmd_add() {
         usage >&2
         exit 2
     fi
-    require_code || exit 1
+    find_cli || exit 1
 
     for id in "$@"; do
-        if ! code --list-extensions 2>/dev/null | grep -Fxqi -- "$id"; then
+        if ! "${CLI[@]}" --list-extensions 2>/dev/null | grep -Fxqi -- "$id"; then
             echo "personal extensions: installing $id"
-            code --install-extension "$id" --force
+            "${CLI[@]}" --install-extension "$id" --force
             # Verify rather than trust the exit status: the CLI reports an
             # unknown ID on stdout and still exits 0.
-            if ! code --list-extensions 2>/dev/null | grep -Fxqi -- "$id"; then
+            if ! "${CLI[@]}" --list-extensions 2>/dev/null | grep -Fxqi -- "$id"; then
                 echo "personal extensions: could not install $id, not adding it" >&2
                 continue
             fi
@@ -106,15 +117,15 @@ cmd_add() {
 
 cmd_sync() {
     [ -f "$LIST" ] || exit 0
-    require_code || exit 0  # nothing to do yet; never fail the attach
+    find_cli || exit 0  # nothing to do yet; never fail the attach
 
     # One snapshot up front, so an attach with nothing to do stays offline.
-    installed="$(code --list-extensions 2>/dev/null)"
+    installed="$("${CLI[@]}" --list-extensions 2>/dev/null)"
 
     list_ids | while IFS= read -r id; do
         printf '%s\n' "$installed" | grep -Fxqi -- "$id" && continue
         echo "personal extensions: installing $id"
-        code --install-extension "$id" --force
+        "${CLI[@]}" --install-extension "$id" --force
     done
 }
 
