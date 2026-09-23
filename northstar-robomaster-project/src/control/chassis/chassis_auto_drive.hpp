@@ -11,7 +11,7 @@
 #include "chassis_odometry.hpp"
 #include "chassis_subsystem.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 class ChassisAutoDrive
 {
@@ -30,10 +30,10 @@ class ChassisAutoDrive
     static constexpr float SLOWDOWN_DISTANCE = 0.15f;
     static constexpr float DEGEN_CURVE_LENGTH = 0.1f;
 
-    src::chassis::ChassisSubsystem* chassis;
-    src::chassis::ChassisOdometry* chassisOdometry;
+    src::control::chassis::ChassisSubsystem* chassis;
+    src::control::chassis::ChassisOdometry* chassisOdometry;
 
-    CubicBezier* currentCurve;
+    src::control::algorithms::CubicBezier* currentCurve;
     float currentT = 0;
 
     modm::Vector<float, 2> desiredGlobalVelocity;
@@ -46,7 +46,7 @@ public:
     float getDesiredRotation() { return desiredRotation; }
 
     void resetPath();
-    void setCurve(CubicBezier* newCurve);
+    void setCurve(src::control::algorithms::CubicBezier* newCurve);
     void updateAutoDrive();
 
     float getOdometryRotation() { return chassisOdometry->getRotation(); }
@@ -158,6 +158,6 @@ private:
     }
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

@@ -50,14 +50,14 @@ public:
      * different commands).
      */
     virtual inline void attachTurretController(
-        const algorithms::TurretControllerInterface *turretController) = 0;
+        const TurretControllerInterface *turretController) = 0;
     /**
      * Sets (and limits!) the chassis frame turret measurement.
      *
      * The setpoint is limited between the min and max config angles as specified in the
      * constructor.
      */
-    virtual void setChassisFrameSetpoint(WrappedFloat setpoint) = 0;
+    virtual void setChassisFrameSetpoint(tap::algorithms::WrappedFloat setpoint) = 0;
 
     /// @return `true` if the hardware motor is connected and powered on
     virtual inline bool isOnline() const = 0;
@@ -65,11 +65,11 @@ public:
     /**
      * @return turret motor angle setpoint relative to the chassis, in radians
      */
-    virtual inline WrappedFloat getChassisFrameSetpoint() const = 0;
+    virtual inline tap::algorithms::WrappedFloat getChassisFrameSetpoint() const = 0;
 
     /// @return turret motor angle measurement relative to the chassis, in radians, wrapped between
     /// [0, 2 PI)
-    virtual inline const WrappedFloat &getChassisFrameMeasuredAngle() const = 0;
+    virtual inline const tap::algorithms::WrappedFloat &getChassisFrameMeasuredAngle() const = 0;
 
     /**
      * @return angular velocity of the turret, in rad/sec, positive rotation is defined by the
@@ -78,7 +78,7 @@ public:
     virtual inline float getChassisFrameVelocity() const = 0;
 
     /// @return turret controller controlling this motor (as specified by `attachTurretController`)
-    virtual const algorithms::TurretControllerInterface *getTurretController() const = 0;
+    virtual const TurretControllerInterface *getTurretController() const = 0;
 
     /**
      * @return Valid minimum error between the chassis relative setpoint and measurement, in
@@ -111,8 +111,9 @@ public:
      * @note Before calling this function, you **must** first set the chassis frame setpoint before
      * calling this function (i.e. call `setChassisFrameSetpoint`).
      */
-    virtual float getValidMinError(const WrappedFloat setpoint, const WrappedFloat measurement)
-        const = 0;
+    virtual float getValidMinError(
+        const tap::algorithms::WrappedFloat setpoint,
+        const tap::algorithms::WrappedFloat measurement) const = 0;
 
     virtual int16_t getMotorOutput() const = 0;
 

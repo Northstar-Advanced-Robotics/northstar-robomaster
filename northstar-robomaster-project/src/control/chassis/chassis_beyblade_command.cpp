@@ -8,11 +8,11 @@
 
 using tap::algorithms::limitVal;
 
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisBeybladeCommand::ChassisBeybladeCommand(
     ChassisSubsystem* chassis,
-    src::control::ControlOperatorInterface* operatorInterface,
+    src::robot::ControlOperatorInterface* operatorInterface,
     short direction,
     bool isVariable)
     : chassis(chassis),
@@ -89,4 +89,4 @@ float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uin
     }
     return calcSpeed * maxSpeed * direction;
 }
-};  // namespace src::chassis
+}  // namespace src::control::chassis

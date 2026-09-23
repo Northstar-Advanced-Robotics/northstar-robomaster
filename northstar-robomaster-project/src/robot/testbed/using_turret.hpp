@@ -49,22 +49,22 @@ src::control::turret::TurretDoubleMotorRev yawTurretMotor(&yawMotor1, &yawMotor2
 TurretSubsystem turretSubsystem(drivers(), pitchTurretMotor, yawTurretMotor);
 
 // turret controlers
-src::control::turret::algorithms::
+src::control::turret::
     ChassisFramePitchTurretController chassisFramePitchTurretController(
         turretSubsystem.pitchMotor,
         chassis_rel::PITCH_PID_CONFIG);
 
-src::control::turret::algorithms::ChassisFrameYawTurretController chassisFrameYawTurretController(
+src::control::turret::ChassisFrameYawTurretController chassisFrameYawTurretController(
     turretSubsystem.yawMotor,
     chassis_rel::YAW_PID_CONFIG);
 
-src::control::turret::algorithms::
+src::control::turret::
     WorldFrameYawChassisImuTurretController worldFrameYawChassisImuController(
         *drivers(),
         turretSubsystem.yawMotor,
         world_rel_chassis_imu::YAW_PID_CONFIG);
 
-src::control::turret::algorithms::
+src::control::turret::
     WorldFramePitchChassisImuTurretController worldFramePitchChassisImuController(
         *drivers(),
         turretSubsystem.pitchMotor,
@@ -79,14 +79,14 @@ tap::algorithms::SmoothPid worldFrameYawTurretPosPid(world_rel_turret_imu::YAW_P
 tap::algorithms::SmoothPid worldFrameYawTurretVelPid(world_rel_turret_imu::YAW_VEL_PID_CONFIG);
 
 // for imu fixed on turret
-src::control::turret::algorithms::
+src::control::turret::
     WorldFramePitchTurretImuCascadePidTurretController worldFramePitchTurretImuController(
         *drivers(),
         turretSubsystem.pitchMotor,
         worldFramePitchTurretPosPid,
         worldFramePitchTurretVelPid);
 
-src::control::turret::algorithms::
+src::control::turret::
     WorldFrameYawTurretImuCascadePidTurretController worldFrameYawTurretImuController(
         *drivers(),
         turretSubsystem.yawMotor,
@@ -94,7 +94,7 @@ src::control::turret::algorithms::
         worldFrameYawTurretVelPid);
 
 // turret commands
-user::TurretUserControlCommand turretUserControlCommand(
+TurretUserControlCommand turretUserControlCommand(
     drivers(),
     drivers()->controlOperatorInterface,
     &turretSubsystem,
@@ -103,7 +103,7 @@ user::TurretUserControlCommand turretUserControlCommand(
     USER_YAW_INPUT_SCALAR,
     USER_PITCH_INPUT_SCALAR);
 
-cv::TurretCVControlCommand turretCVControlCommand(
+TurretCVControlCommand turretCVControlCommand(
     drivers(),
     drivers()->controlOperatorInterface,
     drivers()->visionComms,
@@ -121,7 +121,7 @@ test::TurretTestCommand turretTestCommand(
     &worldFramePitchTurretImuController,
     modm::toRadian(0.5));
 
-// user::TurretUserWorldRelativeCommand turretUserWorldRelativeCommand(
+// TurretUserWorldRelativeCommand turretUserWorldRelativeCommand(
 //     drivers(),
 //     drivers()->controlOperatorInterface,
 //     &turretSubsystem,
@@ -182,12 +182,12 @@ RevTurretSubsystem revTurret(
     PITCH_MOTOR_CONFIG,
     YAW_MOTOR_REV_CONFIG);
 
-algorithms::WorldFrameYawChassisImuTurretController worldFrameYawChassisImuController(
+src::control::turret::WorldFrameYawChassisImuTurretController worldFrameYawChassisImuController(
     *drivers(),
     revTurret.yawMotor,
     world_rel_chassis_imu::YAW_PID_CONFIG);
 
-algorithms::WorldFramePitchChassisImuTurretController worldFramePitchChassisImuController(
+src::control::turret::WorldFramePitchChassisImuTurretController worldFramePitchChassisImuController(
     *drivers(),
     revTurret.pitchMotor,
     world_rel_chassis_imu::PITCH_PID_CONFIG);

@@ -3,6 +3,8 @@
 
 #include "control/buzzer/song_types.hpp"
 
+namespace src::control::buzzer
+{
 const Song tsnSong = {
     {REST, 150},
     {NOTE_G4, 80},
@@ -50,5 +52,7 @@ const Song theWorldRevolving{
     {NOTE_E6, TWR_SIXTEENTH},
     {NOTE_D6, TWR_QUARTER + TWR_QUARTER},
 };
+
+}  // namespace src::control::buzzer
 
 #endif

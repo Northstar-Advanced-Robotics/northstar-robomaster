@@ -24,7 +24,7 @@
 
 using tap::algorithms::WrappedFloat;
 
-namespace src::control::turret::user
+namespace src::control::turret
 {
 TurretQuickTurnCommand::TurretQuickTurnCommand(
     TurretSubsystem *turretSubsystem,
@@ -46,4 +46,4 @@ void TurretQuickTurnCommand::initialize()
 
     turretSubsystem->yawMotor.attachTurretController(nullptr);
 }
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret

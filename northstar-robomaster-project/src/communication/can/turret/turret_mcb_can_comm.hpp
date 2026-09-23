@@ -31,14 +31,14 @@
 namespace modm::can
 {
 class Message;
-}
+}  // namespace modm::can
 
 namespace src
 {
 class Drivers;
-}
+}  // namespace src
 
-namespace src::can
+namespace src::communication::can
 {
 /**
  * A CAN message handler that handles sending and receiving data from the turret mounted
@@ -307,6 +307,6 @@ private:
         }
     }
 };
-}  // namespace src::can
+}  // namespace src::communication::can
 
 #endif  // TURRET_MCB_CAN_COMM_HPP_

@@ -15,9 +15,7 @@
 
 #include "modm/math/filter/pid.hpp"
 
-using namespace tap::motor;
-
-namespace src::agitator
+namespace src::control::agitator
 {
 VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(
     tap::Drivers* drivers,
@@ -106,4 +104,4 @@ void VelocityAgitatorSubsystem::setSetpoint(float velocity)
         velocitySetpoint = velocity;
     }
 }
-}  // namespace src::agitator
+}  // namespace src::control::agitator

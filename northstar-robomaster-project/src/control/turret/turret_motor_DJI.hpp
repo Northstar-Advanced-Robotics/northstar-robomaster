@@ -55,8 +55,7 @@ public:
      * is currently being run (since turret controllers are shared by commands but persist across
      * different commands).
      */
-    inline void attachTurretController(
-        const algorithms::TurretControllerInterface *turretController) override
+    inline void attachTurretController(const TurretControllerInterface *turretController) override
     {
         this->turretController = turretController;
     }
@@ -67,7 +66,7 @@ public:
      * The setpoint is limited between the min and max config angles as specified in the
      * constructor.
      */
-    void setChassisFrameSetpoint(WrappedFloat setpoint) override;
+    void setChassisFrameSetpoint(tap::algorithms::WrappedFloat setpoint) override;
 
     /// @return `true` if the hardware motor is connected and powered on
     inline bool isOnline() const { return motor->isMotorOnline(); }
@@ -75,11 +74,14 @@ public:
     /**
      * @return turret motor angle setpoint relative to the chassis, in radians
      */
-    inline WrappedFloat getChassisFrameSetpoint() const override { return chassisFrameSetpoint; }
+    inline tap::algorithms::WrappedFloat getChassisFrameSetpoint() const override
+    {
+        return chassisFrameSetpoint;
+    }
 
     /// @return turret motor angle measurement relative to the chassis, in radians, wrapped between
     /// [0, 2 PI)
-    inline const WrappedFloat &getChassisFrameMeasuredAngle() const override
+    inline const tap::algorithms::WrappedFloat &getChassisFrameMeasuredAngle() const override
     {
         return chassisFrameMeasuredAngle;
     }
@@ -109,7 +111,7 @@ public:
     }
 
     /// @return turret controller controlling this motor (as specified by `attachTurretController`)
-    const algorithms::TurretControllerInterface *getTurretController() const override
+    const TurretControllerInterface *getTurretController() const override
     {
         return turretController;
     }
@@ -148,8 +150,9 @@ public:
      * @note Before calling this function, you **must** first set the chassis frame setpoint before
      * calling this function (i.e. call `setChassisFrameSetpoint`).
      */
-    float getValidMinError(const WrappedFloat setpoint, const WrappedFloat measurement)
-        const override;
+    float getValidMinError(
+        const tap::algorithms::WrappedFloat setpoint,
+        const tap::algorithms::WrappedFloat measurement) const override;
 
     int16_t getMotorOutput() const override { return motor->getOutputDesired(); }
 
@@ -161,17 +164,17 @@ private:
 
     /// Associated turret controller interface that is being used by a command to control this
     /// motor
-    const algorithms::TurretControllerInterface *turretController = nullptr;
+    const TurretControllerInterface *turretController = nullptr;
 
     /// ratio of motor rotations per rotation of controled pivot
     float ratio;
 
     /// Unwrapped chassis frame setpoint specified by the user and limited to `[config.minAngle,
     /// config.maxAngle]`. Units radians.
-    WrappedFloat chassisFrameSetpoint;
+    tap::algorithms::WrappedFloat chassisFrameSetpoint;
 
     /// Wrapped chassis frame measured angle between [0, 2*PI). Units radians.
-    WrappedFloat chassisFrameMeasuredAngle;
+    tap::algorithms::WrappedFloat chassisFrameMeasuredAngle;
 };
 }  // namespace src::control::turret
 

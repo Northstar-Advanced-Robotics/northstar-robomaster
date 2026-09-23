@@ -35,10 +35,9 @@
 #include "using_chassis.hpp"
 #include "using_flywheel.hpp"
 #include "using_hero_agitator.hpp"
-#include "using_hud.hpp"
 #include "using_turret.hpp"
 
-namespace testbed_control
+namespace src::robot::testbed
 {
 src::control::RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
@@ -46,7 +45,7 @@ src::control::RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers(
 
 #endif  // USING_FLYWHEEL
 
-void initializeSubsystems(src::testbed::Drivers *drivers)
+void initializeSubsystems(src::robot::testbed::Drivers *drivers)
 {
     dummySubsystem.initialize();
 #ifdef USING_AGITATOR
@@ -69,11 +68,9 @@ void initializeSubsystems(src::testbed::Drivers *drivers)
 #if defined(USING_TURRET) && defined(USING_REV)
     revTurret.initialize();
 #endif
-#ifdef USING_HUD
-#endif
 }
 
-void registerTestSubsystems(src::testbed::Drivers *drivers)
+void registerTestSubsystems(src::robot::testbed::Drivers *drivers)
 {
     drivers->commandScheduler.registerSubsystem(&dummySubsystem);
 
@@ -100,12 +97,9 @@ void registerTestSubsystems(src::testbed::Drivers *drivers)
 #if defined(USING_TURRET) && defined(USING_REV)
     drivers->commandScheduler.registerSubsystem(&revTurret);
 #endif
-#ifdef USING_HUD
-    drivers->commandScheduler.registerSubsystem(&clientDisplay);
-#endif
 }
 
-void setDefaultTestCommands(src::testbed::Drivers *drivers)
+void setDefaultTestCommands(src::robot::testbed::Drivers *drivers)
 {
 #ifdef USING_TURRET
     turretSubsystem.setDefaultCommand(&turretUserControlCommand);
@@ -116,18 +110,15 @@ void setDefaultTestCommands(src::testbed::Drivers *drivers)
 #if defined(USING_TURRET) && defined(USING_REV)
     revTurret.setDefaultCommand(&turretUserControlCommand);
 #endif
-#ifdef USING_HUD
-    clientDisplay.setDefaultCommand(&clientDisplayCommand);
-#endif
 }
 
-void startTestCommands(src::testbed::Drivers *drivers)
+void startTestCommands(src::robot::testbed::Drivers *drivers)
 {
     drivers->bmi088.setMountingTransform(
         tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 
-void registerTestIoMappings(src::testbed::Drivers *drivers)
+void registerTestIoMappings(src::robot::testbed::Drivers *drivers)
 {
 #ifdef USING_AGITATOR
     // rightSwitchUp10RPS
@@ -150,22 +141,18 @@ void registerTestIoMappings(src::testbed::Drivers *drivers)
     // bPressedBeyblade
 #endif
 }
-}  // namespace testbed_control
 
-namespace src::testbed
-{
 src::control::imu::ImuCalibrateCommandBase *getImuCalibrateCommand() { return nullptr; }
 
-void initSubsystemCommands(src::testbed::Drivers *drivers)
+void initSubsystemCommands(src::robot::testbed::Drivers *drivers)
 {
-    drivers->commandScheduler.setSafeDisconnectFunction(
-        &testbed_control::remoteSafeDisconnectFunction);
-    testbed_control::initializeSubsystems(drivers);
-    testbed_control::registerTestSubsystems(drivers);
-    testbed_control::setDefaultTestCommands(drivers);
-    testbed_control::startTestCommands(drivers);
-    testbed_control::registerTestIoMappings(drivers);
+    drivers->commandScheduler.setSafeDisconnectFunction(&remoteSafeDisconnectFunction);
+    initializeSubsystems(drivers);
+    registerTestSubsystems(drivers);
+    setDefaultTestCommands(drivers);
+    startTestCommands(drivers);
+    registerTestIoMappings(drivers);
 }
-}  // namespace src::testbed
+}  // namespace src::robot::testbed
 
 #endif

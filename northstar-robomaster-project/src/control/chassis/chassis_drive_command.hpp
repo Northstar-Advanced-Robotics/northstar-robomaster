@@ -7,14 +7,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -23,7 +23,7 @@ class ChassisDriveCommand : public tap::control::Command
 public:
     ChassisDriveCommand(
         ChassisSubsystem *chassis,
-        src::control::ControlOperatorInterface *operatorInterface);
+        src::robot::ControlOperatorInterface *operatorInterface);
 
     const char *getName() const override { return "Chassis tank drive"; }
 
@@ -36,8 +36,8 @@ public:
     bool isFinished() const { return false; }
 
 private:
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
 
-    src::control::ControlOperatorInterface *operatorInterface;
+    src::robot::ControlOperatorInterface *operatorInterface;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

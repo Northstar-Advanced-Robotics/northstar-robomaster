@@ -13,9 +13,7 @@
 #error "Do not include this file directly! Use agitator_constants.hpp instead."
 #endif
 
-using tap::motor::DjiMotor;
-
-namespace src::control::agitator::constants
+namespace src::control::agitator
 {
 static constexpr uint16_t HEAT_LIMIT_BUFFER = 25;
 // position PID terms
@@ -25,7 +23,7 @@ static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 0.0f,
-    .maxOutput = DjiMotor::MAX_OUTPUT_C610,
+    .maxOutput = tap::motor::DjiMotor::MAX_OUTPUT_C610,
     .errDeadzone = 0.0f,
     .errorDerivativeFloor = 0.0f,
 };
@@ -33,7 +31,7 @@ static constexpr int AGITATOR_NUM_POCKETS = 11;       // number of balls in one 
 static constexpr float AGITATOR_MAX_ROF = 30.0f;      // balls per second
 static constexpr float OVERSHOOT_FUDGE_FACTOR = .15;  // how much agitator overshoots
 
-static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
+static constexpr src::control::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
     .gearRatio = 1 / (36.0f) * (20.0f / 21.0f),
     .agitatorMotorId = tap::motor::MOTOR5,
     .agitatorCanBusId = tap::can::CanBus::CAN_BUS1,
@@ -64,6 +62,6 @@ static constexpr src::control::agitator::UnjamSpokeAgitatorCommand::Config AGITA
     .maxWaitTime = static_cast<uint32_t>(1000.0f * UNJAM_DISTANCE / UNJAM_VELOCITY) + 200,
     .targetCycleCount = 3,
 };
-}  // namespace src::control::agitator::constants
+}  // namespace src::control::agitator
 
 #endif  // TESTBED_AGITATOR_CONSTANTS_HPP_

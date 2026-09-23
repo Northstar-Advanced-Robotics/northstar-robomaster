@@ -36,7 +36,7 @@
 
 #endif
 
-namespace src::sentry
+namespace src::robot::sentry
 {
 class Drivers : public tap::Drivers
 {
@@ -58,12 +58,12 @@ public:
     testing::NiceMock<mock::ControlOperatorInterfaceMock> controlOperatorInterface;
 #else
 public:
-    control::ControlOperatorInterface controlOperatorInterface;
-    serial::VisionComms visionComms;
-    tap::encoder::PwmEncoder encoder;
+    src::robot::ControlOperatorInterface controlOperatorInterface;
+    src::communication::serial::VisionComms visionComms;
+    src::communication::sensors::PwmEncoder encoder;
     // tap::motor::RevMotorTxHandler revMotorTxHandler;
 #endif
 };  // class src::SentryDrivers
-}  // namespace src::sentry
+}  // namespace src::robot::sentry
 
 #endif  // SENTRY_DRIVERS_HPP_

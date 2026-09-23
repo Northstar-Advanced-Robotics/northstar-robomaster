@@ -22,15 +22,10 @@
 
 #include "tap/algorithms/wrapped_float.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::turret
 {
 class TurretMotor;
-}
 
-namespace src::control::turret::algorithms
-{
 /**
  * An interface describing the functionality of a turret controller. When implementing this class,
  * the user is responsible for designing a controller that will set the desired output of some
@@ -65,32 +60,40 @@ public:
      * @param[in] desiredSetpoint The controller's desired setpoint in whatever frame the controller
      * is operating. Units radians.
      */
-    virtual void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) = 0;
+    virtual void runController(
+        const uint32_t dt,
+        const tap::algorithms::WrappedFloat desiredSetpoint) = 0;
 
     /**
      * Sets the controller setpoint, but doesn't run the controller.
      */
-    virtual void setSetpoint(WrappedFloat desiredSetpoint) = 0;
+    virtual void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) = 0;
 
-    inline void setSetpoint(float desiredSetpoint) { setSetpoint(Angle(desiredSetpoint)); }
+    inline void setSetpoint(float desiredSetpoint)
+    {
+        setSetpoint(tap::algorithms::Angle(desiredSetpoint));
+    }
 
     /**
      * @return The controller's setpoint, units radians. **Does not** have to be in the same
      * reference frame as the TurretSubsystem's `get<yaw|pitch>Setpoint` functions.
      */
-    virtual WrappedFloat getSetpoint() const = 0;
+    virtual tap::algorithms::WrappedFloat getSetpoint() const = 0;
 
     /**
      * @return The controller's measurement (current value of the system), units radians. **Does
      * not** have to be in the same reference frame as the TurretMotor's `getChassisFrame*`
      * functions. Does not need to be normalized.
      */
-    virtual WrappedFloat getMeasurement() const = 0;
+    virtual tap::algorithms::WrappedFloat getMeasurement() const = 0;
 
     /// @return World frame yaw angle measurement, refer to top level documentation for more
     /// details.
 
-    virtual WrappedFloat getMeasurementMotor() const { return WrappedFloat(0, 0, M_TWOPI); };
+    virtual tap::algorithms::WrappedFloat getMeasurementMotor() const
+    {
+        return tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
+    };
 
     /**
      * @return `false` if the turret controller should not be running, whether this is because the
@@ -108,8 +111,8 @@ public:
      * @return The controllerFrameAngle converted to the chassis frame, a value in radians that is
      * not required to be normalized.
      */
-    virtual WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const = 0;
+    virtual tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const = 0;
 
     /**
      * Converts the passed in controllerFrameAngle from the chassis frame to the controller frame of
@@ -120,8 +123,8 @@ public:
      * @return The chassisFrameAngle converted to the controller frame, a value in radians that is
      * not required to be normalized.
      */
-    virtual WrappedFloat convertChassisAngleToControllerFrame(
-        WrappedFloat chassisFrameAngle) const = 0;
+    virtual tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const = 0;
 
 protected:
     TurretMotor &turretMotor;
@@ -143,6 +146,6 @@ public:
     {
     }
 };
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // TURRET_CONTROLLER_INTERFACE_HPP_

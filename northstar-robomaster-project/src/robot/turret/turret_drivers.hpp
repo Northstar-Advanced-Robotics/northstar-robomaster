@@ -29,7 +29,7 @@
 #include "../../src/communication/can/chassis/chassis_mcb_can_comm.hpp"
 #endif
 
-namespace src::gyro
+namespace src::robot::turret
 {
 class Drivers : public tap::Drivers
 {
@@ -48,10 +48,10 @@ public:
 
 #else
 public:
-    ChassisMcbCanComm chassisMcbCanComm;
+    src::communication::can::ChassisMcbCanComm chassisMcbCanComm;
 #endif
 };  // class src::TurretDrivers
-}  // namespace src::turret
+}  // namespace src::robot::turret
 
 #endif  // TURRET_DRIVERS_HPP_
  

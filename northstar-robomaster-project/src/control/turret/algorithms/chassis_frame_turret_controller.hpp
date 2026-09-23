@@ -29,10 +29,7 @@
 namespace src::control::turret
 {
 class TurretMotor;
-}
 
-namespace src::control::turret::algorithms
-{
 /**
  * Controller that runs a single position PID controller in the chassis frame to control the turret
  * yaw.
@@ -56,31 +53,32 @@ public:
      * @see TurretControllerInterface for more details.
      * @param[in] desiredSetpoint The yaw desired setpoint in the chassis frame.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return The chassis frame yaw turret measurement, refer to top level documentation for more
     /// details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     /**
      * @return The yaw setpoint, in the chassis frame.
      */
-    WrappedFloat getSetpoint() const final;
+    tap::algorithms::WrappedFloat getSetpoint() const final;
 
     bool isOnline() const final;
 
     /// Since the controller is in the chassis frame, no frame transformation is required.
-    inline WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final
+    inline tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final
     {
         return controllerFrameAngle;
     }
 
     /// Since the controller is in the chassis frame, no frame transformation is required.
-    inline WrappedFloat convertChassisAngleToControllerFrame(
-        WrappedFloat chassisFrameAngle) const final
+    inline tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final
     {
         return chassisFrameAngle;
     }
@@ -112,31 +110,32 @@ public:
      * @see TurretControllerInterface for more details.
      * @param[in] desiredSetpoint The pitch desired setpoint in the chassis frame.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /**
      * @return The pitch setpoint, in the chassis frame.
      */
-    WrappedFloat getSetpoint() const final;
+    tap::algorithms::WrappedFloat getSetpoint() const final;
 
     /// @return The chassis frame pitch turret measurement, refer to top level documentation for
     /// more details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     bool isOnline() const final;
 
     /// Since the controller is in the chassis frame, no frame transformation is required.
-    inline WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final
+    inline tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final
     {
         return controllerFrameAngle;
     }
 
     /// Since the controller is in the chassis frame, no frame transformation is required.
-    inline WrappedFloat convertChassisAngleToControllerFrame(
-        WrappedFloat chassisFrameAngle) const final
+    inline tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final
     {
         return chassisFrameAngle;
     }
@@ -145,6 +144,6 @@ private:
     tap::algorithms::SmoothPid pid;
 };
 
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // CHASSIS_FRAME_TURRET_CONTROLLER_HPP_

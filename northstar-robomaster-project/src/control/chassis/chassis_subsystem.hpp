@@ -21,7 +21,7 @@
 #endif
 #include "chassis_odometry.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 struct ChassisConfig
 {
@@ -180,7 +180,8 @@ public:
         float maxDeceleration,
         float dt)
     {
-        if (getSign(ramp.getTarget()) == getSign(ramp.getValue()) &&
+        if (tap::algorithms::getSign(ramp.getTarget()) ==
+                tap::algorithms::getSign(ramp.getValue()) &&
             abs(ramp.getTarget()) > abs(ramp.getValue()))
         {
             // we are trying to speed up
@@ -243,12 +244,12 @@ private:
      */
     inline float mpsToRpm(float mps)
     {
-        return mps / (M_PI * src::chassis::WHEEL_DIAMETER_M) * 60.0f / CHASSIS_GEAR_RATIO;
+        return mps / (M_PI * src::control::chassis::WHEEL_DIAMETER_M) * 60.0f / CHASSIS_GEAR_RATIO;
     }
 
     static modm::Pair<int, float> lastComputedMaxWheelSpeed;
 
-    src::chassis::ChassisOdometry* chassisOdometry;
+    src::control::chassis::ChassisOdometry* chassisOdometry;
 
     src::control::turret::TurretMotor* yawMotor;
 
@@ -268,4 +269,4 @@ private:
 protected:
     std::array<Motor, static_cast<uint8_t>(MotorId::NUM_MOTORS)> motors;
 };  // class ChassisSubsystem
-}  // namespace src::chassis
+}  // namespace src::control::chassis

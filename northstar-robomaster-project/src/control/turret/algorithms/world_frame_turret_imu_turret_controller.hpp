@@ -28,15 +28,10 @@
 
 #include "turret_controller_interface.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::turret
 {
 class TurretMotor;
-}
 
-namespace src::control::turret::algorithms
-{
 /**
  * World frame turret yaw controller. Requires that a development board be mounted rigidly on the
  * turret and connected via the `TurretMCBCanComm` class. The development board's IMU is used to
@@ -60,8 +55,8 @@ public:
     WorldFrameYawTurretImuCascadePidTurretController(
         tap::Drivers &drivers,
         TurretMotor &yawMotor,
-        SmoothPid &positionPid,
-        SmoothPid &velocityPid);
+        tap::algorithms::SmoothPid &positionPid,
+        tap::algorithms::SmoothPid &velocityPid);
 
     void initialize() final;
 
@@ -70,43 +65,46 @@ public:
      * @param[in] desiredSetpoint The unwrapped yaw desired setpoint in the world frame. Clamped
      * within chassis frame turret angle limits if applicable.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
     /// Sets the world frame yaw angle setpoint, refer to top level documentation for more details.
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return World frame yaw angle setpoint, refer to top level documentation for more details.
-    inline WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
+    inline tap::algorithms::WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
 
     /// @return World frame yaw angle measurement from IMU, refer to top level documentation for
     /// more details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     /// @return World frame yaw angle measurement from MOTOR, refer to top level documentation for
     /// more details.
-    WrappedFloat getMeasurementMotor() const override final;
+    tap::algorithms::WrappedFloat getMeasurementMotor() const override final;
 
     bool isOnline() const final;
 
-    WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final;
 
-    WrappedFloat convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final;
 
 private:
     tap::Drivers &drivers;
 
-    SmoothPid &positionPid;
-    SmoothPid &velocityPid;
+    tap::algorithms::SmoothPid &positionPid;
+    tap::algorithms::SmoothPid &velocityPid;
 
-    WrappedFloat worldFrameSetpoint;
+    tap::algorithms::WrappedFloat worldFrameSetpoint;
 
     float worldFrameMeasurementIMU;
     int32_t IMUrevolutions;
 
-    inline WrappedFloat getBmi088Yaw(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getBmi088Yaw(bool negitive = false) const
     {
-        return negitive ? Angle(drivers.bmi088.getYaw() * -1) : Angle(drivers.bmi088.getYaw());
+        return negitive ? tap::algorithms::Angle(drivers.bmi088.getYaw() * -1)
+                        : tap::algorithms::Angle(drivers.bmi088.getYaw());
     }
 
     inline float getBmi088YawVelocity() const { return drivers.bmi088.getGz(); }
@@ -136,8 +134,8 @@ public:
     WorldFramePitchTurretImuCascadePidTurretController(
         tap::Drivers &drivers,
         TurretMotor &pitchMotor,
-        SmoothPid &positionPid,
-        SmoothPid &velocityPid);
+        tap::algorithms::SmoothPid &positionPid,
+        tap::algorithms::SmoothPid &velocityPid);
 
     void initialize() final;
 
@@ -145,40 +143,43 @@ public:
      * @see TurretControllerInterface for more details.
      * @param[in] desiredSetpoint The pitch desired setpoint in the world frame.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
     /// Sets the world frame pitch angle setpoint, refer to top level documentation for more
     /// details.
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
-    inline WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
+    inline tap::algorithms::WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
 
     /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     bool isOnline() const final;
 
-    WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final;
 
-    WrappedFloat convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final;
 
 private:
     tap::Drivers &drivers;
 
-    SmoothPid &positionPid;
-    SmoothPid &velocityPid;
+    tap::algorithms::SmoothPid &positionPid;
+    tap::algorithms::SmoothPid &velocityPid;
 
-    WrappedFloat worldFrameSetpoint;
+    tap::algorithms::WrappedFloat worldFrameSetpoint;
 
-    inline WrappedFloat getBmi088Pitch(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getBmi088Pitch(bool negitive = false) const
     {
-        return negitive ? Angle(drivers.bmi088.getPitch() * -1) : Angle(drivers.bmi088.getPitch());
+        return negitive ? tap::algorithms::Angle(drivers.bmi088.getPitch() * -1)
+                        : tap::algorithms::Angle(drivers.bmi088.getPitch());
     }
 
     inline float getBmi088PitchVelocity() const { return drivers.bmi088.getGy(); }
 };
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  //  WORLD_FRAME_TURRET_IMU_TURRET_CONTROLLER_HPP_

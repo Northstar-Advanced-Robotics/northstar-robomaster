@@ -5,8 +5,9 @@
 #include "tap/algorithms/math_user_utils.hpp"
 #include "tap/motor/dji_motor.hpp"
 
-using namespace tap::motor;
-using namespace tap::algorithms;
+using tap::algorithms::Angle;
+using tap::algorithms::limitVal;
+using tap::algorithms::WrappedFloat;
 
 namespace src::control::turret
 {

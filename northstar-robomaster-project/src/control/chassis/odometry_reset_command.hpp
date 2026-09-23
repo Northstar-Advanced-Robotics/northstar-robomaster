@@ -7,14 +7,16 @@
 
 #include "chassis_subsystem.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
 class OdometryResetCommand : public tap::control::Command
 {
 public:
-    OdometryResetCommand(ChassisSubsystem *chassis, src::chassis::ChassisOdometry *odometry)
+    OdometryResetCommand(
+        ChassisSubsystem *chassis,
+        src::control::chassis::ChassisOdometry *odometry)
         : chassis(chassis),
           odometry(odometry)
     {
@@ -32,9 +34,9 @@ public:
     bool isFinished() const { return true; }
 
 private:
-    src::chassis::ChassisSubsystem *chassis;
-    src::chassis::ChassisOdometry *odometry;
+    src::control::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisOdometry *odometry;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

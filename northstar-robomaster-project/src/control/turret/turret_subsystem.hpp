@@ -40,14 +40,11 @@
 
 #include "modm/math/filter/pid.hpp"
 
-namespace src::control::turret::algorithms
+namespace src::control::turret
 {
 class TurretPitchControllerInterface;
 class TurretYawControllerInterface;
-}  // namespace src::control::turret::algorithms
 
-namespace src::control::turret
-{
 /**
  * Stores software necessary for interacting with two gimbals that control the pitch and
  * yaw of a turret. Provides a convenient API for other commands to interact with a turret.

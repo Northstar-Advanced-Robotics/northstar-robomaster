@@ -22,14 +22,13 @@
 // #define USING_HERO_AGITATOR
 // #define USING_FLYWHEEL
 // #define USING_REV
-// #define USING_HUD
 
 #include "control/dummy_subsystem.hpp"
 
 #include "drivers_singleton.hpp"
 
-src::testbed::driversFunc drivers = src::testbed::DoNotUse_getDrivers;
-DummySubsystem dummySubsystem(drivers());
+src::robot::testbed::driversFunc drivers = src::robot::testbed::DoNotUse_getDrivers;
+src::control::DummySubsystem dummySubsystem(drivers());
 
 #ifdef USING_CHASSIS
 
@@ -114,24 +113,6 @@ DummySubsystem dummySubsystem(drivers());
 #include "control/flywheel/flywheel_constants.hpp"
 #include "control/flywheel/flywheel_run_command.hpp"
 #include "control/flywheel/flywheel_subsystem.hpp"
-
-#endif
-
-#ifdef USING_HUD
-
-#include "tap/communication/serial/ref_serial_transmitter.hpp"
-
-#include "control/clientDisplay/client_display_command.hpp"
-#include "control/clientDisplay/client_display_subsystem.hpp"
-#include "control/clientDisplay/indicators/ammo_indicator.hpp"
-#include "control/clientDisplay/indicators/chassis_power_indicator.hpp"
-#include "control/clientDisplay/indicators/circle_crosshair.hpp"
-#include "control/clientDisplay/indicators/cv_aiming_indicator.hpp"
-#include "control/clientDisplay/indicators/flywheel_indicator.hpp"
-#include "control/clientDisplay/indicators/hud_indicator.hpp"
-#include "control/clientDisplay/indicators/shooting_mode_indicator.hpp"
-#include "control/clientDisplay/indicators/text_hud_indicators.hpp"
-#include "control/clientDisplay/indicators/vision_indicator.hpp"
 
 #endif
 

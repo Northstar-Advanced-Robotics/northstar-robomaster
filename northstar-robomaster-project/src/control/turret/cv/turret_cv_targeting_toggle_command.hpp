@@ -6,7 +6,7 @@
 #include "control/dummy_subsystem.hpp"
 #include "control/turret/cv/turret_cv_control_command.hpp"
 
-namespace src::control::turret::cv
+namespace src::control::turret
 {
 class TurretCVTargetingToggleCommand : public tap::control::Command
 {
@@ -35,6 +35,6 @@ public:
 private:
     TurretCVControlCommand *turretCVControlCommand;
 };
-}  // namespace src::control::turret::cv
+}  // namespace src::control::turret
 
 #endif  // TURRET_CV_TARGETING_TOGGLE_COMMAND_HPP_

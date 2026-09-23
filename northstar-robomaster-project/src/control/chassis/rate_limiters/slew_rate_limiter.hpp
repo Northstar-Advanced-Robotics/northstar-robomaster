@@ -1,4 +1,4 @@
-namespace src::chassis::algorithms
+namespace src::control::chassis
 {
 class SlewRateLimiter
 {
@@ -15,4 +15,4 @@ private:
     float maxError;   // Rotations per minute
 };
 
-}  // namespace src::chassis::algorithms
+}  // namespace src::control::chassis

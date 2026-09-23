@@ -4,7 +4,7 @@
 #include "tap/communication/gpio/digital.hpp"
 #include "tap/communication/sensors/limit_switch/limit_switch_interface.hpp"
 
-namespace src::communication::sensors::limit_switch
+namespace src::communication::sensors
 {
 class LimitSwitch : public tap::communication::sensors::limit_switch::LimitSwitchInterface
 {
@@ -36,6 +36,6 @@ public:
         }
     }
 };
-}  // namespace src::communication::sensors::limit_switch
+}  // namespace src::communication::sensors
 
 #endif  // LIMIT_SWITCH_HPP

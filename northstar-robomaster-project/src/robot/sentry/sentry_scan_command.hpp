@@ -8,17 +8,17 @@
 #include "control/turret/algorithms/turret_controller_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
 
-namespace src::control::turret::cv
+namespace src::robot::sentry
 {
 class SentryScanCommand : public tap::control::Command
 {
 public:
     SentryScanCommand(
         tap::Drivers *drivers,
-        TurretSubsystem *turretSubsystem,
-        algorithms::TurretYawControllerInterface *yawController,
-        algorithms::TurretPitchControllerInterface *pitchController,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::turret::TurretSubsystem *turretSubsystem,
+        src::control::turret::TurretYawControllerInterface *yawController,
+        src::control::turret::TurretPitchControllerInterface *pitchController,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float MIN_PITCH_ANGLE,
         float MAX_PITCH_ANGLE,
         float PITCH_SPEED,
@@ -38,23 +38,23 @@ public:
 
 private:
     tap::Drivers *drivers;
-    TurretSubsystem *turretSubsystem;
+    src::control::turret::TurretSubsystem *turretSubsystem;
 
     uint32_t prevTime = 0;
 
     float currentYawChunkTimer = 0;
     float currentYawSetpoint = 0;
 
-    algorithms::TurretYawControllerInterface *yawController;
-    algorithms::TurretPitchControllerInterface *pitchController;
+    src::control::turret::TurretYawControllerInterface *yawController;
+    src::control::turret::TurretPitchControllerInterface *pitchController;
 
-    src::chassis::ChassisOdometry *chassisOdometry;
+    src::control::chassis::ChassisOdometry *chassisOdometry;
 
     float MIN_PITCH_ANGLE;
     float MAX_PITCH_ANGLE;
     float PITCH_SPEED;
     float YAW_SPEED;
 };
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry
 
 #endif  // SENTRY_TURRET_USER_CONTROL_COMMAND_HPP_

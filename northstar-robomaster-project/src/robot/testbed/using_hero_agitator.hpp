@@ -10,7 +10,6 @@
 
 using namespace tap::control::setpoint;
 using namespace tap::control;
-using namespace src::agitator;
 using namespace src::control::agitator;
 using namespace tap::communication::serial;
 using namespace src::control::governor;
@@ -26,19 +25,19 @@ TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 12);
 // agitator subsystem
 VelocityAgitatorSubsystem agitator(
     drivers(),
-    constants::AGITATOR_PID_CONFIG,
-    constants::AGITATOR_CONFIG);
+    src::control::agitator::AGITATOR_PID_CONFIG,
+    src::control::agitator::AGITATOR_CONFIG);
 
-src::kicker::KickerSubsystem kicker(
+src::control::kicker::KickerSubsystem kicker(
     drivers(),
-    src::control::kicker::constants::KICKER_PID_CONFIG,
-    src::control::kicker::constants::KICKER_CONFIG);
+    src::control::kicker::KICKER_PID_CONFIG,
+    src::control::kicker::KICKER_CONFIG);
 
-ConstantVelocityAgitatorCommand rotateAgitator(agitator, constants::AGITATOR_ROTATE_CONFIG);
+ConstantVelocityAgitatorCommand rotateAgitator(agitator, src::control::agitator::AGITATOR_ROTATE_CONFIG);
 
 src::control::kicker::ConstantVelocityKickerCommand rotateKicker(&kicker, 40.0f);
 
-UnjamSpokeAgitatorCommand unjamAgitator(agitator, constants::AGITATOR_UNJAM_CONFIG);
+UnjamSpokeAgitatorCommand unjamAgitator(agitator, src::control::agitator::AGITATOR_UNJAM_CONFIG);
 
 MoveUnjamIntegralComprisedCommand rotateAndUnjamAgitator(
     *drivers(),

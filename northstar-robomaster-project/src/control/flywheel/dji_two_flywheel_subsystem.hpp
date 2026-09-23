@@ -86,7 +86,7 @@ private:
     tap::motor::DjiMotor rightWheel;
 
     float launchSpeedToFlywheelRpm(float launchSpeed) const override;
-};  // namespace src::control::flywheel
+};
 
 }  // namespace src::control::flywheel
 

@@ -10,14 +10,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -26,7 +26,7 @@ class ChassisDriveDistanceCommand : public tap::control::Command
 public:
     ChassisDriveDistanceCommand(
         ChassisSubsystem *chassis,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float xDist,
         float yDist,
         float maxError);
@@ -45,10 +45,10 @@ private:
     static constexpr float MAXIMUM_MPS = 1.0f;
     static constexpr float MINIMUM_MPS = 0.38f;
 
-    src::chassis::ChassisSubsystem *chassis;
-    src::chassis::ChassisOdometry *chassisOdometry;
+    src::control::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisOdometry *chassisOdometry;
 
     modm::Vector<float, 2> targetPosition;
     float maxError;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

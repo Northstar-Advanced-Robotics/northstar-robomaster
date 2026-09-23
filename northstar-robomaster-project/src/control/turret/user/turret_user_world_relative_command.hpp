@@ -29,20 +29,17 @@
 namespace src
 {
 class Drivers;
-}
+}  // namespace src
 
-namespace src::control
+namespace src::robot
 {
 class ControlOperatorInterface;
-}
+}  // namespace src::robot
 
 namespace src::control::turret
 {
 class TurretSubsystem;
-}
 
-namespace src::control::turret::user
-{
 /**
  * Turret control, with the yaw and pitch gimbals using the world relative frame,
  * such that the desired turret angle is independent of the direction that the chassis
@@ -73,12 +70,12 @@ public:
      */
     TurretUserWorldRelativeCommand(
         tap::Drivers *drivers,
-        ControlOperatorInterface &controlOperatorInterface,
+        src::robot::ControlOperatorInterface &controlOperatorInterface,
         TurretSubsystem *turretSubsystem,
-        algorithms::TurretYawControllerInterface *chassisImuYawController,
-        algorithms::TurretPitchControllerInterface *chassisImuPitchController,
-        algorithms::TurretYawControllerInterface *turretImuYawController,
-        algorithms::TurretPitchControllerInterface *turretImuPitchController,
+        TurretYawControllerInterface *chassisImuYawController,
+        TurretPitchControllerInterface *chassisImuPitchController,
+        TurretYawControllerInterface *turretImuYawController,
+        TurretPitchControllerInterface *turretImuPitchController,
         float userYawInputScalar,
         float userPitchInputScalar,
         uint8_t turretID = 0);
@@ -100,6 +97,6 @@ private:
     TurretUserControlCommand turretWRTurretImuCommand;
 };  // class TurretUserWorldRelativeCommand
 
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret
 
 #endif  // TURRET_USER_WORLD_RELATIVE_COMMAND_HPP_

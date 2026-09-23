@@ -27,7 +27,11 @@
 
 #include "turret_gravity_compensation.hpp"
 
-namespace src::control::turret::algorithms
+using tap::algorithms::Angle;
+using tap::algorithms::compareFloatClose;
+using tap::algorithms::WrappedFloat;
+
+namespace src::control::turret
 {
 /**
  * Transforms the specified `angleToTransform`, a yaw/pitch angle (in radians) from the chassis
@@ -467,4 +471,4 @@ WrappedFloat WorldFramePitchTurretImuCascadePidTurretControllerFF::
         worldFramePitchAngle,
         chassisFrameAngle);
 }
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

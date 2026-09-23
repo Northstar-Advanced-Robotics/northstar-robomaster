@@ -8,10 +8,9 @@
 
 #include "modm/platform/timer/timer_12.hpp"
 
-
-namespace tap::encoder
+namespace src::communication::sensors
 {
-class PwmEncoder : public WrappedEncoder
+class PwmEncoder : public tap::encoder::WrappedEncoder
 {
 public:
     static constexpr uint16_t ENC_RESOLUTION = 4096;
@@ -32,6 +31,6 @@ public:
     bool isOnline() const override;
 };
 
-}  // namespace tap::encoder
+}  // namespace src::communication::sensors
 
 #endif  // TAPROOT_PWM_ENCODER_HPP_

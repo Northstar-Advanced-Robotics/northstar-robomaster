@@ -8,6 +8,8 @@
 #include "control/chassis/chassis_auto_drive.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 
+namespace src::control::algorithms
+{
 class CubicBezier
 {
 public:
@@ -115,5 +117,7 @@ public:
 private:
     CurveData curveData;
 };
+
+}  // namespace src::control::algorithms
 
 #endif

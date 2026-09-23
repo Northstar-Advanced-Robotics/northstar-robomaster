@@ -8,7 +8,7 @@
 #include "control/agitator/constant_velocity_agitator_command.hpp"
 #include "control/agitator/manual_fire_rate_reselection_manager.hpp"
 
-namespace src::agitator
+namespace src::control::agitator
 {
 class SetFireRateCommand : public tap::control::Command
 {
@@ -55,6 +55,6 @@ private:
     u_int8_t fireRate = 0;
     std::optional<src::control::agitator::ConstantVelocityAgitatorCommand *> command;
 };
-}  // namespace src::agitator
+}  // namespace src::control::agitator
 
 #endif

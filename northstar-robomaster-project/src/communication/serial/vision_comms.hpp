@@ -12,7 +12,7 @@
 
 #include "uart_constants.hpp"
 
-namespace src::serial
+namespace src::communication::serial
 {
 class VisionComms : public tap::communication::serial::DJISerial
 {
@@ -142,9 +142,9 @@ public:
         uint32_t timestamp;
     } modm_packed;
 
-    src::chassis::ChassisOdometry* chassisOdometry;
+    src::control::chassis::ChassisOdometry* chassisOdometry;
 
-    src::chassis::ChassisAutoDrive* chassisAutoDrive;
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive;
 
     tap::communication::serial::Remote* remote;
 
@@ -204,12 +204,12 @@ public:
         return isAimDataUpdated();
     }
 
-    mockable inline void attachOdometry(src::chassis::ChassisOdometry* chassisOdometry)
+    mockable inline void attachOdometry(src::control::chassis::ChassisOdometry* chassisOdometry)
     {
         this->chassisOdometry = chassisOdometry;
     }
 
-    mockable inline void attachAutoDrive(src::chassis::ChassisAutoDrive* chassisAutoDrive)
+    mockable inline void attachAutoDrive(src::control::chassis::ChassisAutoDrive* chassisAutoDrive)
     {
         this->chassisAutoDrive = chassisAutoDrive;
     }
@@ -257,6 +257,6 @@ private:
 
     bool decodeToVT13Remote(const ReceivedSerialMessage& message);
 };
-}  // namespace src::serial
+}  // namespace src::communication::serial
 
 #endif  // VISION_COMMS_HPP

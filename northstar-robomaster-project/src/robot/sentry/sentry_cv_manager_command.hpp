@@ -11,19 +11,19 @@
 #include "robot/control_operator_interface.hpp"
 #include "robot/sentry/sentry_scan_command.hpp"
 
-namespace src::control::turret::cv
+namespace src::robot::sentry
 {
 class SentryCvManagerCommand : public tap::control::ComprisedCommand
 {
 public:
     SentryCvManagerCommand(
         tap::Drivers *drivers,
-        src::serial::VisionComms &visionComms,
+        src::communication::serial::VisionComms &visionComms,
         src::control::turret::TurretSubsystem *sentryTurretSubsystem,
-        src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand,
-        src::control::turret::algorithms::TurretYawControllerInterface *yawController,
-        src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::turret::TurretCVControlCommand &turretCVControlCommand,
+        src::control::turret::TurretYawControllerInterface *yawController,
+        src::control::turret::TurretPitchControllerInterface *pitchController,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float userYawInputScalar,
         float userPitchInputScalar,
         float MIN_PITCH_ANGLE,
@@ -44,11 +44,11 @@ public:
     const char *getName() const override { return "Sentry CV"; }
 
 private:
-    src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand;
-    src::control::turret::cv::SentryScanCommand turretScanCommand;
-    src::serial::VisionComms &visionComms;
+    src::control::turret::TurretCVControlCommand &turretCVControlCommand;
+    SentryScanCommand turretScanCommand;
+    src::communication::serial::VisionComms &visionComms;
 };  // class SentryCvManagerCommand
 
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry
 
 #endif  // SENTRY_TURRET_USER_WORLD_RELATIVE_COMMAND_HPP_

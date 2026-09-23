@@ -25,7 +25,7 @@
 
 #include "modm/architecture/interface/can.hpp"
 
-namespace src::can
+namespace src::communication::can
 {
 TurretMCBCanComm::TurretMCBCanComm(tap::Drivers* drivers, tap::can::CanBus canBus)
     : canBus(canBus),
@@ -223,4 +223,4 @@ void TurretMCBCanComm::TurretMcbRxHandler::processMessage(const modm::can::Messa
     (msgHandler->*funcToCall)(message);
 }
 
-}  // namespace src::can
+}  // namespace src::communication::can

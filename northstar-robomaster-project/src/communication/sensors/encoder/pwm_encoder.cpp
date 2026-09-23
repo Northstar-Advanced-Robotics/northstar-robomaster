@@ -3,7 +3,7 @@
 // We need device.hpp to ensure definitions are visible
 #include <modm/platform/device.hpp>
 
-namespace tap::encoder
+namespace src::communication::sensors
 {
 PwmEncoder::PwmEncoder(bool isInverted, float gearRatio)
     : WrappedEncoder(isInverted, ENC_RESOLUTION, gearRatio)
@@ -90,4 +90,4 @@ bool PwmEncoder::isOnline() const
     return modm::platform::Timer12::getCompareValue(1) > 0;
 }
 
-}  // namespace tap::encoder
+}  // namespace src::communication::sensors

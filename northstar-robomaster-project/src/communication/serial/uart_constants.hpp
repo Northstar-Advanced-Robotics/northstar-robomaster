@@ -13,8 +13,8 @@
 #include "robot/standard/standard_uart_constants.hpp"
 #endif
 
-namespace src::serial
+namespace src::communication::serial
 {
-}  // namespace src::serial
+}  // namespace src::communication::serial
 
 #endif  // UART_CONSTANTS_HPP

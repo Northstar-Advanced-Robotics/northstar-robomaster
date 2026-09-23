@@ -10,7 +10,9 @@ namespace src::control::kicker
 class ConstantVelocityKickerCommand : public tap::control::Command
 {
 public:
-    ConstantVelocityKickerCommand(src::kicker::KickerSubsystem* kicker, float velocitySetpoint);
+    ConstantVelocityKickerCommand(
+        src::control::kicker::KickerSubsystem* kicker,
+        float velocitySetpoint);
 
     void initialize() override;
 
@@ -25,7 +27,7 @@ public:
     const char* getName() const override { return "ConstantVelocityKickerCommand"; }
 
 private:
-    src::kicker::KickerSubsystem* kicker;
+    src::control::kicker::KickerSubsystem* kicker;
 
     float velocitySetpoint;
 };

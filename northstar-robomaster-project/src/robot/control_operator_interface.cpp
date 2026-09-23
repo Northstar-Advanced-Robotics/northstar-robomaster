@@ -30,13 +30,14 @@
 #include "control/chassis/chassis_subsystem.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 
-using namespace tap::algorithms;
-using namespace tap::communication::serial;
-using namespace src::chassis;
+using src::control::chassis::CHASSIS_GEAR_RATIO;
+using src::control::chassis::CHASSIS_WALK_SPEED_MPS;
+using src::control::chassis::ChassisSubsystem;
+using src::control::chassis::WHEEL_DIAMETER_M;
+using tap::algorithms::compareFloatClose;
+using tap::algorithms::limitVal;
 
-namespace src
-{
-namespace control
+namespace src::robot
 {
 float ControlOperatorInterface::getTurretYawInput()
 {
@@ -210,6 +211,4 @@ float ControlOperatorInterface::getDrivetrainRotationalTranslation()
     return 0;
 }
 
-}  // namespace control
-
-}  // namespace src
+}  // namespace src::robot

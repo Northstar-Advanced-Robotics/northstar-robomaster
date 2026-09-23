@@ -15,7 +15,7 @@
 
 #endif
 
-namespace src::standard
+namespace src::robot::standard
 {
 class Drivers : public tap::Drivers
 {
@@ -36,11 +36,11 @@ public:
     testing::NiceMock<mock::ControlOperatorInterfaceMock> controlOperatorInterface;
 #else
 public:
-    control::ControlOperatorInterface controlOperatorInterface;
-    serial::VisionComms visionComms;
-    tap::encoder::PwmEncoder encoder;
+    src::robot::ControlOperatorInterface controlOperatorInterface;
+    src::communication::serial::VisionComms visionComms;
+    src::communication::sensors::PwmEncoder encoder;
 #endif
 };  // class src::StandardDrivers
-}  // namespace src::standard
+}  // namespace src::robot::standard
 
 #endif  // STANDARD_DRIVERS_HPP_

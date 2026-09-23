@@ -2,16 +2,16 @@
 
 #include "tap/drivers.hpp"
 
-namespace src::control::turret::cv
+namespace src::robot::sentry
 {
 SentryCvManagerCommand::SentryCvManagerCommand(
     tap::Drivers *drivers,
-    src::serial::VisionComms &visionComms,
+    src::communication::serial::VisionComms &visionComms,
     src::control::turret::TurretSubsystem *sentryTurretSubsystem,
-    src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand,
-    src::control::turret::algorithms::TurretYawControllerInterface *yawController,
-    src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
-    src::chassis::ChassisOdometry *chassisOdometry,
+    src::control::turret::TurretCVControlCommand &turretCVControlCommand,
+    src::control::turret::TurretYawControllerInterface *yawController,
+    src::control::turret::TurretPitchControllerInterface *pitchController,
+    src::control::chassis::ChassisOdometry *chassisOdometry,
     float userYawInputScalar,
     float userPitchInputScalar,
     float MIN_PITCH_ANGLE,
@@ -74,4 +74,4 @@ void SentryCvManagerCommand::end(bool interrupted)
     comprisedCommandScheduler.removeCommand(&turretCVControlCommand, interrupted);
 }
 
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry

@@ -10,7 +10,7 @@
 using namespace src::control::governor;
 using namespace tap::control;
 using namespace src::control::turret;
-using namespace src::chassis;
+using namespace src::control::chassis;
 
 
 extern src::control::turret::TurretSubsystem turretSubsystem;
@@ -77,25 +77,25 @@ PlateHitGovernor plateHitGovernor(drivers(), 5000);
 //     }},
 //     &chassisSubsystem);
 
-src::chassis::ChassisOdometry* chassisOdometry = new src::chassis::ChassisOdometry(
+src::control::chassis::ChassisOdometry* chassisOdometry = new src::control::chassis::ChassisOdometry(
     &drivers()->bmi088,
     yawMotor,
-    src::chassis::DIST_TO_CENTER,
-    src::chassis::WHEEL_DIAMETER_M);
+    src::control::chassis::DIST_TO_CENTER,
+    src::control::chassis::WHEEL_DIAMETER_M);
 
 ChassisSubsystem chassisSubsystem(
     drivers(),
-    src::chassis::ChassisConfig{
-        .leftFrontId = src::chassis::LEFT_FRONT_MOTOR_ID,
-        .leftBackId = src::chassis::LEFT_BACK_MOTOR_ID,
-        .rightBackId = src::chassis::RIGHT_BACK_MOTOR_ID,
-        .rightFrontId = src::chassis::RIGHT_FRONT_MOTOR_ID,
+    src::control::chassis::ChassisConfig{
+        .leftFrontId = src::control::chassis::LEFT_FRONT_MOTOR_ID,
+        .leftBackId = src::control::chassis::LEFT_BACK_MOTOR_ID,
+        .rightBackId = src::control::chassis::RIGHT_BACK_MOTOR_ID,
+        .rightFrontId = src::control::chassis::RIGHT_FRONT_MOTOR_ID,
         .canBus = CanBus::CAN_BUS1,
         .wheelVelocityPidConfig = modm::Pid<float>::Parameter(
-            src::chassis::VELOCITY_PID_KP,
-            src::chassis::VELOCITY_PID_KI,
-            src::chassis::VELOCITY_PID_KD,
-            src::chassis::VELOCITY_PID_MAX_ERROR_SUM),
+            src::control::chassis::VELOCITY_PID_KP,
+            src::control::chassis::VELOCITY_PID_KI,
+            src::control::chassis::VELOCITY_PID_KD,
+            src::control::chassis::VELOCITY_PID_MAX_ERROR_SUM),
     },
     &drivers()->turretMCBCanCommBus2,
     yawMotor,

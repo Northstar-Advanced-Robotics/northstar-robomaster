@@ -16,7 +16,7 @@
     +Rotation: CCW
 */
 
-namespace src::chassis
+namespace src::control::chassis
 {
 class ChassisOdometry
 {
@@ -251,6 +251,6 @@ public:
     }
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

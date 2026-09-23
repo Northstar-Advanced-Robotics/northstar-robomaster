@@ -20,9 +20,9 @@
 namespace src
 {
 class Drivers;
-}
+}  // namespace src
 
-namespace src::agitator
+namespace src::control::agitator
 {
 /**
  * Subsystem whose primary purpose is to encapsulate an agitator motor that operates using a
@@ -170,6 +170,6 @@ private:
 #endif
 };
 
-}  // namespace src::agitator
+}  // namespace src::control::agitator
 
 #endif  // VELOCITY_AGITATOR_SUBSYSTEM_HPP_

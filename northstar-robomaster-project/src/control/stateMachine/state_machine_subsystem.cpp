@@ -7,13 +7,13 @@
 
 #include "state_machine_subsytem.hpp"
 
-namespace src::stateMachine
+namespace src::control::state_machine
 {
 StateMachineSubsystem::StateMachineSubsystem(
     tap::Drivers* drivers,
-    src::chassis::ChassisSubsystem* chassisSubsystem,
-    src::chassis::ChassisAutoDrive* chassisAutoDrive,
-    src::chassis::ChassisBeybladeCommand* beybladeCommand,
+    src::control::chassis::ChassisSubsystem* chassisSubsystem,
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive,
+    src::control::chassis::ChassisBeybladeCommand* beybladeCommand,
     src::control::governor::MatchRunningGovernor* matchRunningGovernor)
     : Subsystem(drivers),
       drivers(drivers),
@@ -50,7 +50,7 @@ void StateMachineSubsystem::refresh()
                 chassisSubsystem->setVelocityFieldDrive(
                     0,
                     0,
-                    rotation * src::chassis::BEYBLADE_SPEEDUP_FACTOR);
+                    rotation * src::control::chassis::BEYBLADE_SPEEDUP_FACTOR);
             }
             else
             {
@@ -73,7 +73,7 @@ void StateMachineSubsystem::refresh()
             if (chassisSubsystem->getChassisOdometry()->getVelocityLocal().getLength() < 0.3f)
             {
                 chassisSubsystem->isBeybladingOnly = true;
-                desiredRotation *= src::chassis::BEYBLADE_SPEEDUP_FACTOR;
+                desiredRotation *= src::control::chassis::BEYBLADE_SPEEDUP_FACTOR;
             }
             else
             {
@@ -94,4 +94,4 @@ void StateMachineSubsystem::refresh()
     }
 }
 
-}  // namespace src::stateMachine
+}  // namespace src::control::state_machine

@@ -9,10 +9,7 @@
 #error "Do not include this file directly! Use chassis_constants.hpp instead."
 #endif
 
-using tap::can::CanBus;
-using tap::motor::DjiMotor;
-
-namespace src::chassis
+namespace src::control::chassis
 {
 static constexpr float VELOCITY_PID_KP = 10.0f;                 // 10.0f;
 static constexpr float VELOCITY_PID_KI = 0.0f;                  // 0.0f;
@@ -20,7 +17,7 @@ static constexpr float VELOCITY_PID_KD = 1.0f;                  // 1.25f;
 static constexpr float VELOCITY_PID_MAX_ERROR_SUM = 16'000.0f;  // 0.0f;
 static constexpr float VELOCITY_PID_KV = 0.0f;                  // 0.057f;
 static constexpr float VELOCITY_PID_KS = 0.0f;                  // 350.0f;
-static constexpr float VELOCITY_PID_MAX_OUTPUT = DjiMotor::MAX_OUTPUT_C620;
+static constexpr float VELOCITY_PID_MAX_OUTPUT = tap::motor::DjiMotor::MAX_OUTPUT_C620;
 static constexpr float CHASSIS_ROTATION_P = 4.0f;
 static constexpr float CHASSIS_ROTATION_D = 0.01f;
 static constexpr float CHASSIS_ROTATION_MAX_VEL = M_TWOPI;
@@ -65,6 +62,6 @@ static modm::interpolation::Linear<modm::Pair<int, float>> CHASSIS_POWER_TO_SPEE
     CHASSIS_POWER_TO_MAX_SPEED_LUT,
     MODM_ARRAY_SIZE(CHASSIS_POWER_TO_MAX_SPEED_LUT));
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

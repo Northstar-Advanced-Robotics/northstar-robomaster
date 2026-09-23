@@ -23,8 +23,8 @@
 
 #include "control/turret/constants/turret_constants.hpp"
 
-using namespace tap::algorithms;
-using namespace tap::communication::sensors::imu::bmi088;
+using tap::algorithms::Angle;
+using tap::communication::sensors::imu::bmi088::Bmi088;
 
 namespace src::control::imu
 {

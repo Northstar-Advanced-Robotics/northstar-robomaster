@@ -17,8 +17,4 @@
 #include "robot/hero/hero_flywheel_constants.hpp"
 #endif
 
-namespace src::flywheel
-{
-}  // namespace src::flywheel
-
 #endif  // FLYWHEEL_CONSTANTS_HPP_

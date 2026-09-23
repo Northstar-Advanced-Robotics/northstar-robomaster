@@ -3,6 +3,8 @@
 
 #include "control/buzzer/song_types.hpp"
 
+namespace src::control::buzzer
+{
 const Song rouser_song = {
 
     // --- MAIN THEME [A] ---
@@ -66,5 +68,7 @@ const Song rouser_song = {
 
     {0, 0}  // Sentinel to stop playback
 };
+
+}  // namespace src::control::buzzer
 
 #endif  // MEGALOVANIA_SONG_HPP

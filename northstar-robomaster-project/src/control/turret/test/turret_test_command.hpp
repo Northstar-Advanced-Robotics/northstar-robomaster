@@ -28,9 +28,9 @@
 namespace tap
 {
 class Drivers;
-}
+}  // namespace tap
 
-namespace src::control::turret::test
+namespace src::control::turret
 {
 /**
  * A command that performs a "u-turn" operation of the turret. Commands
@@ -54,8 +54,8 @@ public:
         TurretSubsystem *turretSubsystem,
         float yawMoveAmount,
         float pitchMoveAmount,
-        algorithms::TurretYawControllerInterface *yawController,
-        algorithms::TurretPitchControllerInterface *pitchController,
+        TurretYawControllerInterface *yawController,
+        TurretPitchControllerInterface *pitchController,
         float allowedError = 0.5f);
 
     bool isReady() override;
@@ -77,14 +77,14 @@ private:
     uint32_t startTime;
     uint32_t endTime;
     uint32_t prevTime;
-    WrappedFloat startYawAngle = WrappedFloat(0, 0, M_TWOPI);
-    WrappedFloat startPitchAngle = WrappedFloat(0, 0, M_TWOPI);
-    WrappedFloat newYawSetpoint = WrappedFloat(0, 0, M_TWOPI);
-    WrappedFloat newPitchSetpoint = WrappedFloat(0, 0, M_TWOPI);
+    tap::algorithms::WrappedFloat startYawAngle = tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
+    tap::algorithms::WrappedFloat startPitchAngle = tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
+    tap::algorithms::WrappedFloat newYawSetpoint = tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
+    tap::algorithms::WrappedFloat newPitchSetpoint = tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
     float allowedError;
-    algorithms::TurretYawControllerInterface *yawController;
-    algorithms::TurretPitchControllerInterface *pitchController;
+    TurretYawControllerInterface *yawController;
+    TurretPitchControllerInterface *pitchController;
 };
-}  // namespace src::control::turret::test
+}  // namespace src::control::turret
 
 #endif  // TURRET_QUICK_TURN_COMMAND_HPP_

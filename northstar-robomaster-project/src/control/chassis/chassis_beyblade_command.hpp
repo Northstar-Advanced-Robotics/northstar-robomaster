@@ -7,14 +7,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -23,7 +23,7 @@ class ChassisBeybladeCommand : public tap::control::Command
 public:
     ChassisBeybladeCommand(
         ChassisSubsystem *chassis,
-        src::control::ControlOperatorInterface *operatorInterface,
+        src::robot::ControlOperatorInterface *operatorInterface,
         short direction,
         bool isVariable);
 
@@ -40,9 +40,9 @@ public:
     float calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt);
 
 private:
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
 
-    src::control::ControlOperatorInterface *operatorInterface;
+    src::robot::ControlOperatorInterface *operatorInterface;
 
     uint32_t prevTime;
 
@@ -58,4 +58,4 @@ private:
 
     float beyBladeFastSpinSpeedThreshold = 0.3f;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

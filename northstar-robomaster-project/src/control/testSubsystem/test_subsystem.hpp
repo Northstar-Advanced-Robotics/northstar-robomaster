@@ -13,7 +13,7 @@
 
 // class Drivers;
 
-namespace HardwareTesting
+namespace src::control::test_subsystem
 {
 ///
 /// @brief This subsystem encapsulates four motors that control the chassis.
@@ -45,4 +45,4 @@ private:
     Motor debugPitchMotor;
 
 };  // class ChassisSubsystem
-}  // namespace Communications::Rev
+}  // namespace src::control::test_subsystem

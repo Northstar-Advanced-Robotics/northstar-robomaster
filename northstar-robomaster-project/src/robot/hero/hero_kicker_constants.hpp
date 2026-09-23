@@ -13,7 +13,7 @@
 #error "Do not include this file directly! Use kicker_constants.hpp instead."
 #endif
 
-namespace src::control::kicker::constants
+namespace src::control::kicker
 {
 // position PID terms
 // PID terms for hero
@@ -27,12 +27,12 @@ static constexpr tap::algorithms::SmoothPidConfig KICKER_PID_CONFIG = {
     .errorDerivativeFloor = 0.0f,
 };
 
-static constexpr src::kicker::KickerSubsystemConfig KICKER_CONFIG = {
+static constexpr src::control::kicker::KickerSubsystemConfig KICKER_CONFIG = {
     .gearRatio = 1 / 36.0f,
     .kickerMotorId = tap::motor::MOTOR3,
     .kickerCanBusId = tap::can::CanBus::CAN_BUS2,
     .isKickerInverted = false,
 };
-}  // namespace src::control::kicker::constants
+}  // namespace src::control::kicker
 
 #endif  // HERO_KICKER_CONSTANTS_HPP_

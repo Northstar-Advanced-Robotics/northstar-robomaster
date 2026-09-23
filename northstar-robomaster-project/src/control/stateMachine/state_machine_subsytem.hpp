@@ -9,16 +9,16 @@
 #include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 
-namespace src::stateMachine
+namespace src::control::state_machine
 {
 class StateMachineSubsystem : public tap::control::Subsystem
 {
 public:
     StateMachineSubsystem(
         tap::Drivers* drivers,
-        src::chassis::ChassisSubsystem* chassisSubsystem,
-        src::chassis::ChassisAutoDrive* chassisAutoDrive,
-        src::chassis::ChassisBeybladeCommand* beybladeCommand,
+        src::control::chassis::ChassisSubsystem* chassisSubsystem,
+        src::control::chassis::ChassisAutoDrive* chassisAutoDrive,
+        src::control::chassis::ChassisBeybladeCommand* beybladeCommand,
         src::control::governor::MatchRunningGovernor* matchRunningGovernor);
 
     void initialize() override;
@@ -30,15 +30,15 @@ public:
     const char* getName() const override { return "StateMachine"; }
 
 private:
-    src::chassis::ChassisSubsystem* chassisSubsystem;
-    src::chassis::ChassisAutoDrive* chassisAutoDrive;
-    src::chassis::ChassisBeybladeCommand* beybladeCommand;
+    src::control::chassis::ChassisSubsystem* chassisSubsystem;
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive;
+    src::control::chassis::ChassisBeybladeCommand* beybladeCommand;
     src::control::governor::MatchRunningGovernor* matchRunningGovernor;
 
     tap::Drivers* drivers;
     uint32_t prevTime = 0;
 };
 
-}  // namespace src::stateMachine
+}  // namespace src::control::state_machine
 
 #endif

@@ -6,6 +6,7 @@
 #include "tap/drivers.hpp"
 
 using tap::algorithms::limitVal;
+using tap::motor::DjiMotor;
 
 /*
     Chassis subsystem uses right hand rule, causing the following.
@@ -14,7 +15,7 @@ using tap::algorithms::limitVal;
     +Rotation: CCW
 */
 
-namespace src::chassis
+namespace src::control::chassis
 {
 modm::Pair<int, float> ChassisSubsystem::lastComputedMaxWheelSpeed =
     CHASSIS_POWER_TO_MAX_SPEED_LUT[0];
@@ -330,4 +331,4 @@ void ChassisSubsystem::refresh()
     debugGlobalvelocity = chassisOdometry->getVelocityGlobal();
     debugLocalvelocity = chassisOdometry->getVelocityLocal();
 }
-}  // namespace src::chassis
+}  // namespace src::control::chassis

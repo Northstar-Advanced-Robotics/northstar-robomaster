@@ -23,8 +23,6 @@
 #include "tap/algorithms/math_user_utils.hpp"
 #include "tap/control/setpoint/commands/move_integral_command.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::agitator
 {
 /**
@@ -60,7 +58,7 @@ public:
         useSingleShotMode = !constantRotation;
         if (useSingleShotMode && previousModeWasConstantRotation)
         {
-            if (getSign(config.targetIntegralChange) == -1)
+            if (tap::algorithms::getSign(config.targetIntegralChange) == -1)
             {
                 while (finalTargetIntegralSetpoint >
                        integrableSetpointSubsystem.getCurrentValueIntegral())

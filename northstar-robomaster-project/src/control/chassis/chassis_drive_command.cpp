@@ -6,13 +6,11 @@
 
 #include "chassis_subsystem.hpp"
 
-using tap::algorithms::limitVal;
-
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisDriveCommand::ChassisDriveCommand(
     ChassisSubsystem* chassis,
-    src::control::ControlOperatorInterface* operatorInterface)
+    src::robot::ControlOperatorInterface* operatorInterface)
     : chassis(chassis),
       operatorInterface(operatorInterface)
 {
@@ -34,4 +32,4 @@ void ChassisDriveCommand::end([[maybe_unused]] bool interrupted)
 {
     chassis->setVelocityTurretDrive(0, 0, 0);
 }
-};  // namespace src::chassis
+}  // namespace src::control::chassis

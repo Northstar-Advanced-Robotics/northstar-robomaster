@@ -28,8 +28,7 @@
 #include "tap/control/command_mapper.hpp"
 #include "tap/errors/create_errors.hpp"
 
-using namespace tap::motor;
-using namespace tap::algorithms;
+using tap::motor::MotorInterface;
 
 namespace src::control::turret
 {

@@ -25,7 +25,10 @@
 
 #include "turret_gravity_compensation.hpp"
 
-namespace src::control::turret::algorithms
+using tap::algorithms::Angle;
+using tap::algorithms::WrappedFloat;
+
+namespace src::control::turret
 {
 /**
  * Transforms the specified `angleToTransform`, a yaw/pitch angle (in radians) from the chassis
@@ -189,7 +192,7 @@ static inline float runWorldFrameTurretImuController(
 
 WorldFrameYawTurretCanImuCascadePidTurretController::
     WorldFrameYawTurretCanImuCascadePidTurretController(
-        const src::can::TurretMCBCanComm &turretMCBCanComm,
+        const src::communication::can::TurretMCBCanComm &turretMCBCanComm,
         TurretMotor &yawMotor,
         tap::algorithms::SmoothPid &positionPid,
         tap::algorithms::SmoothPid &velocityPid)
@@ -286,7 +289,7 @@ WrappedFloat WorldFrameYawTurretCanImuCascadePidTurretController::
 
 WorldFramePitchTurretCanImuCascadePidTurretController::
     WorldFramePitchTurretCanImuCascadePidTurretController(
-        const src::can::TurretMCBCanComm &turretMCBCanComm,
+        const src::communication::can::TurretMCBCanComm &turretMCBCanComm,
         TurretMotor &turretMotor,
         tap::algorithms::SmoothPid &positionPid,
         tap::algorithms::SmoothPid &velocityPid)
@@ -386,4 +389,4 @@ WrappedFloat WorldFramePitchTurretCanImuCascadePidTurretController::
         worldFramePitchAngle,
         chassisFrameAngle);
 }
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

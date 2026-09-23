@@ -1,5 +1,7 @@
 #include "control/buzzer/song_types.hpp"
 
+namespace src::control::buzzer
+{
 // Define the tempo for THIS song
 constexpr uint32_t TWINKLE_BPM = 120;
 
@@ -25,3 +27,5 @@ const Song twinkleTwinkle = {
     {NOTE_D4, QN},
     {NOTE_C4, HN},
 };
+
+}  // namespace src::control::buzzer

@@ -25,7 +25,7 @@
 
 #include "modm/math/geometry/angle.hpp"
 
-namespace src::control::turret::algorithms
+namespace src::control::turret
 {
 /**
  * @param[in] cgX The center of gravity relative to the center of the turret's pitch pivot point
@@ -50,6 +50,6 @@ float computeGravitationalForceOffset(
     const float cgZ,
     const float pitchAngleFromCenter,
     const float gravityCompensatorMax);
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // GRAVITY_COMPENSATION_HPP_

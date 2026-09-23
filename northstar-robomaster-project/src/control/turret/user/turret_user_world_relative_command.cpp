@@ -23,16 +23,16 @@
 
 #include "../turret_subsystem.hpp"
 
-namespace src::control::turret::user
+namespace src::control::turret
 {
 TurretUserWorldRelativeCommand::TurretUserWorldRelativeCommand(
     tap::Drivers *drivers,
-    ControlOperatorInterface &controlOperatorInterface,
+    src::robot::ControlOperatorInterface &controlOperatorInterface,
     TurretSubsystem *turretSubsystem,
-    algorithms::TurretYawControllerInterface *chassisImuYawController,
-    algorithms::TurretPitchControllerInterface *chassisImuPitchController,
-    algorithms::TurretYawControllerInterface *turretImuYawController,
-    algorithms::TurretPitchControllerInterface *turretImuPitchController,
+    TurretYawControllerInterface *chassisImuYawController,
+    TurretPitchControllerInterface *chassisImuPitchController,
+    TurretYawControllerInterface *turretImuYawController,
+    TurretPitchControllerInterface *turretImuPitchController,
     float userYawInputScalar,
     float userPitchInputScalar,
     uint8_t turretID)
@@ -111,4 +111,4 @@ void TurretUserWorldRelativeCommand::end(bool interrupted)
     comprisedCommandScheduler.removeCommand(&turretWRChassisImuCommand, interrupted);
 }
 
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret

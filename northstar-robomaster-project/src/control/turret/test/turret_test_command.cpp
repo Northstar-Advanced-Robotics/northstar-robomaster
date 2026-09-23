@@ -24,14 +24,14 @@
 
 using tap::algorithms::WrappedFloat;
 
-namespace src::control::turret::test
+namespace src::control::turret
 {
 TurretTestCommand::TurretTestCommand(
     TurretSubsystem *turretSubsystem,
     float yawMoveAmount,
     float pitchMoveAmount,
-    algorithms::TurretYawControllerInterface *yawController,
-    algorithms::TurretPitchControllerInterface *pitchController,
+    TurretYawControllerInterface *yawController,
+    TurretPitchControllerInterface *pitchController,
     float allowedError)
     : turretSubsystem(turretSubsystem),
       yawMoveAmount(yawMoveAmount),
@@ -108,4 +108,4 @@ void TurretTestCommand::end(bool)
     totalTime = (endTime - startTime) / 1000.0f;
 }
 
-}  // namespace src::control::turret::test
+}  // namespace src::control::turret

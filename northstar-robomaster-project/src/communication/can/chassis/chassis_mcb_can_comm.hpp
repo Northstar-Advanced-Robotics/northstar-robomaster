@@ -29,8 +29,10 @@
  
  namespace src {
     class Drivers;
-}
+}  // namespace src
  
+namespace src::communication::can
+{
  class ChassisMcbCanComm
  {
  public:
@@ -171,5 +173,7 @@
      void handleTimeSynchronizationMessage(const modm::can::Message& message);
  };
  
+}  // namespace src::communication::can
+
  #endif  // CHASSIS_MCB_CAN_COMM_HPP_
  

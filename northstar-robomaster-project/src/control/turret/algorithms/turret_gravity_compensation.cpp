@@ -20,9 +20,9 @@
 
 #include "tap/algorithms/math_user_utils.hpp"
 
-using namespace tap::algorithms;
+using tap::algorithms::compareFloatClose;
 
-namespace src::control::turret::algorithms
+namespace src::control::turret
 {
 float computeGravitationalForceOffset(
     const float cgX,
@@ -53,4 +53,4 @@ float computeGravitationalForceOffset(
 
     return gravityCompensatorMax * cosf(turretCGPolarTheta + pitchAngleFromCenter);
 }
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

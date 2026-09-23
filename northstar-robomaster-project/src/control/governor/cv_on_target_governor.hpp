@@ -37,8 +37,8 @@ class CvOnTargetGovernor : public tap::control::governor::CommandGovernorInterfa
 public:
     CvOnTargetGovernor(
         tap::Drivers *drivers,
-        src::serial::VisionComms &visionComms,
-        src::control::turret::cv::TurretCVControlCommandTemplate &turretCVCommand,
+        src::communication::serial::VisionComms &visionComms,
+        src::control::turret::TurretCVControlCommandTemplate &turretCVCommand,
         [[maybe_unused]] uint8_t turretID = 0,
         bool sentry = false)
         : drivers(drivers),
@@ -94,8 +94,8 @@ public:
 
 private:
     tap::Drivers *drivers;
-    src::serial::VisionComms &visionComms;
-    src::control::turret::cv::TurretCVControlCommandTemplate &turretCVCommand;
+    src::communication::serial::VisionComms &visionComms;
+    src::control::turret::TurretCVControlCommandTemplate &turretCVCommand;
     uint8_t turretID;
     bool enabled = true;
     bool sentry;

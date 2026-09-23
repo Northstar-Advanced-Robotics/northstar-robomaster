@@ -11,11 +11,11 @@
 #include "control/chassis/chassis_subsystem.hpp"
 #include "control/chassis/chassis_drive_command.hpp"
 
-using namespace src::gyro;
+using namespace src::robot::turret;
 
 driversFunc drivers = DoNotUse_getDrivers;
 
-namespace turret_control
+namespace src::robot::turret
 {
     
     
@@ -36,22 +36,16 @@ void setDefaultSoldierCommands(Drivers *drivers)
 
 void startSoldierCommands(Drivers *drivers) {}
 
-void registerSoldierIoMappings(Drivers *drivers)
-{
-   
-}
-}  // namespace turret_control
+void registerSoldierIoMappings(Drivers *drivers) {}
 
-namespace src::gyro
+void initSubsystemCommands(src::robot::turret::Drivers *drivers)
 {
-void initSubsystemCommands(src::gyro::Drivers *drivers)
-{
-    turret_control::initializeSubsystems(drivers);
-    turret_control::registerSoldierSubsystems(drivers);
-    turret_control::setDefaultSoldierCommands(drivers);
-    turret_control::startSoldierCommands(drivers);
-    turret_control::registerSoldierIoMappings(drivers);
+    initializeSubsystems(drivers);
+    registerSoldierSubsystems(drivers);
+    setDefaultSoldierCommands(drivers);
+    startSoldierCommands(drivers);
+    registerSoldierIoMappings(drivers);
 }
-} //namespace src::gyro
+}  // namespace src::robot::turret
 
 #endif

@@ -4,9 +4,7 @@
 
 #include "control/flywheel/flywheel_constants.hpp"
 
-using namespace tap::motor;
-using namespace tap::algorithms;
-using namespace src::flywheel;
+using tap::algorithms::limitVal;
 
 namespace src::control::flywheel
 {

@@ -24,10 +24,10 @@
 
 #include "modm/math/geometry/vector3.hpp"
 
-namespace src::can
+namespace src::communication::can
 {
 class TurretMCBCanComm;
-}
+}  // namespace src::communication::can
 
 namespace src::control::turret
 {

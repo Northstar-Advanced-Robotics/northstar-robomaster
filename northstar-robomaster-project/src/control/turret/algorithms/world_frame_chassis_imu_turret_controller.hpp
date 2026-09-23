@@ -30,15 +30,10 @@
 
 #include "turret_controller_interface.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::turret
 {
 class TurretMotor;
-}
 
-namespace src::control::turret::algorithms
-{
 /**
  * World frame turret yaw controller. Requires that the development board type A is mounted rigidly
  * to the chassis and is properly initialized. Runs a single position PID controller to control the
@@ -69,37 +64,42 @@ public:
      * @see TurretControllerInterface for more details.
      * @param[in] desiredSetpoint The yaw desired setpoint in the world frame.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
     /// @return World frame yaw angle setpoint, refer to top level documentation for more details.
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return world frame yaw angle measurement, refer to top level documentation for more
     /// details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     /**
      * @return The yaw setpoint, in the world frame.
      */
-    inline WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
+    inline tap::algorithms::WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
 
     bool isOnline() const final;
 
-    WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final;
 
-    WrappedFloat convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final;
 
 private:
     tap::Drivers &drivers;
 
     tap::algorithms::SmoothPid pid;
 
-    WrappedFloat worldFrameSetpoint;
+    tap::algorithms::WrappedFloat worldFrameSetpoint;
 
-    WrappedFloat chassisFrameInitImuYawAngle;
+    tap::algorithms::WrappedFloat chassisFrameInitImuYawAngle;
 
-    inline WrappedFloat getBmi088Yaw() const { return Angle(-drivers.bmi088.getYaw()); }
+    inline tap::algorithms::WrappedFloat getBmi088Yaw() const
+    {
+        return tap::algorithms::Angle(-drivers.bmi088.getYaw());
+    }
 };
 
 class WorldFramePitchChassisImuTurretController final : public TurretPitchControllerInterface
@@ -121,39 +121,44 @@ public:
      * @see TurretControllerInterface for more details.
      * @param[in] desiredSetpoint The pitch desired setpoint in the world frame.
      */
-    void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
+    void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
+        final;
 
     /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
-    void setSetpoint(WrappedFloat desiredSetpoint) final;
+    void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return world frame pitch angle measurement, refer to top level documentation for more
     /// details.
-    WrappedFloat getMeasurement() const final;
+    tap::algorithms::WrappedFloat getMeasurement() const final;
 
     /**
      * @return The pitch setpoint, in the world frame.
      */
-    inline WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
+    inline tap::algorithms::WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
 
     bool isOnline() const final;
 
-    WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const final;
 
-    WrappedFloat convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const final;
+    tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const final;
 
 private:
     tap::Drivers &drivers;
 
     tap::algorithms::SmoothPid pid;
 
-    WrappedFloat worldFrameSetpoint;
+    tap::algorithms::WrappedFloat worldFrameSetpoint;
 
-    WrappedFloat chassisFrameInitImuPitchAngle;
+    tap::algorithms::WrappedFloat chassisFrameInitImuPitchAngle;
 
-    inline WrappedFloat getBmi088Pitch() const { return Angle(drivers.bmi088.getPitch()); }
+    inline tap::algorithms::WrappedFloat getBmi088Pitch() const
+    {
+        return tap::algorithms::Angle(drivers.bmi088.getPitch());
+    }
 };
 
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // WORLD_FRAME_CHASSIS_IMU_TURRET_CONTROLLER_HPP_

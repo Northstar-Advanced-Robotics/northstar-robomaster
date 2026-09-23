@@ -27,9 +27,9 @@
 namespace tap
 {
 class Drivers;
-}
+}  // namespace tap
 
-namespace src::control::turret::user
+namespace src::control::turret
 {
 /**
  * A command that performs a "u-turn" operation of the turret. Commands
@@ -67,6 +67,6 @@ private:
     TurretSubsystem *turretSubsystem;
     const float targetOffsetToTurn;
 };
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret
 
 #endif  // TURRET_QUICK_TURN_COMMAND_HPP_

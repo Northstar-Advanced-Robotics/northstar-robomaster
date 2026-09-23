@@ -29,9 +29,7 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-namespace src
-{
-namespace control
+namespace src::robot
 {
 /**
  * A class for interfacing with the remote IO inside of Commands. While the
@@ -82,8 +80,6 @@ private:
     tap::algorithms::LinearInterpolationPredictor chassisYInput;
     tap::algorithms::LinearInterpolationPredictor chassisRInput;
 };
-}  // namespace control
-
-}  // namespace src
+}  // namespace src::robot
 
 #endif  // CONTROL_OPERATOR_INTERFACE_HPP_

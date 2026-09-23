@@ -17,7 +17,7 @@
 #include "robot/standard/standard_chassis_constants.hpp"
 #endif
 
-namespace src::chassis
+namespace src::control::chassis
 {
 // hardware constants, not specific to any particular chassis
 static constexpr tap::motor::MotorId LEFT_FRONT_MOTOR_ID = tap::motor::MOTOR2;
@@ -45,6 +45,6 @@ static constexpr float MAX_M3508_RPM_CHASSIS =
         vert * (maxDeflection / magnitude),
         hor * (maxDeflection / magnitude));
 }
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif  // CHASSIS_CONSTANTS_HPP_
