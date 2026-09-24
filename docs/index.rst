@@ -1,4 +1,4 @@
-NorthStarFleet2025
+NorthStarControls
 ==================
 
 Embedded control code for NorthStar's RoboMaster robots, running on a DJI type C

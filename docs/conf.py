@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'NorthStarFleet2025'
-copyright = '2020, NorthStarFleet2025'
-author = 'NorthStarFleet2025'
+project = 'NorthStarControls'
+copyright = '2020, NorthStarControls'
+author = 'NorthStarControls'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.0'
@@ -54,7 +54,7 @@ html_theme = 'sphinx_rtd_theme'
 # every build.
 
 
-breathe_default_project = "NorthStarFleet2025"
+breathe_default_project = "NorthStarControls"
 
 extensions = [
     'breathe',   # pulls Doxygen XML into Sphinx
@@ -63,7 +63,7 @@ extensions = [
 
 # Setup the breathe extension
 breathe_projects = {
-    "NorthStarFleet2025": "./doxyoutput/xml"
+    "NorthStarControls": "./doxyoutput/xml"
 }
 
 # Setup the exhale extension
