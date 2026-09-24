@@ -111,6 +111,8 @@ private:
     governor::CvOnTargetGovernor &cvOnTargetGovernor;
 #ifdef TARGET_SENTRY
     LaunchMode launchMode = LIMITED_10HZ;
+#elif TARGET_STANDARD
+    LaunchMode launchMode = LIMITED_20HZ;
 #else
     LaunchMode launchMode = SINGLE;
 #endif
