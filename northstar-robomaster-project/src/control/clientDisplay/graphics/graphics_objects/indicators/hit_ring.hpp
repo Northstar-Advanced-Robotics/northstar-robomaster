@@ -14,6 +14,16 @@ namespace src::control::client_display::graphics
 //
 //
 // if someone hit you in that direction
+/**
+ * @ingroup client_display
+ *
+ * Draws an arc at the center of the screen pointing in the direction a hit came from.
+ *
+ * The referee system reports which armor plate was struck, which is relative to the chassis, so the
+ * turret's yaw is subtracted to place the arc where the operator is actually looking. Several arcs
+ * at increasing radii record the last few hits, each fading out on its own timer, so a burst from
+ * one direction is distinguishable from fire from several.
+ */
 class HitRing : public GraphicsContainer
 {
 public:
@@ -36,6 +46,7 @@ public:
         }
     }
 
+    /// Draws an arc for any newly reported hit and clears the ones whose timers have expired.
     void update()
     {
         float encoder =

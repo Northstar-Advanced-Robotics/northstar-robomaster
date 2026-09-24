@@ -32,16 +32,24 @@ using namespace tap::communication::serial;
 namespace src::control::client_display
 {
 /**
- * Adds text to show in bright yellow the number of bullets currently the robot has.
- * Displays up to 3 digits, in the format "AMMO: 123" or "AMMO: -12".
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
+/**
+ * @ingroup client_display
+ *
+ * Draws an "AMMO: " label plus the projectile count the referee system reports.
+ *
+ * Reads `bulletsRemaining42` for the hero and `bulletsRemaining17` for every other robot. Drawn in
+ * orange, not the yellow an earlier version of this comment claimed.
  */
 class AmmoIndicator : public HudIndicator, protected modm::Resumable<2>
 {
 public:
     /**
-     * Construct a AmmoIndicator object.
-     *
-     * @param[in] refSerialTransmitter RefSerialTransmitter instance.
+     * @param[in] refSerialTransmitter Sends the assembled graphics to the referee system.
+     * @param[in] refSerial Referee system data supplying the projectile count.
      */
     AmmoIndicator(
         tap::communication::serial::RefSerialTransmitter &refSerialTransmitter,

@@ -6,6 +6,15 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Fills the entire screen with a grid of circles.
+ *
+ * A stress test for the drawing pipeline: it produces far more graphics than any real HUD, which is
+ * what exposes how the batching and layer handling behave under load. Not part of any robot's
+ * display.
+ */
 class TestFill : public GraphicsContainer
 {
 public:

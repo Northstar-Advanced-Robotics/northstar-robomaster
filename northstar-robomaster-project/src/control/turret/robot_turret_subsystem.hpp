@@ -26,6 +26,8 @@
 namespace src::control::turret
 {
 /**
+ * @ingroup turret
+ *
  * Subsystem that must be extended. Extends both the TurretSubsystem and TurretOrientationInterface.
  */
 class RobotTurretSubsystem : public src::control::turret::TurretSubsystem,

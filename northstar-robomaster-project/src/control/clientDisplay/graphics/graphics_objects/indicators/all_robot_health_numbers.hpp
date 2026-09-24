@@ -6,6 +6,15 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Shows the health of all six robots on the field, as a row of numbers.
+ *
+ * Laid out to line up with the robot icons the client already draws, so a number reads as belonging
+ * to the icon above it. A number flashes when that robot takes damage, which is how the operator
+ * notices a teammate under fire without watching the whole row.
+ */
 class AllRobotHealthNumbers : public GraphicsContainer
 {
 public:
@@ -24,6 +33,8 @@ public:
         }
     }
 
+    /// Reads every robot's health from the referee system, flashes any that just took damage, and
+    /// hides the row during the countdown when the client's own icons disappear.
     void update()
     {
         if (drivers->refSerial.getRefSerialReceivingData())

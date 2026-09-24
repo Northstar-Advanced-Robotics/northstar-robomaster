@@ -37,6 +37,12 @@ namespace src::control::client_display
  * A list of text indicators that are displayed if a condition is met
  */
 
+/**
+ * @ingroup client_display
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
 class TextHudIndicators : public HudIndicator, protected modm::Resumable<2>
 {
 public:
@@ -45,10 +51,12 @@ public:
      *
      * @param[in] drivers Global drivers instance.
      * @param[in] agitatorSubsystem Agitator used when checking if the agitator is jammed.
-     * @param[in] imuCalibrateCommand IMU calibrate command used to check if the IMU is being
-     * calibrated.
-     * @param[in] validChassisCommands List of valid chassis commands.
+     * @param[in] validChassisCommands Chassis commands whose absence means the robot is not
+     * spinning, which is what drives the `NOT_SPINNING` warning.
      * @param[in] refSerialTransmitter Transmitter to send client data
+     *
+     * @note The IMU-calibration parameter this constructor used to take is commented out of the
+     * signature, so no calibration state is shown any more.
      */
     TextHudIndicators(
         tap::Drivers &drivers,

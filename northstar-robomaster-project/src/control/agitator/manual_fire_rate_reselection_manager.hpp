@@ -28,6 +28,8 @@
 namespace src::control::agitator
 {
 /**
+ * @ingroup agitator
+ *
  * A container that stores a fire rate. The container will limit any specified fire rate to >= 0.
  * This object implements the FireRateReselectionManagerInterface and will be ready to fire whenever
  * the fire rate is > 0.

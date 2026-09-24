@@ -7,8 +7,14 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Shows how many projectiles are estimated to be left in the hopper.
+ *
+ * The referee system reports projectiles bought but not what is physically loaded, so this counts
+ * down from the hopper's capacity as the referee system reports shots being launched.
+ */
 class ShotsRemainingIndicator : public GraphicsContainer
 {
 public:
@@ -21,6 +27,8 @@ public:
         shotsRemaining.integer = MAX_HOPPER_CAPACITY;
     }
 
+    /// Decrements the count when the referee system reports a newly launched projectile, and
+    /// recenters the number.
     void update()
     {
         if (drivers->refSerial.getRefSerialReceivingData())

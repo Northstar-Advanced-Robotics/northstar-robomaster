@@ -43,6 +43,12 @@ class ClientDisplaySubsystem;
  * @note Only a single ClientDisplayCommand should be instantiated. If more than one is
  * instantiated, this will lead to undefined behavior.
  */
+/**
+ * @ingroup client_display
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
 class ClientDisplayCommand : public tap::control::Command, ::modm::pt::Protothread
 {
 public:

@@ -1,3 +1,13 @@
+/**
+ * Declares the test bed's chassis, and the turret yaw motor the chassis needs to orient against.
+ *
+ * `testbed_control.cpp` includes this file unconditionally; the `#ifdef` guards below are what
+ * actually select its contents, and those switches are set in `test_def.hpp`. Note the file is
+ * split into two independently guarded halves -- a `USING_TURRET` section for the yaw motor and a
+ * `USING_CHASSIS` section for the drivetrain -- so enabling one does not enable the other.
+ *
+ * Everything is declared at file scope, which is why exactly one translation unit may include it.
+ */
 #ifdef USING_TURRET
 
 #ifndef USING_CHASSIS_HPP_
@@ -48,6 +58,18 @@ src::control::turret::TurretMotor* yawMotor = &turretSubsystem.yawMotor;
 
 #endif
 
+/**
+ * The chassis half of this file: the subsystem and its odometry, the tank/orient/beyblade/wiggle
+ * drive commands, the two governors that gate beyblade on recent combat, and one remote mapping
+ * that toggles beyblade.
+ *
+ * Selected by `#ifdef USING_CHASSIS`, set in `test_def.hpp`.
+ *
+ * @warning This block does not currently compile if enabled: it passes
+ *      `&drivers()->turretMCBCanCommBus2` where `ChassisSubsystem` expects a `TurretMotor*`, and
+ *      the testbed `Drivers` has no such member. The drive commands are also declared without any
+ *      mapping, so only beyblade is reachable from the remote.
+ */
 #ifdef USING_CHASSIS
 
 FiredRecentlyGovernor firedRecentlyGovernor(drivers(), 5000);

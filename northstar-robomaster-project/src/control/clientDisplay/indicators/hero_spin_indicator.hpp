@@ -33,13 +33,26 @@ using namespace tap::communication::serial;
 
 namespace src::control::client_display
 {
+/**
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
+/**
+ * @ingroup client_display
+ *
+ * Draws an indicator that turns green while either the beyblade or the wiggle command is
+ * scheduled, so the hero's operator can see the chassis is spinning.
+ */
 class HeroSpinIndicator : public HudIndicator, protected modm::Resumable<2>
 {
 public:
     /**
-     * Construct a AmmoIndicator object.
-     *
-     * @param[in] refSerialTransmitter RefSerialTransmitter instance.
+     * @param[in] refSerialTransmitter Sends the assembled graphics to the referee system.
+     * @param[in] refSerial Referee system data. Stored but not read.
+     * @param[in] drivers The global drivers object.
+     * @param[in] beyblade Beyblade command, polled for whether it is scheduled.
+     * @param[in] wiggle Wiggle command, polled for whether it is scheduled.
      */
     HeroSpinIndicator(
         tap::communication::serial::RefSerialTransmitter &refSerialTransmitter,

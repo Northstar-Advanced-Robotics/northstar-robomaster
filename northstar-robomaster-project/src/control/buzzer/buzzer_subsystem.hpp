@@ -7,6 +7,14 @@
 #include "tap/drivers.hpp"
 namespace src::control::buzzer
 {
+/**
+ * @ingroup util
+ *
+ * The buzzer, driven as a PWM tone generator.
+ *
+ * Holds whatever note it was last given until told otherwise, which is why `PlaySongCommand` has to
+ * sequence notes itself. Used for audible status cues -- startup, and IMU calibration finishing.
+ */
 class BuzzerSubsystem : public tap::control::Subsystem
 {
 public:

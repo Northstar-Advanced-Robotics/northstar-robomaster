@@ -33,16 +33,23 @@ using namespace tap::communication::serial;
 namespace src::control::client_display
 {
 /**
- * Adds text to show in bright yellow the number of bullets currently the robot has.
- * Displays up to 3 digits, in the format "AMMO: 123" or "AMMO: -12".
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
+/**
+ * @ingroup client_display
+ *
+ * Draws a "CV control:  " label plus a circle coloured green or black by whether auto-aim reports
+ * being on target.
  */
 class CvAimingIndicator : public HudIndicator, protected modm::Resumable<2>
 {
 public:
     /**
-     * Construct a AmmoIndicator object.
-     *
-     * @param[in] refSerialTransmitter RefSerialTransmitter instance.
+     * @param[in] refSerialTransmitter Sends the assembled graphics to the referee system.
+     * @param[in] refSerial Referee system data. Stored but not read.
+     * @param[in] cvAimingGovorner The governor polled for on-target state.
      */
     CvAimingIndicator(
         tap::communication::serial::RefSerialTransmitter &refSerialTransmitter,

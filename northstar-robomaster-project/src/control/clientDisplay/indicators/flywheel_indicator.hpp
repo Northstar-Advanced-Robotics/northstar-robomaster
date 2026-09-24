@@ -32,13 +32,23 @@ using namespace tap::communication::serial;
 
 namespace src::control::client_display
 {
+/**
+ * @deprecated Not built into any robot. Superseded by `control/clientDisplay/graphics/`, which is
+ * what every robot's control file actually instantiates. The only construction site for this class
+ * is `robot/testbed/using_hud.hpp`, behind a `USING_HUD` switch that is commented out.
+ */
+/**
+ * @ingroup client_display
+ *
+ * Draws a label plus a circle reporting whether the flywheels are spun up.
+ */
 class FlywheelIndicator : public HudIndicator, protected modm::Resumable<2>
 {
 public:
     /**
-     * Construct a AmmoIndicator object.
-     *
-     * @param[in] refSerialTransmitter RefSerialTransmitter instance.
+     * @param[in] refSerialTransmitter Sends the assembled graphics to the referee system.
+     * @param[in] refSerial Referee system data. Stored but not read.
+     * @param[in] governor The governor polled for flywheel readiness.
      */
     FlywheelIndicator(
         tap::communication::serial::RefSerialTransmitter &refSerialTransmitter,

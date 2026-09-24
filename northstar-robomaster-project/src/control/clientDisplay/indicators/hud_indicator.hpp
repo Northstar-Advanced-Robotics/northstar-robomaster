@@ -33,12 +33,14 @@ class RefSerialTransmitter;
 namespace src::control::client_display
 {
 /**
+ * @ingroup client_display
+ *
  * A generic HUD indicator interface class with helper utilities that other HUD indicators may use.
  */
 class HudIndicator : protected tap::communication::serial::RefSerialData
 {
 public:
-    /*
+    /**
      * Note that absolute X/Y pixel coordinates are measured from the bottom left side of the
      * screen, X is increasing from left to right and Y is increasing from bottom to top.
      */

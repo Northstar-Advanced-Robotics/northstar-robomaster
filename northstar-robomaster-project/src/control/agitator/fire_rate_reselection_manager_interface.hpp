@@ -36,6 +36,8 @@ enum class FireRateReadinessState
 };
 
 /**
+ * @ingroup agitator
+ *
  * An interface that can be implemented to convey fire rate information to the
  * FireRateLimitGovernor.
  */

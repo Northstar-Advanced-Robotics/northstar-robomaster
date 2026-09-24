@@ -44,14 +44,18 @@ class TurretSubsystem;
 namespace src::control::turret::user
 {
 /**
- * Turret control, with the yaw and pitch gimbals using the world relative frame,
- * such that the desired turret angle is independent of the direction that the chassis
- * is facing or rotating. Assumes the board running this subsystem is a RoboMaster type A //NOTE changed for type C
- * board with an Mpu6500 and that this board is mounted statically on the chassis.
- * Also assumes that there is an IMU mounted on the turret that interfaces
- * with the `TurretMCBCanComm`. If there is no such IMU, the chassis IMU will be used
- * to run the turret controller and the pitch axis will run a controller in the chassis
- * frame.
+ * @ingroup turret
+ *
+ * Operator turret control in the world frame, so the aim the operator asks for is independent of
+ * how the chassis is facing or rotating.
+ *
+ * A comprised command holding two inner commands, one per available IMU source, and switching
+ * between them at runtime as their controllers report online. The robot runs on a RoboMaster
+ * type C board with a BMI088 mounted to the chassis.
+ *
+ * @warning The two paths are less distinct than the parameter names suggest. Every controller the
+ *      robots actually pass in reads the same chassis-mounted BMI088 -- the genuine turret-MCB
+ *      controllers are never instantiated -- so in practice both paths use the same sensor.
  *
  * Takes in user input from the `ControlOperatorInterface` to control the pitch and yaw
  * axis of some turret.
@@ -63,13 +67,23 @@ public:
      * This command requires the turret subsystem from a command/subsystem framework perspective.
      *
      * @param[in] drivers Pointer to a global drivers object.
+     * @param[in] controlOperatorInterface Source of the operator's turret input.
      * @param[in] turretSubsystem Pointer to the turret to control.
      * @param[in] chassisImuYawController World frame turret controller that uses the chassis IMU.
      * @param[in] chassisImuPitchController Turret controller that is used when the chassis IMU is
      * in use.
      * @param[in] turretImuYawController World frame turret controller that uses the turret IMU.
-     * @param[in] turretImuPitchController Turret controller that is used when the turret IMU is in
-     * use. Doesn't strictly have to be world relative.
+     * @param[in] turretImuPitchController Turret controller intended for the turret-IMU path.
+     * Doesn't strictly have to be world relative.
+     * @param[in] userYawInputScalar Value to scale the operator's yaw input by; effectively mouse
+     * sensitivity.
+     * @param[in] userPitchInputScalar See `userYawInputScalar`.
+     * @param[in] turretID Which turret this command drives, for robots with more than one.
+     *
+     * @warning `turretImuPitchController` is currently **ignored**: the constructor passes
+     * `chassisImuPitchController` into the turret-IMU sub-command instead, and this argument is
+     * not stored anywhere. See the `// TODO for actual use change back to pitch` note at the call
+     * site in the .cpp.
      */
     TurretUserWorldRelativeCommand(
         tap::Drivers *drivers,

@@ -1,3 +1,11 @@
+/**
+ * Kicker constants for the hero.
+ *
+ * Kicker motor IDs, gear ratio, PID gains, and velocity setpoints.
+ *
+ * Include `kicker_constants.hpp` rather than this file; it picks the right robot's constants for
+ * the build target, and this header refuses to compile on its own.
+ */
 #ifndef HERO_KICKER_CONSTANTS_HPP_
 #define HERO_KICKER_CONSTANTS_HPP_
 

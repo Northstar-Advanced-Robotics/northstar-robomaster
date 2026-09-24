@@ -30,16 +30,26 @@
 namespace src::control::governor
 {
 /**
- * Governor that blocks Commands from running if the referee-reported heat limit is too high. Use to
- * avoid running commands that cause ref-system overheating.
+ * @ingroup governors
+ *
+ * Blocks firing when the barrel's referee-reported heat is close enough to its limit that one more
+ * projectile would exceed it.
+ *
+ * Overheating costs health, so this predicts the next shot's cost rather than reacting after the
+ * fact.
+ *
+ * @note Permits firing -- i.e. does no limiting at all -- when the referee system is not sending
+ *      data, or when the configured mechanism ID is neither `TURRET_17MM*` nor `TURRET_42MM`.
  */
 class HeatLimitGovernor : public tap::control::governor::CommandGovernorInterface
 {
 public:
     /**
-     * @param firingSystemMechanismID ID of the barrel used to determine heat
-     * @param heatLimitBuffer Amount of extra heat on top of cost of next projectile to wait for
-     * before allowing firing
+     * @param[in] drivers The global drivers object, used to read referee system heat.
+     * @param[in] firingSystemMechanismID Which barrel's heat to track.
+     * @param[in] heatLimitBuffer Extra margin, in referee-system heat units, required on top of the
+     *      next projectile's cost before firing is allowed. For scale, a 17mm shot costs 10 and a
+     *      42mm shot costs 100; see `ref_system_constants.hpp`.
      */
     HeatLimitGovernor(
         tap::Drivers &drivers,

@@ -1,0 +1,75 @@
+# .github/workflows/docs.yml
+name: docs
+
+on:
+  push:
+    branches: [main]
+  pull_request:          # build-only, no deploy — catches breakage before merge
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: pages
+  cancel-in-progress: true
+
+jobs:
+  build:
+    # Pinned to 22.04 to match the devcontainer's Doxygen version.
+    # exhale parses Doxygen's XML schema directly and is sensitive to
+    # version drift — ubuntu-latest would silently move to a newer Doxygen.
+    runs-on: ubuntu-22.04
+    env:
+      LC_ALL: C.UTF-8
+      LANG: C.UTF-8
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Install Doxygen and Graphviz
+        run: |
+          sudo apt-get update
+          sudo apt-get install -y doxygen graphviz
+          doxygen --version
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install Sphinx toolchain
+        run: pip install sphinx breathe exhale sphinx-rtd-theme
+
+      - name: Build docs
+        # exhale runs Doxygen itself (exhaleExecutesDoxygen: True in conf.py),
+        # so this single command does the whole pipeline.
+        run: |
+          cd docs
+          make html
+
+      - uses: actions/upload-pages-artifact@v3
+        with:
+          path: docs/_build/html
+
+      # Doxygen XML — the input for the RAG bot later. Grab it from any run
+      # without rebuilding locally.
+      - uses: actions/upload-artifact@v4
+        with:
+          name: doxygen-xml
+          path: docs/doxyoutput/xml
+          retention-days: 30
+          if-no-files-found: warn
+
+  deploy:
+    needs: build
+    if: github.ref == 'refs/heads/main'
+    runs-on: ubuntu-latest
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    steps:
+      - id: deployment
+        uses: actions/deploy-pages@v4

@@ -7,8 +7,14 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * A large ring around the center of the screen that turns green once the flywheels are spun up.
+ *
+ * Firing before the flywheels are at speed wastes projectiles, so the ring is drawn in black
+ * (effectively invisible against the feed) until they are ready.
+ */
 class FlywheelReadyIndicator : public GraphicsContainer
 {
 public:
@@ -21,6 +27,7 @@ public:
         addGraphicsObject(&readyCircle);
     }
 
+    /// Colors the ring green when the flywheels are up to speed, black otherwise.
     void update()
     {
         // if(drivers->remote.keyPressed(Remote::Key::R))

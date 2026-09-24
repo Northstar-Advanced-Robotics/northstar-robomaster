@@ -1,0 +1,74 @@
+/**
+ * @file doc_groups.dox
+ * @brief Defines the documentation groups the generated site is organised by.
+ *
+ * These groups exist because the namespaces do not map cleanly onto what things are *for* -- the
+ * agitator, for instance, is spread across `src::agitator`, `src::control::agitator`, and
+ * `src::control::agitator::constants`. Tagging each class with `@ingroup` gives one entry per
+ * subsystem regardless of where it lives in the namespace or directory tree.
+ *
+ * To file a new class, add `@ingroup <name>` to its doc block.
+ */
+
+/**
+ * @defgroup chassis Chassis
+ * @brief Driving the robot: the drivetrain, its odometry, and the drive commands.
+ *
+ * `ChassisSubsystem` resolves a translation and rotation request into four wheel speeds, ramps
+ * them, and keeps the total inside the referee system's power budget. It also defines the robot's
+ * canonical coordinate frame (+X forward, +Y left).
+ */
+
+/**
+ * @defgroup turret Turret
+ * @brief Aiming: the pitch and yaw gimbals, their controllers, and the commands that drive them.
+ *
+ * The controllers in `algorithms/` are the interesting part -- they differ in which frame they
+ * measure in (chassis or world) and which sensor they trust.
+ */
+
+/**
+ * @defgroup agitator Agitator and Firing
+ * @brief Feeding projectiles into the flywheels, plus fire rate selection and unjamming.
+ */
+
+/**
+ * @defgroup flywheel Flywheels
+ * @brief Spinning the wheels that launch projectiles, and converting launch speed to motor RPM.
+ */
+
+/**
+ * @defgroup hopper_kicker Hopper and Kicker
+ * @brief The hopper lid servo, and the hero's kicker that feeds its 42mm projectiles.
+ */
+
+/**
+ * @defgroup governors Governors
+ * @brief Conditions that gate whether a command may run -- heat, flywheel readiness, aim, and
+ * game state.
+ */
+
+/**
+ * @defgroup client_display Client Display
+ * @brief The operator HUD drawn on the referee system's client.
+ *
+ * The live implementation is the `graphics/` tree. The older `indicators/` classes are deprecated
+ * and built into no robot.
+ */
+
+/**
+ * @defgroup communication Communication
+ * @brief Links to the outside world: the vision computer over UART, other boards over CAN, and
+ * sensors.
+ */
+
+/**
+ * @defgroup robots Robot Targets
+ * @brief Per-robot wiring and constants. One of these is compiled in, selected by build target.
+ */
+
+/**
+ * @defgroup util Shared Utilities
+ * @brief Pieces used across subsystems: IMU calibration, the buzzer, curve maths, the sentry
+ * state machine, and safe-disconnect handling.
+ */

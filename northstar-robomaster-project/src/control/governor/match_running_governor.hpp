@@ -29,8 +29,16 @@
 namespace src::control::governor
 {
 /**
- * A governor that tracks game state. Is ready if the game state is unknown (offline)
- * or if the game is running
+ * @ingroup governors
+ *
+ * Gates commands on the referee system reporting that a match is underway.
+ *
+ * Used to keep autonomous behaviour from running outside a match.
+ *
+ * @warning Ready **only** while `gameStage == IN_GAME`. The clause that also accepted an unknown
+ *      game type -- i.e. tolerated an offline referee system -- is commented out in `isReady`, so
+ *      an unplugged or unpowered referee system now blocks every governed command. That is the
+ *      opposite of what this comment used to promise, and it bites on the bench.
  */
 class MatchRunningGovernor : public tap::control::governor::CommandGovernorInterface
 {

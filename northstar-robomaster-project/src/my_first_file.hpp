@@ -20,6 +20,13 @@
 #ifndef MY_FIRST_FILE_HPP_
 #define MY_FIRST_FILE_HPP_
 
+/**
+ * Adds two integers. Exists as the subject of the template project's example unit test.
+ *
+ * @param[in] x The first addend.
+ * @param[in] y The second addend.
+ * @return Their sum.
+ */
 int sum(int x, int y) { return x + y; }
 
 #endif  // MY_FIRST_FILE_HPP_

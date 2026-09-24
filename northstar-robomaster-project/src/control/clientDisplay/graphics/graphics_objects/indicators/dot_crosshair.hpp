@@ -6,8 +6,13 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * A small circle near the center of the screen, drawn as a fixed aiming reference.
+ *
+ * Static: it has no `update` because nothing about it depends on robot state.
+ */
 class DotCrosshair : public GraphicsContainer
 {
 public:

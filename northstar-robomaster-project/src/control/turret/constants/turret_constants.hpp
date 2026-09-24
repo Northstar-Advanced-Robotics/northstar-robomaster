@@ -24,6 +24,13 @@
 
 #include "tap/util_macros.hpp"
 
+/**
+ * Selects the turret constants for the robot currently being built.
+ *
+ * Motor IDs, encoder offsets, pitch and yaw travel limits, and controller gains live in each
+ * target's `*_turret_constants.hpp`; `standard` is used as the fallback when no known target is
+ * defined.
+ */
 #ifdef TARGET_STANDARD
 #include "robot/standard/standard_turret_constants.hpp"
 #elif TARGET_SENTRY

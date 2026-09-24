@@ -7,14 +7,15 @@
 namespace src::agitator
 {
 /**
- * @param[in] jammingDistance jamming timer counts down when distance between
- *      setpoint and current angle is > `jammingDistance` and resets timer when
- *      distance is <= `jammingDistance`.
- * @param[in] jammingTime how long the jamming timer is. Once this timer finishes
- *      the subsystem is considered jammed
- * @param[in] jamLogicEnabled whether or not to enable jam detection
+ * @ingroup agitator
  *
- * Configuration struct for the velocity agitator subsystem
+ * How one robot's agitator motor is wired and geared, and when it should be considered jammed.
+ *
+ * Supplied per robot from `robot/<target>/<target>_agitator_constants.hpp`.
+ *
+ * Jam detection is velocity-based: while the measured velocity stays further than
+ * `jammingVelocityDifference` from the setpoint for `jammingTime`, the agitator is declared
+ * jammed. There is no distance- or angle-based check.
  */
 struct VelocityAgitatorSubsystemConfig
 {
@@ -27,16 +28,17 @@ struct VelocityAgitatorSubsystemConfig
     /// If `true` positive rotation is clockwise when looking at the motor shaft opposite the motor.
     /// Counterclockwise if false.
     bool isAgitatorInverted;
-    /// Difference between target and setpoint velocity.
+    /// How far the **measured** velocity may sit from the setpoint before the jam timer starts
+    /// counting, in radians/second.
     float jammingVelocityDifference;
-    /// How long the jamming timer is. If the target/setpoint difference is > the
-    /// jammingVelocityDifference for jammingTime the agitator is considered to be jammed.
+    /// How long the measured velocity must stay outside `jammingVelocityDifference` before the
+    /// agitator is declared jammed, in milliseconds.
     uint32_t jammingTime;
     /// A flag which determines whether or not jamming detection is enabled. `true` means enabled,
     /// `false` means disabled.
     bool jamLogicEnabled;
     /// Velocity PID feed forward term. Scaling factor that converts desired velocity to desired
-    /// motor output. When using the M308 or the M2006, motor velocity -> motor current is mostly
+    /// motor output. When using the M3508 or the M2006, motor velocity -> motor current is mostly
     /// linear since these motors take a desired current as a command. When using a motor that is
     /// controlled by sending voltage commands, this term should be 0.
     float velocityPIDFeedForwardGain;

@@ -34,41 +34,75 @@ namespace src
 namespace control
 {
 /**
- * A class for interfacing with the remote IO inside of Commands. While the
- * CommandMapper handles the scheduling of Commands, this class is used
- * inside of Commands to interact with the remote. Filtering and normalization
- * is done in this class.
+ * @ingroup robots
+ *
+ * The single place commands read operator input from.
+ *
+ * `CommandMapper` decides *when* a command runs; this decides what the operator is currently
+ * asking for once it is running. Keeping the remote behind one interface means deadzones, scaling,
+ * and the blending of stick and keyboard/mouse input are applied consistently everywhere.
+ *
+ * The two turret getters return a normalized, deadzoned value. The drivetrain getters do **not**
+ * -- they return meters/second already scaled against the referee system's power limit.
  */
 class ControlOperatorInterface
 {
 public:
+    /// Mouse x movement is clamped to +/- this before scaling, bounding how fast one frame of
+    /// mouse motion can slew the turret.
     static constexpr int16_t USER_MOUSE_YAW_MAX = 1000;
+    /// Mouse y equivalent of `USER_MOUSE_YAW_MAX`.
     static constexpr int16_t USER_MOUSE_PITCH_MAX = 1000;
+    /// Maps clamped mouse x onto [-1, 1]. Negative, so moving the mouse right yields negative yaw.
     static constexpr float USER_MOUSE_YAW_SCALAR = -(1.0f / USER_MOUSE_YAW_MAX);
+    /// Maps clamped mouse y onto [-1, 1]. Negative, so moving the mouse down yields negative pitch.
     static constexpr float USER_MOUSE_PITCH_SCALAR = -(1.0f / USER_MOUSE_PITCH_MAX);
 
+    /// Scales the remote stick's contribution to turret input, making the sticks less sensitive
+    /// than the mouse.
     static constexpr float REMOTE_TURRET_SCALAR = 0.6f;
 
+    /**
+     * @param[in] drivers The global drivers object, polled for remote and referee system state.
+     */
     ControlOperatorInterface(tap::Drivers *drivers) : drivers(drivers) {}
 
     /**
-     * @return the value used for turret yaw rotation, between about -1 and 1
-     *      this value can be greater or less than (-1, 1) since the mouse input has no
-     *      clear lower and upper bound.
+     * @return How fast the operator wants the turret to yaw, as the sum of the remote stick
+     *      (scaled by `REMOTE_TURRET_SCALAR`) and the mouse (clamped then normalized), so at most
+     *      +/-1.6. Values with magnitude under 0.01 are snapped to exactly 0, so a resting mouse
+     *      does not drift the turret.
      */
     mockable float getTurretYawInput();
 
     /**
-     * @return the value used for turret pitch rotation, between about -1 and 1
-     *      this value can be greater or less than (-1, 1) since the mouse input has no
-     *      clear lower and upper bound.
+     * @return How fast the operator wants the turret to pitch. Same construction and same 0.01
+     *      deadzone as `getTurretYawInput`.
      */
     mockable float getTurretPitchInput();
 
+    /**
+     * @return Desired sideways chassis velocity in **meters/second**, positive to the left.
+     *
+     * Blends the remote stick with A/D keyboard input, uses `CHASSIS_WALK_SPEED_MPS` unless shift
+     * is held for the full power-limited speed, and clamps the total to what the referee system's
+     * current power budget allows.
+     */
     float getDrivetrainHorizontalTranslation();
 
+    /**
+     * @return Desired forward chassis velocity in **meters/second**. Same construction as
+     *      `getDrivetrainHorizontalTranslation`, with W/S as the keyboard axis.
+     */
     float getDrivetrainVerticalTranslation();
 
+    /**
+     * @return Desired chassis rotational velocity.
+     *
+     * @warning Currently returns 0 unconditionally -- the entire body is commented out, so the
+     *      operator has no direct rotation control. Chassis rotation comes only from the drive
+     *      commands (beyblade, orient, wiggle).
+     */
     float getDrivetrainRotationalTranslation();
 
 private:

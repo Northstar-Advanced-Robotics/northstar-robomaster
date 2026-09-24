@@ -13,15 +13,30 @@
 namespace src::control::turret::cv
 {
 /**
- * Command that takes user input from the `ControlOperatorInterface` to control the pitch and yaw
- * axis of some turret using some passed in yaw and pitch controller upon construction.
+ * @ingroup turret
+ *
+ * Auto-aim: drives the turret to the aim solution the vision computer produces, falling back to
+ * operator input when there is no solution to follow.
+ *
+ * Each iteration, if vision has fresh aim data for this turret, that becomes the setpoint;
+ * otherwise the operator drives the turret as they normally would, so losing a target degrades to
+ * manual control rather than freezing the turret. Whether the turret is close enough to the
+ * solution to be worth firing is reported through `isAimingWithinLaunchingTolerance`, which the
+ * `CvOnTargetGovernor` gates the agitator on.
+ *
+ * In pitch-only mode, vision supplies pitch (the ballistic drop) while the operator keeps yaw --
+ * useful when auto-aim is picking the wrong target or the operator wants to lead a moving one.
+ * `TurretCVTargetingToggleCommand` flips that mode.
  */
 class TurretCVControlCommand : public TurretCVControlCommandTemplate
 {
 public:
     /**
      * @param[in] drivers Pointer to a global drivers object.
-     * @param[in] turretSubsystem Pointer to the sentry turret to control.
+     * @param[in] controlOperatorInterface Source of operator input, used on the fallback path when
+     * vision has no solution and for yaw in pitch-only mode.
+     * @param[in] visionComms The vision link supplying aim solutions.
+     * @param[in] turretSubsystem The turret to control, taken as a subsystem requirement.
      * @param[in] yawController Pointer to a yaw controller that will be used to control the yaw
      * axis of the turret.
      * @param[in] pitchController Pointer to a pitch controller that will be used to control the
@@ -29,6 +44,7 @@ public:
      * @param[in] userYawInputScalar Value to scale the user input from `ControlOperatorInterface`
      * by. Basically mouse sensitivity.
      * @param[in] userPitchInputScalar See userYawInputScalar.
+     * @param[in] turretID Which turret's aim solution to read from `visionComms`.
      */
     TurretCVControlCommand(
         tap::Drivers *drivers,

@@ -23,17 +23,25 @@
 #include "tap/control/command_scheduler.hpp"
 #include "tap/drivers.hpp"
 
-/**
- * Defines the condition for a robot to be "safely disconnected" to be
- * when the remote is disconnected. Ends running of all current Commands and
- * disallows new Commands from being added.
- */
 namespace src::control
 {
+/**
+ * @ingroup util
+ *
+ * Defines "safely disconnected" as the remote being disconnected.
+ *
+ * When this reports true the scheduler ends every running command and refuses new ones, so a robot
+ * that loses its operator coasts to a stop instead of continuing on its last instruction.
+ */
 class RemoteSafeDisconnectFunction : public tap::control::SafeDisconnectFunction
 {
 public:
+    /**
+     * @param[in] drivers The global drivers object, used to poll the remote's connection state.
+     */
     RemoteSafeDisconnectFunction(tap::Drivers *drivers);
+
+    /// @return `true` while the remote is disconnected.
     virtual bool operator()();
 
 private:

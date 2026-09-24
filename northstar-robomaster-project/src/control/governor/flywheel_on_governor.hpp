@@ -29,10 +29,17 @@
 namespace src::control::governor
 {
 /**
- * Governor that allows one to gate a command from running when the actual, average friction wheel
- * speed isn't above a certain threshold.
+ * @ingroup governors
  *
- * Useful for disallowing the agitator from rotating while friction wheels are not on.
+ * Gates commands on the flywheels actually running at the speed they were asked for.
+ *
+ * Used to stop the agitator feeding projectiles into flywheels that are not ready, which would
+ * launch them at the wrong speed or jam them.
+ *
+ * The check is a **band**, not a floor: the measured average must be at least
+ * `MINIMUM_SPEED_THRESHOLD_FRACTION` and at most `MAXIMUM_SPEED_THRESHOLD_FRACTION` of the desired
+ * speed, so flywheels overspinning by more than 5% also block firing. Requesting a speed of
+ * approximately zero blocks unconditionally.
  */
 class FlywheelOnGovernor : public tap::control::governor::CommandGovernorInterface
 {

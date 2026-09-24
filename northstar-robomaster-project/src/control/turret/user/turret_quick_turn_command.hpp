@@ -32,6 +32,8 @@ class Drivers;
 namespace src::control::turret::user
 {
 /**
+ * @ingroup turret
+ *
  * A command that performs a "u-turn" operation of the turret. Commands
  * the turret relative to where it is facing to rotate some set amount.
  * Used to turn around easily without having to do so manually.

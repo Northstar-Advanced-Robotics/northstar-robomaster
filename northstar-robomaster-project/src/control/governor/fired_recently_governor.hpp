@@ -31,13 +31,18 @@
 namespace src::control::governor
 {
 /**
+ * @ingroup governors
+ *
  * Governor that blocks commands from running if a shot has been fired recently.
  */
 class FiredRecentlyGovernor : public tap::control::governor::CommandGovernorInterface
 {
 public:
     /**
-     * @param durationBuffer Time since last shot in milliseconds to run the command blocked.
+     * @param[in] drivers The global drivers object, used to read the referee system's last
+     *      launch timestamp.
+     * @param[in] durationBuffer How long must elapse since the last shot before the governed
+     *      command may run, in milliseconds.
      */
     FiredRecentlyGovernor(tap::Drivers* drivers, const uint32_t durationBuffer)
         : drivers(drivers),

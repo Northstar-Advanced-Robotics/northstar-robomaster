@@ -41,18 +41,24 @@ using namespace tap::algorithms;
 namespace src::control::imu
 {
 /**
- * A command whose job is to perform a calibration of the turret and chassis IMUs. Requires that the
- * robot has a turret and a chassis subsystem. Also requires that a turret IMU is connected via the
- * TurretMCBCanComm object.
+ * @ingroup util
  *
- * When this command is scheduled, it performs the following actions:
- * 1. Wait until the turret is online and either the chassis mpu6500 or turret MCB IMU is online.
- * 2. Command the pitch and yaw turret gimbals to move to PI/2 radians (forward and flat).
+ * Calibrates the onboard BMI088 IMU, holding the robot still while it happens.
+ *
+ * A gyroscope can only measure its own bias while stationary, so the command takes the turret and
+ * chassis away from the operator, parks them, waits for motion to settle, and only then asks the
+ * IMU to recalibrate. Requires the robot to have a turret and a chassis subsystem.
+ *
+ * When scheduled it performs the following actions:
+ * 1. Wait until the turret and the IMU are online.
+ * 2. Command the pitch and yaw gimbals to their configured `startAngle`.
  * 3. Command the chassis to stay still.
- * 4. Pause until the chassis/turret subsystems are no longer moving.
- * 5. Send a calibration signal to the turret MCB.
- * 6. Send signal to onboard IMU to recalibrate.
- * 7. Wait until calibration is complete and then end the command.
+ * 4. Pause until the chassis and turret are no longer moving.
+ * 5. Signal the onboard IMU to recalibrate.
+ * 6. Wait for calibration to complete, play a tone, and end.
+ *
+ * @note An earlier revision also calibrated a turret-mounted IMU over `TurretMCBCanComm`. That
+ *      path is commented out throughout this class, so no turret MCB is required or contacted.
  */
 class ImuCalibrateCommand : public ImuCalibrateCommandBase
 {
@@ -65,16 +71,16 @@ public:
         /** While in this state, the command waits for the turret to be online and the IMUs to be
            online. */
         WAITING_FOR_SYSTEMS_ONLINE,
-        /** While in this state, the command "locks" the turret at PI/2 radians (horizontal to the
-           ground). The command then sends a calibration request to the mpu6500 and the
-           TurretMCBCanComm class. */
+        /** The command holds the turret at its configured `startAngle` and waits for it to settle
+           before requesting calibration. */
         LOCKING_TURRET,
-        /** While in this state, the command waits until calibration of the IMUs are complete. */
+        /** The command waits for the BMI088 to report that calibration has finished. */
         CALIBRATING_IMU,
-        /** While in this state, turn on buzzer so people know we are done*/
+        /** @warning Never entered. Nothing assigns this state; the completion tone is scheduled
+           from `WAITING_CALIBRATION_COMPLETE` instead. */
         BUZZING,
-        /** While in this state, the command waits a small time after calibration is complete to
-           handle any latency associated with sending messages to the TurretMCBCanComm. */
+        /** The command waits a short settling time after calibration completes, during which the
+           completion tone is scheduled, then finishes. */
         WAITING_CALIBRATION_COMPLETE,
     };
 
@@ -90,7 +96,7 @@ public:
 
     struct TurretIMUCalibrationConfig
     {
-        /// The turret mounted IMU to be calibrated.
+        /// (Unused: the turret-MCB IMU member this described is commented out below.)
         // src::can::TurretMCBCanComm *turretMCBCanComm;
         /// A `TurretSubsystem` that this command will control (will lock the turret).
         turret::TurretSubsystem *turret;
@@ -112,6 +118,8 @@ public:
      * turret and turret IMU information necessary for calibrating the IMU
      * @param[in] chassis A `ChassisSubsystem` that this command will control (will set the desired
      * movement to 0).
+     * @param[in] song Tone scheduled once calibration completes, so the operator knows the robot
+     * is usable again. Optional.
      * @param[in] velocityZeroThreshold Threshold around 0 where turret pitch and yaw velocity is
      * considered to be 0, in radians/s.
      * @param[in] positionZeroThreshold Threshold around 0 where turret pitch and yaw position from
@@ -148,7 +156,8 @@ protected:
      */
     static constexpr uint32_t WAIT_TIME_TURRET_RESPONSE_MS = 2000;
     /**
-     * Wait this time after the mpu6500 is done calibrating to ensure the turret MCB's IMU is
+     * @warning Unreferenced. The code hardcodes a 200 ms settle instead. Was: wait this long
+     * after the onboard IMU finishes calibrating to ensure the turret MCB's IMU is
      * calibrated.
      */
     static constexpr uint32_t TURRET_IMU_EXTRA_WAIT_CALIBRATE_MS = 2000;
@@ -174,7 +183,7 @@ protected:
      * Timeout that we set after initially starting the turret PID controller to allow any residual
      * movement from starting the new PID controller to be resolved.
      *
-     * Also the delay that we set after onboard mpu6500 is calibrated to ensure that turret IMU has
+     * Also the delay that we set after the onboard BMI088 is calibrated to ensure that turret IMU has
      * enough time to successfully calibrate.
      */
     tap::arch::MilliTimeout calibrationTimer;

@@ -33,22 +33,28 @@ class Drivers;
 namespace src::control::turret::test
 {
 /**
- * A command that performs a "u-turn" operation of the turret. Commands
- * the turret relative to where it is facing to rotate some set amount.
- * Used to turn around easily without having to do so manually.
+ * @ingroup turret
  *
- * @note This command runs **exactly once**. As such, it should be scheduled
- *      **exactly once**. The command does not run a PID controller and such,
- *      re-scheduling it over and over will result in unexpected behavior (the
- *      turret will appear to not do anything).
+ * Bench-test command: steps the turret by a fixed yaw and pitch offset and holds it there until it
+ * arrives, for checking travel and controller tuning without a remote.
+ *
+ * Unlike `TurretQuickTurnCommand`, this **does** run the PID controllers every iteration and is
+ * **not** one-shot -- it keeps driving until the yaw measurement is within `allowedError`.
+ *
+ * @warning Not built into any robot. Only `robot/testbed/using_turret.hpp` constructs it, behind
+ *      `USING_TURRET`, which is currently commented out in `test_def.hpp`.
  */
 class TurretTestCommand : public tap::control::Command
 {
 public:
     /**
-     * @param[in] turretSubsystem Turret whose setpoint to update
-     * @param[in] targetOffsetToTurn Offset angle, in radians, that the turret setpoint
-     *      will be updated to when this command is run.
+     * @param[in] turretSubsystem The turret to move, taken as a subsystem requirement.
+     * @param[in] yawMoveAmount How far to move yaw from its current measured angle, in radians.
+     * @param[in] pitchMoveAmount How far to move pitch from its current measured angle, in radians.
+     * @param[in] yawController The controller driving yaw to its setpoint.
+     * @param[in] pitchController The controller driving pitch to its setpoint.
+     * @param[in] allowedError How close yaw must get before the command finishes, in radians.
+     *      Pitch is not checked.
      */
     TurretTestCommand(
         TurretSubsystem *turretSubsystem,

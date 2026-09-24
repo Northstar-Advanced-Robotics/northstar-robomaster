@@ -6,12 +6,18 @@ using namespace tap::communication::serial;
 
 namespace src::control::client_display::graphics
 {
-/* Both containers and non containers are a GraphicsObject. The UISubsystem deals with most
- * things at a GraphicsObject level. */
+/**
+ * @ingroup client_display
+ *
+ * Base of everything drawable on the client display.
+ *
+ * Both individual graphics and containers of graphics are `GraphicsObject`s, so `UISubsystem` can
+ * walk an arbitrarily nested display without caring which is which.
+ */
 class GraphicsObject
 {
 public:
-    /*
+    /**
      * Simple objects return 0 or 1, for if they need redrawn.
      * Container objects return a number, for how many things
      * need redrawn. Container objects must also keep track of
@@ -23,7 +29,7 @@ public:
     // existence of any pure virtual methods means the object can't be instantiated, like an
     // abstract class in Java.
 
-    /*
+    /**
      * Allows iteration of the tree-like structure of containers
      * containing containers.
      *
@@ -58,9 +64,11 @@ public:
      */
     virtual GraphicsObject* getNext() = 0;
 
+    /// Rewinds this object's iteration state so a fresh traversal starts from the beginning.
+    /// Containers rewind everything they hold.
     virtual void resetIteration() = 0;
 
-    /*
+    /**
      * For facilitating flattening of containers of containers. Simple
      * objects have a size of 1, and containers call size() on each
      * of their objects.
@@ -69,13 +77,13 @@ public:
      */
     virtual int size() = 0;
 
-    /*
+    /**
      * Containers do nothing, AtomicGraphicsObject's fill the graphic data
      */
     virtual void configGraphicData(RefSerialData::Tx::GraphicData*) {}
     virtual void configCharacterData(RefSerialData::Tx::GraphicCharacterMessage*) {}
 
-    /*
+    /**
      * For when a layer gets cleared. This should make it so next
      * time this object or all contained objects are told to draw,
      * they use GRAPHIC_ADD and not GRAPHIC_MODIFY if they were on
@@ -84,23 +92,34 @@ public:
     virtual void layerHasBeenCleared(int8_t) = 0;
     virtual void allLayersCleared() = 0;
 
-    /*
+    /**
      * Graphics representing strings need to be sent as a CharacterMessage,
      * and can't be sent in a group of 7 like other graphics can.
      */
     virtual bool isStringGraphic() { return false; }
 
+    /// Marks this object to be deleted from the screen the next time it is drawn. Containers hide
+    /// everything they hold.
     virtual void hide() = 0;
 
+    /// Marks this object to be drawn again after being hidden. Containers show everything they
+    /// hold.
     virtual void show() = 0;
 
+    /**
+     * @param[in] hidden `true` to hide this object, `false` to show it.
+     */
     void setHidden(bool hidden) { hidden ? hide() : show(); }
 
+    /// Clears the marks set by `markToDraw`, so the objects sent in the last batch become eligible
+    /// for iteration again.
     virtual void resetDrawMarks() = 0;
     virtual void markToDraw(){};  // only applies to objects, marking a container to draw
                                   // doesn't make sense
 
 protected:
+    /// How far into this object the current traversal has reached. Simple objects use 0 and 1;
+    /// containers use it as an index into their children.
     u_int16_t countIndex = 0;
 };
 

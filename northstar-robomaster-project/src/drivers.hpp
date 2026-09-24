@@ -24,6 +24,16 @@
 
 namespace src
 {
+/**
+ * @ingroup util
+ *
+ * The project's hardware access point, extending taproot's `tap::Drivers` with anything specific to
+ * this codebase.
+ *
+ * There is exactly one instance, owned by `DriversSingleton`; the constructor is private so no
+ * other copy can be made, which is what keeps two pieces of code from independently claiming the
+ * same peripheral. Unit tests are the exception, and are allowed to construct their own.
+ */
 class Drivers : public tap::Drivers
 {
     friend class DriversSingleton;
@@ -31,6 +41,8 @@ class Drivers : public tap::Drivers
 #ifdef ENV_UNIT_TESTS
 public:
 #endif
+    /// Constructs the drivers. Private outside of unit tests; use `DriversSingleton` to obtain the
+    /// single instance.
     Drivers() : tap::Drivers() {}
 
 public:

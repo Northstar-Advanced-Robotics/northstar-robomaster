@@ -38,15 +38,21 @@ class ControlOperatorInterface;
 namespace src::control::turret::user
 {
 /**
- * Command that takes user input from the `ControlOperatorInterface` to control the pitch and yaw
- * axis of some turret using some passed in yaw and pitch controller upon construction.
+ * @ingroup turret
+ *
+ * Drives the turret directly from operator input for as long as it is scheduled.
+ *
+ * Operator input is treated as a *velocity*: it is scaled and integrated into the setpoint each
+ * iteration, so holding the stick sweeps the turret rather than jumping it to an angle. Runs until
+ * interrupted, and zeroes the motor outputs when it ends.
  */
 class TurretUserControlCommand : public tap::control::Command
 {
 public:
     /**
      * @param[in] drivers Pointer to a global drivers object.
-     * @param[in] turretSubsystem Pointer to the sentry turret to control.
+     * @param[in] controlOperatorInterface Source of the operator's turret input.
+     * @param[in] turretSubsystem The turret to control, taken as a subsystem requirement.
      * @param[in] yawController Pointer to a yaw controller that will be used to control the yaw
      * axis of the turret.
      * @param[in] pitchController Pointer to a pitch controller that will be used to control the
@@ -54,6 +60,7 @@ public:
      * @param[in] userYawInputScalar Value to scale the user input from `ControlOperatorInterface`
      * by. Basically mouse sensitivity.
      * @param[in] userPitchInputScalar See userYawInputScalar.
+     * @param[in] turretID Which turret this command drives, for robots with more than one.
      */
     TurretUserControlCommand(
         tap::Drivers *drivers,

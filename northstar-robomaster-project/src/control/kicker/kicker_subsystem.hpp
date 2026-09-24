@@ -24,6 +24,15 @@ class Drivers;
 
 namespace src::kicker
 {
+/**
+ * @ingroup hopper_kicker
+ *
+ * The hero's kicker: a single motor that pushes a 42mm projectile from the hopper into the
+ * flywheels.
+ *
+ * Runs a velocity PID against the motor encoder. Unlike the agitator it is not indexed to discrete
+ * shots -- it is simply run at a constant velocity while firing.
+ */
 class KickerSubsystem : public tap::control::Subsystem
 {
 public:
@@ -31,8 +40,8 @@ public:
      * Construct a kicker with the passed in velocity PID parameters, gear ratio, and
      * kicker-specific configuration.
      *
-     * @param[in] drivers pointer to src drivers struct
-     * @param[in] pidParams Position PID configuration struct for the kicker motor controller.
+     * @param[in] drivers Pointer to the global `tap::Drivers` object.
+     * @param[in] pidParams **Velocity** PID configuration struct for the kicker motor controller.
      * @param[in] kickerSubsystemConfig Kicker configuration struct that contains
      * kicker-specific parameters.
      */

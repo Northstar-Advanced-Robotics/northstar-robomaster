@@ -31,13 +31,22 @@
 namespace src::control::governor
 {
 /**
- * Governor that blocks commands from running if a plate has been hit recently.
+ * @ingroup governors
+ *
+ * Intended to block commands for a short window after an armor plate is hit.
+ *
+ * @warning Does not currently do that. `isReady` and `isFinished` return the **same** expression
+ *      with no negation, so a governed command is allowed to start only once enough time has
+ *      passed since the last hit -- and is then immediately reported finished by that same
+ *      condition. Compare `FiredRecentlyGovernor`, whose `isFinished` correctly negates.
  */
 class PlateHitGovernor : public tap::control::governor::CommandGovernorInterface
 {
 public:
     /**
-     * @param durationBuffer Time since last hit in milliseconds to run the command blocked.
+     * @param[in] drivers The global drivers object, used to read referee system damage reports.
+     * @param[in] durationBuffer How long after a hit the governed command should stay blocked, in
+     *      milliseconds.
      */
     PlateHitGovernor(tap::Drivers* drivers, const uint32_t durationBuffer)
         : drivers(drivers),

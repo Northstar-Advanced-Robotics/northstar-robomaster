@@ -10,6 +10,15 @@
 
 namespace src::control::imu
 {
+/**
+ * @ingroup util
+ *
+ * Interface for the IMU calibration command, so `robot_control.hpp` can hand one back without every
+ * robot's control file depending on the concrete type.
+ *
+ * @note The state enum and timing constants declared here are shadowed by identically named members
+ *      in `ImuCalibrateCommand`; the copies in this base are inert.
+ */
 class ImuCalibrateCommandBase : public tap::control::Command
 {
 public:
@@ -21,16 +30,14 @@ public:
         /** While in this state, the command waits for the turret to be online and the IMUs to be
            online. */
         WAITING_FOR_SYSTEMS_ONLINE,
-        /** While in this state, the command "locks" the turret at PI/2 radians (horizontal to the
-           ground). The command then sends a calibration request to the mpu6500 and the
-           TurretMCBCanComm class. */
+        /** The command holds the turret at its configured `startAngle` and waits for it to settle
+           before requesting calibration of the onboard BMI088. */
         LOCKING_TURRET,
         /** While in this state, the command waits until calibration of the IMUs are complete. */
         CALIBRATING_IMU,
-        /** While in this state, turn on buzzer so people know we are done*/
+        /** @warning Never entered; see `ImuCalibrateCommand`. */
         BUZZING,
-        /** While in this state, the command waits a small time after calibration is complete to
-           handle any latency associated with sending messages to the TurretMCBCanComm. */
+        /** The command waits a short settling time after calibration completes, then finishes. */
         WAITING_CALIBRATION_COMPLETE,
     };
 
