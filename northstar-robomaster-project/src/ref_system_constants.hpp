@@ -24,7 +24,10 @@
 
 namespace src::constants
 {
+/// Heat the referee system adds per 42mm projectile launched. Used to predict whether a shot
+/// would exceed the heat limit before it is fired.
 static constexpr uint16_t HEAT_COST_42MM = 100;
+/// Heat the referee system adds per 17mm projectile launched.
 static constexpr uint16_t HEAT_COST_17MM = 10;
 
 }  // namespace src::constants

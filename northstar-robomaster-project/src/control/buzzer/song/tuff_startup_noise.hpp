@@ -5,6 +5,7 @@
 
 namespace src::control::buzzer
 {
+/// A short rising arpeggio played once at startup, as an audible sign that the board has booted.
 const Song tsnSong = {
     {REST, 150},
     {NOTE_G4, 80},
@@ -13,12 +14,18 @@ const Song tsnSong = {
     {NOTE_G5, 400},
 };
 
+/// Tempo of `theWorldRevolving`, in beats per minute.
 constexpr uint32_t TWR_BPM = 190;
+/// One quarter note at `TWR_BPM`, in milliseconds.
 constexpr uint32_t TWR_QUARTER = quarterNote(TWR_BPM);
+/// One eighth note at `TWR_BPM`, in milliseconds.
 constexpr uint32_t TWR_EIGHTH = TWR_QUARTER / 2;
+/// One sixteenth note at `TWR_BPM`, in milliseconds.
 constexpr uint32_t TWR_SIXTEENTH = TWR_EIGHTH / 2;
+/// One whole note at `TWR_BPM`, in milliseconds.
 constexpr uint32_t TWR_WHOLE = TWR_QUARTER * 4;
 
+/// A longer tune, played on command rather than at startup.
 const Song theWorldRevolving{
     {REST, TWR_QUARTER},
     {NOTE_C6, TWR_WHOLE},

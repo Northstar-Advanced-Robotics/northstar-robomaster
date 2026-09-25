@@ -79,14 +79,15 @@ void PwmEncoder::update()
         pulseWidth = period;
     }
 
-    // Calculate position: (PulseWidth / Period) * 1024
+    // Calculate position: (PulseWidth / Period) * ENC_RESOLUTION
     uint16_t encoderActual = (pulseWidth * ENC_RESOLUTION) / period;
     updateEncoderValue(encoderActual);
 }
 
 bool PwmEncoder::isOnline() const
 {
-    // Check if Channel 1 (Period) is receiving data
+    // Non-zero once Channel 1 has captured a period. Note the register retains its last
+    // value after the signal stops, so this does not detect the signal going away.
     return modm::platform::Timer12::getCompareValue(1) > 0;
 }
 

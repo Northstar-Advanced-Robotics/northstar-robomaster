@@ -25,6 +25,8 @@
 namespace src::control::agitator
 {
 /**
+ * @ingroup agitator
+ *
  * A utility class that may be used to limit the fire rate via checking if a projectile may be
  * launched given the time difference between the current time and when the last projectile was
  * fired. Check `isReadyToLaunchProjectile` before launching a projectile, then call

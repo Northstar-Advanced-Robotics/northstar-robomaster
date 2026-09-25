@@ -12,7 +12,10 @@ using tap::motor::DjiMotor;
     Chassis subsystem uses right hand rule, causing the following.
     +X: Forward
     +Y: Left
-    +Rotation: CCW
+    +Rotation: CCW (headings, getChassisYaw, getChassisRotationSpeed)
+
+    Exception: the `rotational` argument of the drive methods is CW positive. See the class
+    documentation in chassis_subsystem.hpp.
 */
 
 namespace src::control::chassis
@@ -83,7 +86,7 @@ float LBSpeed;
 float RFSpeed;
 float RBSpeed;
 
-inline float ChassisSubsystem::getTurretYaw()
+float ChassisSubsystem::getTurretYaw()
 {
     return yawMotor->getChassisFrameMeasuredAngle().getWrappedValue();
 }
@@ -326,9 +329,10 @@ void ChassisSubsystem::refresh()
             motors[static_cast<int>(MotorId::LB)].getEncoder()->getVelocity(),
             motors[static_cast<int>(MotorId::RF)].getEncoder()->getVelocity(),
             motors[static_cast<int>(MotorId::RB)].getEncoder()->getVelocity());
+
+        debugGlobalPose = chassisOdometry->getPositionGlobal();
+        debugGlobalvelocity = chassisOdometry->getVelocityGlobal();
+        debugLocalvelocity = chassisOdometry->getVelocityLocal();
     }
-    debugGlobalPose = chassisOdometry->getPositionGlobal();
-    debugGlobalvelocity = chassisOdometry->getVelocityGlobal();
-    debugLocalvelocity = chassisOdometry->getVelocityLocal();
 }
 }  // namespace src::control::chassis

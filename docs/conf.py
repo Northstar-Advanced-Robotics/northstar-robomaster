@@ -17,9 +17,9 @@
 
 # -- Project information -----------------------------------------------------
 
-project = 'NorthStarFleet2025'
-copyright = '2020, NorthStarFleet2025'
-author = 'NorthStarFleet2025'
+project = 'NorthStarControls'
+copyright = '2020, NorthStarControls'
+author = 'NorthStarControls'
 
 # The full version, including alpha/beta/rc tags
 release = '1.0.0'
@@ -30,8 +30,8 @@ release = '1.0.0'
 # Add any Sphinx extension module names here, as strings. They can be
 # extensions coming with Sphinx (named 'sphinx.ext.*') or your custom
 # ones.
-extensions = [
-]
+# NOTE: extensions are configured once, further down, alongside the breathe/exhale settings
+# they belong with.
 
 # Add any paths that contain templates here, relative to this directory.
 templates_path = ['_templates']
@@ -49,23 +49,21 @@ exclude_patterns = ['_build', 'Thumbs.db', '.DS_Store']
 #
 html_theme = 'sphinx_rtd_theme'
 
-# Add any paths that contain custom static files (such as style sheets) here,
-# relative to this directory. They are copied after the builtin static files,
-# so a file named "default.css" will overwrite the builtin "default.css".
-html_static_path = ['_static']
+# No custom static files yet. Re-add html_static_path = ['_static'] alongside a _static/
+# directory if a stylesheet or logo is introduced; pointing at a missing directory warns on
+# every build.
 
 
-breathe_default_project = "NorthStarFleet2025"
+breathe_default_project = "NorthStarControls"
 
 extensions = [
-    # there may be others here already, e.g. 'sphinx.ext.mathjax'
-    'breathe',
-    'exhale'
+    'breathe',   # pulls Doxygen XML into Sphinx
+    'exhale',    # generates a page per C++ symbol from that XML
 ]
 
 # Setup the breathe extension
 breathe_projects = {
-    "NorthStarFleet2025": "./doxyoutput/xml"
+    "NorthStarControls": "./doxyoutput/xml"
 }
 
 # Setup the exhale extension
@@ -73,13 +71,15 @@ exhale_args = {
     # These arguments are required
     "containmentFolder":     "./api",
     "rootFileName":          "library_root.rst",
-    "rootFileTitle":         "Library API",
+    "rootFileTitle":         "Code Reference",
     "doxygenStripFromPath":  "..",
     # Suggested optional arguments
     "createTreeView":        True,
     # TIP: if using the sphinx-bootstrap-theme, you need
     # "treeViewIsBootstrap": True,
-    "exhaleExecutesDoxygen": True,
+    # Doxygen is run by the Makefile instead, so gen_subsystem_pages.py can read its XML
+    # before sphinx-build starts.
+    "exhaleExecutesDoxygen": False,
     "exhaleUseDoxyfile":     True
 }
 

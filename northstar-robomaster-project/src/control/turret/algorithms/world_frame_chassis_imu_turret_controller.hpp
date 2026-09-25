@@ -35,10 +35,16 @@ namespace src::control::turret
 class TurretMotor;
 
 /**
- * World frame turret yaw controller. Requires that the development board type A is mounted rigidly
- * to the chassis and is properly initialized. Runs a single position PID controller to control the
- * turret yaw. Feedback from the bmi088 and the turret yaw encoder used to determine the world
- * frame turret angle.
+ * @ingroup turret
+ *
+ * World frame turret yaw controller for robots without a turret-mounted IMU.
+ *
+ * The board's BMI088 is bolted to the chassis, so it measures chassis rotation rather than turret
+ * rotation. The turret's world-frame angle is reconstructed by adding the yaw encoder's
+ * chassis-relative angle to the IMU heading -- which means any encoder or IMU error shows up
+ * directly as aim drift. Prefer `WorldFrameYawTurretImuCascadePidTurretController` where available.
+ *
+ * Runs a single position PID, not the cascade used by the turret-IMU controllers.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  *
@@ -62,12 +68,17 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The yaw desired setpoint in the world frame.
      */
     void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
         final;
 
-    /// @return World frame yaw angle setpoint, refer to top level documentation for more details.
+    /**
+     * Updates the world-frame yaw setpoint without running the controller.
+     *
+     * @param[in] desiredSetpoint The desired world-frame yaw angle, in radians.
+     */
     void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return world frame yaw angle measurement, refer to top level documentation for more
@@ -94,14 +105,25 @@ private:
 
     tap::algorithms::WrappedFloat worldFrameSetpoint;
 
+    /// The chassis IMU heading captured at `initialize`, which defines this controller's
+    /// world-frame zero. Everything downstream is measured relative to it.
     tap::algorithms::WrappedFloat chassisFrameInitImuYawAngle;
 
+    /// @return The chassis IMU's yaw, negated to match this controller's sign convention.
     inline tap::algorithms::WrappedFloat getBmi088Yaw() const
     {
         return tap::algorithms::Angle(-drivers.bmi088.getYaw());
     }
 };
 
+/**
+ * @ingroup turret
+ *
+ * World frame turret pitch controller for robots without a turret-mounted IMU.
+ *
+ * The pitch counterpart to `WorldFrameYawChassisImuTurretController`; see that class for why a
+ * chassis-mounted IMU makes this the weaker option. Runs a single position PID.
+ */
 class WorldFramePitchChassisImuTurretController final : public TurretPitchControllerInterface
 {
 public:
@@ -119,12 +141,17 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The pitch desired setpoint in the world frame.
      */
     void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
         final;
 
-    /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
+    /**
+     * Updates the world-frame pitch setpoint without running the controller.
+     *
+     * @param[in] desiredSetpoint The desired world-frame pitch angle, in radians.
+     */
     void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) final;
 
     /// @return world frame pitch angle measurement, refer to top level documentation for more

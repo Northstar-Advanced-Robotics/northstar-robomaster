@@ -31,6 +31,8 @@ namespace src::control::turret
 class TurretMotor;
 
 /**
+ * @ingroup turret
+ *
  * Controller that runs a single position PID controller in the chassis frame to control the turret
  * yaw.
  *
@@ -51,6 +53,7 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The yaw desired setpoint in the chassis frame.
      */
     void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)
@@ -88,6 +91,8 @@ private:
 };
 
 /**
+ * @ingroup turret
+ *
  * Controller that runs a single position PID controller in the chassis frame to control the turret
  * pitch.
  *
@@ -108,6 +113,7 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The pitch desired setpoint in the chassis frame.
      */
     void runController(const uint32_t dt, const tap::algorithms::WrappedFloat desiredSetpoint)

@@ -29,13 +29,17 @@
 namespace src::control::agitator
 {
 /**
- * Command that unjams a velocity setpoint subsystem corresponding to a 2023/2024 spoke agitator.
+ * @ingroup agitator
  *
- * Runs the agitator backwards until either reaching a @param targetUnjamIntegralChange or when the
- * @param maxWaitTime has past. Then, it attempts to rotate back to the original position. If it
- * successfully reaches that position, the agitator is considered unjammed and the command ends.
- * Otherwise, it repeats this process up to a maximum of @param targetCycleCount times before
- * giving up and ending.
+ * Frees a jammed spoke agitator by rocking it backwards and forwards.
+ *
+ * Runs the agitator backwards until it has moved `targetUnjamIntegralChange` or `maxWaitTime`
+ * elapses, then tries to rotate forward to where it started. Reaching that position counts as
+ * unjammed and the command ends; otherwise it tries again.
+ *
+ * @note The first backward attempt happens in `initialize`, and the loop terminates at
+ *      `targetCycleCount + 1` attempts -- so the agitator is rocked one more time than that name
+ *      suggests.
  */
 class UnjamSpokeAgitatorCommand : public tap::control::setpoint::UnjamCommandInterface
 {
@@ -79,6 +83,8 @@ public:
 
     /**
      * @param[in] integrableSetpointSubsystem The associated agitator subsystem to control.
+     * @param[in] config Unjam distances, speed, cycle count, and timeout. Asserted on at
+     *      construction.
      */
     UnjamSpokeAgitatorCommand(
         tap::control::setpoint::IntegrableSetpointSubsystem& integrableSetpointSubsystem,
@@ -109,7 +115,8 @@ private:
     Config config;
 
     /**
-     * Timeout for time allowed to rotate past the `unjamThreshold`.
+     * Bounds one backward or forward attempt, in milliseconds, so a fully seized agitator does not
+     * stall the command forever. Set from `config.maxWaitTime`.
      */
     tap::arch::MilliTimeout unjamRotateTimeout;
 

@@ -1,3 +1,14 @@
+/**
+ * Declares the agitator: the subsystem, its rotate and unjam commands, the governors that gate
+ * firing, and the remote mappings that drive them.
+ *
+ * `testbed_control.cpp` includes this file unconditionally; the `#ifdef USING_AGITATOR` below is
+ * what actually selects it, and that switch is set in `test_def.hpp`. Commenting the switch out
+ * there drops this hardware from the build, so a motor that is not on the bench cannot stall
+ * bring-up of the rest.
+ *
+ * Everything is declared at file scope, which is why exactly one translation unit may include it.
+ */
 #ifdef USING_AGITATOR
 
 #ifndef USING_AGITATOR_HPP_

@@ -17,6 +17,15 @@
  * along with aruw-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Turret constants for the sentry.
+ *
+ * Turret motor IDs, encoder offsets, pitch and yaw travel limits, and the gains for the
+ * chassis-frame and world-frame controllers.
+ *
+ * Include `turret_constants.hpp` rather than this file; it picks the right robot's constants for
+ * the build target, and this header refuses to compile on its own.
+ */
 #ifndef SENTRY_TURRET_CONSTANTS_HPP_
 #define SENTRY_TURRET_CONSTANTS_HPP_
 

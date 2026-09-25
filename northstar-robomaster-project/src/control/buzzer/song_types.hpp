@@ -9,6 +9,7 @@ namespace src::control::buzzer
 // --- Core Data Structures ---
 
 /**
+ * @ingroup util
  * @brief Represents a single musical note with a duration.
  */
 struct songNote

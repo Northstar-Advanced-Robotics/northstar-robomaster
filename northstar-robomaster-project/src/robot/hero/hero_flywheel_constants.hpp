@@ -1,3 +1,12 @@
+/**
+ * Flywheel constants for the hero.
+ *
+ * Flywheel motor IDs, PID gains, and the measured launch-speed-to-RPM tables, including one per
+ * spin setting where the robot has three flywheels.
+ *
+ * Include `flywheel_constants.hpp` rather than this file; it picks the right robot's constants for
+ * the build target, and this header refuses to compile on its own.
+ */
 #ifndef HERO_FLYWHEEL_CONSTANTS_HPP_
 #define HERO_FLYWHEEL_CONSTANTS_HPP_
 

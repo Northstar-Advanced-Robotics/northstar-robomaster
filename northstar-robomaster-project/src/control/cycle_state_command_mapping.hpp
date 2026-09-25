@@ -32,6 +32,8 @@ class Drivers;
 namespace src::control
 {
 /**
+ * @ingroup util
+ *
  * A command mapping that doesn't actually schedule commands. Instead, allows the user to change the
  * state of an object. This can allow you to change the state of a command or subsystem that
  * might be actually mapped to be scheduled by some other remote map state.
@@ -56,8 +58,9 @@ public:
      * Construct a cycle state command mapping wtih some initial state.
      *
      * @param[in] drivers A pointer to the global drivers object.
-     * @param[in] rms The map state that will be compared to the actual remote state
-     *      to determine whether or not to add `cmds`.
+     * @param[in] rms The map state compared against the remote to decide when to advance the
+     *      cycled state. Note this mapping schedules no commands of its own -- the base
+     *      `CommandMapping` is constructed with an empty command list.
      * @param[in] initialState The initial state that this command mapping should start in.
      * @param[in] stateChangeObject The object whose associated `stateChangedFn` will be called when
      *      the state of this command mapping has changed.
