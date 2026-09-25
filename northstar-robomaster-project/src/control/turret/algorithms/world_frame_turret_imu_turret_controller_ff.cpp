@@ -295,15 +295,9 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::runController(
         world_rel_turret_imu::STATIC_FRICTION_FF_VELOCITY_DEADZONE,
         world_rel_turret_imu::STATIC_FRICTION_FF_ERROR_DEADZONE);
 
+    const float yawRateDifference = turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
     const float chassisYawRate =
-        compareFloatClose(
-            static_cast<src::control::turret::TurretMotorDJI &>(turretMotor)
-                    .getChassisFrameVelocitySUS() -
-                worldFrameYawVelocity,
-            0,
-            1)
-            ? 0
-            : turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+        compareFloatClose(yawRateDifference, 0, 1) ? 0 : yawRateDifference;
     turretMotor.setMotorOutput(pidOut + chassisYawRate * world_rel_turret_imu::BEYBLADE_FF_GAIN);
 }
 

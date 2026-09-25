@@ -66,6 +66,9 @@ static constexpr TurretMotorConfig YAW_MOTOR_CONFIG = {
     .minAngle = 0,
     .maxAngle = M_PI / 4,
     .limitMotorAngles = false,
+    // Velocity comes from the yaw motor's internal encoder (position comes from the PWM encoder on
+    // the yaw axis), so scale by the M3508 gearbox and the belt pulley ratio.
+    .velocityRatio = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 * (64.0f / 94.0f),
 };
 
 static constexpr TurretMotorConfig PITCH_MOTOR_CONFIG = {

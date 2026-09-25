@@ -33,7 +33,6 @@
 #define USING_AGITATOR
 // #define USING_HERO_AGITATOR
 // #define USING_FLYWHEEL
-// #define USING_REV
 
 #include "control/dummy_subsystem.hpp"
 
@@ -60,24 +59,9 @@ src::control::DummySubsystem dummySubsystem(drivers());
 #include "control/turret/algorithms/world_frame_chassis_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_imu_turret_controller.hpp"
 #include "control/turret/constants/turret_constants.hpp"
-#include "control/turret/user/turret_user_world_relative_command.hpp"
-// turret
 #include "control/turret/cv/turret_cv_control_command.hpp"
-#include "control/turret/algorithms/world_frame_turret_can_imu_turret_controller.hpp"
 #include "control/turret/turret_subsystem.hpp"
-#include "control/turret/user/turret_quick_turn_command.hpp"
 #include "control/turret/user/turret_user_control_command.hpp"
-#include "robot/standard/standard_turret_subsystem.hpp"
-
-// testbed turret
-#include "control/turret/test/turret_test_command.hpp"
-
-#endif
-
-#if defined(USING_TURRET) && defined(USING_REV)
-
-#include "control/turret/rev_turret_subsystem.hpp"
-#include "control/turret/user/neo_turret_user_control_command.hpp"
 
 #endif
 

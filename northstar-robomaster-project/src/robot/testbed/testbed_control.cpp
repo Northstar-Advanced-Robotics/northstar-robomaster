@@ -65,9 +65,6 @@ void initializeSubsystems(src::robot::testbed::Drivers *drivers)
 #ifdef USING_CHASSIS
     chassisSubsystem.initialize();
 #endif
-#if defined(USING_TURRET) && defined(USING_REV)
-    revTurret.initialize();
-#endif
 }
 
 void registerTestSubsystems(src::robot::testbed::Drivers *drivers)
@@ -94,9 +91,6 @@ void registerTestSubsystems(src::robot::testbed::Drivers *drivers)
 #ifdef REV_TEST
     drivers->commandScheduler.registerSubsystem(&revMotorTesterSingleMotor);
 #endif
-#if defined(USING_TURRET) && defined(USING_REV)
-    drivers->commandScheduler.registerSubsystem(&revTurret);
-#endif
 }
 
 void setDefaultTestCommands(src::robot::testbed::Drivers *drivers)
@@ -106,9 +100,6 @@ void setDefaultTestCommands(src::robot::testbed::Drivers *drivers)
 #endif  // USING_TURRET
 #ifdef USING_CHASSIS
     chassisSubsystem.setDefaultCommand(&chassisOrientDriveCommand);
-#endif
-#if defined(USING_TURRET) && defined(USING_REV)
-    revTurret.setDefaultCommand(&turretUserControlCommand);
 #endif
 }
 
@@ -135,7 +126,6 @@ void registerTestIoMappings(src::robot::testbed::Drivers *drivers)
 #endif
 #ifdef USING_TURRET
     // xPressedCvControl
-    // leftSwitchDownTurretTest
 #endif  // USING_TURRET
 #ifdef USING_CHASSIS
     // bPressedBeyblade

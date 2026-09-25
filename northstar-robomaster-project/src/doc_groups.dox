@@ -3,7 +3,7 @@
  * @brief Defines the documentation groups the generated site is organised by.
  *
  * Namespaces follow the directory tree down to the module (`control/chassis/` is
- * `src::control::chassis`, `communication/can/chassis/` is `src::communication::can`), so they say
+ * `src::control::chassis`, `communication/can/turret/` is `src::communication::can`), so they say
  * where a class lives, not what it is *for*. A subsystem is often spread across several trees --
  * the turret's CAN link lives in `communication/can/turret/` beside the controllers in
  * `control/turret/`. Tagging each class with `@ingroup` gives one entry per subsystem regardless
@@ -27,6 +27,31 @@
  *
  * The controllers in `control/turret/algorithms/` are the interesting part -- they differ in which frame they
  * measure in (chassis or world) and which sensor they trust.
+ *
+ * @section turret_motor_layering Motor layering
+ *
+ * Every motor on the robot is a `tap::motor::DjiMotor`. The turret adds one layer on top:
+ *
+ * | Layer    | Type                          | Role                                                  |
+ * |----------|-------------------------------|-------------------------------------------------------|
+ * | Hardware | `tap::motor::MotorInterface`  | taproot's motor abstraction: output, encoder, online   |
+ * | Hardware | `tap::motor::DjiMotor`        | CAN driver for GM6020 / M3508 / M2006; optional external encoder |
+ * | Axis     | `TurretMotor`                 | One gimbal axis: chassis-frame angle, setpoint, travel limits, attached controller |
+ *
+ * Each robot's `*_control.cpp` builds the pitch and yaw `DjiMotor`s and passes them to
+ * `TurretSubsystem` as `MotorInterface*`. `TurretSubsystem` wraps each in a `TurretMotor`, and the
+ * controllers and `ChassisSubsystem` work with `TurretMotor` only. Motor-specific numbers (output
+ * clamp, gearing) live in each axis' `TurretMotorConfig`, not in code.
+ *
+ * On the standard, hero, and sentry the yaw `DjiMotor` also takes the PWM encoder
+ * (`drivers()->encoder`) mounted on the yaw axis. Position is read through `getEncoder()`;
+ * velocity is read from the motor's internal encoder, scaled by `TurretMotorConfig::velocityRatio`
+ * (gearbox times belt ratio).
+ *
+ * Other mechanisms own their `DjiMotor`s directly: four M3508s in `ChassisSubsystem`, two M3508s in
+ * `DJITwoFlywheelSubsystem`, one in `VelocityAgitatorSubsystem`, and the hero's M2006 in
+ * `KickerSubsystem`. `ChassisSubsystem` also borrows the turret's yaw `TurretMotor` to read the
+ * turret-to-chassis angle.
  */
 
 /**

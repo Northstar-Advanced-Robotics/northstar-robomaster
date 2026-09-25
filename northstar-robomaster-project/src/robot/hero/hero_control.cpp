@@ -44,19 +44,15 @@
 #include "control/kicker/kicker_subsystem_config.hpp"
 
 // turret
-#include "tap/motor/double_dji_motor.hpp"
 
 #include "control/turret/algorithms/chassis_frame_imu_cal_turret_controller.hpp"
 #include "control/turret/algorithms/chassis_frame_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_chassis_imu_turret_controller.hpp"
-#include "control/turret/algorithms/world_frame_turret_can_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_imu_turret_controller_ff.hpp"
 #include "control/turret/constants/turret_constants.hpp"
 #include "control/turret/turret_subsystem.hpp"
-#include "control/turret/user/turret_quick_turn_command.hpp"
 #include "control/turret/user/turret_user_control_command.hpp"
-#include "control/turret/user/turret_user_world_relative_command.hpp"
 
 // cv
 #include "control/agitator/multi_shot_cv_command_mapping.hpp"
@@ -264,8 +260,6 @@ tap::motor::DjiMotor pitchMotor(
     1,
     PITCH_MOTOR_CONFIG.startEncoderValue);
 
-const float YawRation = tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 * (64.0f / 94.0f);
-
 tap::motor::DjiMotor yawMotor(
     drivers(),
     YAW_MOTOR_ID_2,
@@ -277,22 +271,13 @@ tap::motor::DjiMotor yawMotor(
     YAW_MOTOR_CONFIG.startEncoderValue,
     &drivers()->encoder);
 
-// tap::motor::DoubleDjiMotor yawMotor(
-//     drivers(),
-//     YAW_MOTOR_ID_1,
-//     YAW_MOTOR_ID_2,
-//     CAN_BUS_YAW,
-//     CAN_BUS_YAW,
-//     true,
-//     true,
-//     "YawMotor1",
-//     "YawMotor2",
-//     false,
-//     1,  // tap::motor::DjiMotorEncoder::GEAR_RATIO_M3508 *(1.0f / 3.6f),
-//     YAW_MOTOR_CONFIG.startEncoderValue,
-//     &drivers()->encoder);
-
-TurretSubsystem turret(drivers(), &pitchMotor, &yawMotor, PITCH_MOTOR_CONFIG, YAW_MOTOR_CONFIG);
+TurretSubsystem turret(
+    drivers(),
+    &pitchMotor,
+    &yawMotor,
+    PITCH_MOTOR_CONFIG,
+    YAW_MOTOR_CONFIG,
+    &yawMotor.getInternalEncoder());
 
 // turret controlers
 src::control::turret::ChassisFramePitchTurretController chassisFramePitchTurretController(

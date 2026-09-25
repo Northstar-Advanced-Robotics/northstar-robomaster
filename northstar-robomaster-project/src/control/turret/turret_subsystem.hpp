@@ -24,17 +24,11 @@
 #include "tap/algorithms/wrapped_float.hpp"
 #include "tap/control/subsystem.hpp"
 #include "tap/control/turret_subsystem_interface.hpp"
-#include "tap/motor/dji_motor.hpp"
+#include "tap/communication/sensors/encoder/encoder_interface.hpp"
+#include "tap/motor/motor_interface.hpp"
 
+#include "turret_motor.hpp"
 #include "turret_motor_config.hpp"
-
-#if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
-#include "src/mock/turret_motor_mock.hpp"
-#else
-
-#include "turret_motor_DJI.hpp"
-
-#endif
 
 #include "tap/util_macros.hpp"
 
@@ -71,13 +65,16 @@ public:
      * @param[in] yawMotor Hardware motor for the yaw axis. Not owned; must outlive this object.
      * @param[in] pitchMotorConfig Mounting and travel limits for the pitch axis.
      * @param[in] yawMotorConfig Mounting and travel limits for the yaw axis.
+     * @param[in] yawVelocityEncoder Encoder to read yaw velocity from, or `nullptr` to use the yaw
+     *      motor's own `getEncoder()`. See `TurretMotor`.
      */
     explicit TurretSubsystem(
         tap::Drivers* drivers,
         tap::motor::MotorInterface* pitchMotor,
         tap::motor::MotorInterface* yawMotor,
         const TurretMotorConfig& pitchMotorConfig,
-        const TurretMotorConfig& yawMotorConfig);
+        const TurretMotorConfig& yawMotorConfig,
+        const tap::encoder::EncoderInterface* yawVelocityEncoder = nullptr);
 
     /// Initializes both axes' motors. Must be called before the turret can be driven.
     void initialize() override;
@@ -97,28 +94,14 @@ public:
     /// @return The name used to identify this subsystem in logs and the scheduler.
     const char* getName() const override { return "Turret"; }
 
-    /**
-     * @return Whether the turret is usable.
-     *
-     * @warning Currently hardcoded to `true`; the real check
-     *      (`pitchMotor.isOnline() && yawMotor.isOnline()`) is commented out on the line below.
-     *      Callers gating on this will treat a disconnected turret as healthy. Note
-     *      `TurretMotor::isOnline` does report truthfully, so prefer asking the motors directly.
-     */
-    mockable inline bool isOnline() const
-    {
-        return true;
-    }  // pitchMotor.isOnline() && yawMotor.isOnline(); }
+    /// @return `true` if both the pitch and yaw motors are online. `ImuCalibrateCommand` waits on
+    /// this before calibrating.
+    mockable inline bool isOnline() const { return pitchMotor.isOnline() && yawMotor.isOnline(); }
 
-#ifdef ENV_UNIT_TESTS
-    testing::NiceMock<mock::TurretMotorMock> pitchMotor;
-    testing::NiceMock<mock::TurretMotorMock> yawMotor;
-#else
     /// Associated with and contains logic for controlling the turret's pitch motor
-    TurretMotorDJI pitchMotor;
+    TurretMotor pitchMotor;
     /// Associated with and contains logic for controlling the turret's yaw motor
-    TurretMotorDJI yawMotor;
-#endif
+    TurretMotor yawMotor;
 
 };  // class TurretSubsystem
 

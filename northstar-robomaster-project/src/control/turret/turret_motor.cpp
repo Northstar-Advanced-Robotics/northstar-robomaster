@@ -1,9 +1,8 @@
-#include "turret_motor_DJI.hpp"
+#include "turret_motor.hpp"
 
 #include <cassert>
 
 #include "tap/algorithms/math_user_utils.hpp"
-#include "tap/motor/dji_motor.hpp"
 
 using tap::algorithms::Angle;
 using tap::algorithms::limitVal;
@@ -11,12 +10,13 @@ using tap::algorithms::WrappedFloat;
 
 namespace src::control::turret
 {
-TurretMotorDJI::TurretMotorDJI(
+TurretMotor::TurretMotor(
     tap::motor::MotorInterface *motor,
-    const TurretMotorConfig &motorConfig)
+    const TurretMotorConfig &motorConfig,
+    const tap::encoder::EncoderInterface *velocityEncoder)
     : config(motorConfig),
       motor(motor),
-      ratio(config.ratio),
+      velocityEncoder(velocityEncoder != nullptr ? velocityEncoder : motor->getEncoder()),
       chassisFrameSetpoint(Angle(config.startAngle)),
       chassisFrameMeasuredAngle(Angle(config.startAngle))
 {
@@ -24,14 +24,14 @@ TurretMotorDJI::TurretMotorDJI(
     assert(motor != nullptr);
 }
 
-void TurretMotorDJI::updateMotorAngle()
+void TurretMotor::updateMotorAngle()
 {
     if (isOnline())
     {
         float chassisFrameUnwrappedMeasurement =
             motor->getEncoder()->getPosition().getUnwrappedValue();
 
-        chassisFrameMeasuredAngle.setUnwrappedValue(chassisFrameUnwrappedMeasurement * ratio);
+        chassisFrameMeasuredAngle.setUnwrappedValue(chassisFrameUnwrappedMeasurement * config.ratio);
     }
     else
     {
@@ -39,9 +39,9 @@ void TurretMotorDJI::updateMotorAngle()
     }
 }
 
-void TurretMotorDJI::setMotorOutput(float out)
+void TurretMotor::setMotorOutput(float out)
 {
-    out = limitVal(out, -MAX_OUT_6020, MAX_OUT_6020);
+    out = limitVal(out, -config.maxOutput, config.maxOutput);
 
     if (motor->isMotorOnline())
     {
@@ -53,7 +53,7 @@ void TurretMotorDJI::setMotorOutput(float out)
     }
 }
 
-void TurretMotorDJI::setChassisFrameSetpoint(WrappedFloat setpoint)
+void TurretMotor::setChassisFrameSetpoint(WrappedFloat setpoint)
 {
     chassisFrameSetpoint = setpoint;
 
@@ -68,12 +68,12 @@ void TurretMotorDJI::setChassisFrameSetpoint(WrappedFloat setpoint)
     }
 }
 
-float TurretMotorDJI::getValidChassisMeasurementError() const
+float TurretMotor::getValidChassisMeasurementError() const
 {
     return getValidMinError(chassisFrameSetpoint, chassisFrameMeasuredAngle);
 }
 
-float TurretMotorDJI::getValidMinError(const WrappedFloat setpoint, const WrappedFloat measurement)
+float TurretMotor::getValidMinError(const WrappedFloat setpoint, const WrappedFloat measurement)
     const
 {
     if (config.limitMotorAngles)

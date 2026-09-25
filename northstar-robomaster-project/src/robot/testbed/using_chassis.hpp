@@ -27,35 +27,6 @@ extern src::control::turret::TurretSubsystem turretSubsystem;
 
 src::control::turret::TurretMotor* yawMotor = &turretSubsystem.yawMotor;
 
-#else
-
-/// TODO UPDATE THIS FOR NEW CODE
-// tap::motor::RevMotor yawMotor1(
-//     drivers(),
-//     YAW_MOTOR_ID_1,
-//     CAN_BUS_MOTORS,
-//     tap::motor::RevMotor::ControlMode::DUTY_CYCLE,  // Change from duty cycle
-//     true,
-//     "YawMotor1",
-//     1,
-//     YAW_MOTOR_CONFIG.startEncoderValue,
-//     &drivers()->encoder);
-
-// tap::motor::RevMotor yawMotor2(
-//     drivers(),
-//     YAW_MOTOR_ID_2,
-//     CAN_BUS_MOTORS,
-//     tap::motor::RevMotor::ControlMode::DUTY_CYCLE,
-//     false,
-//     "YawMotor2",
-//     1,
-//     YAW_MOTOR_CONFIG.startEncoderValue);
-
-// src::control::turret::TurretDoubleMotorRev yawTurretMotor(&yawMotor1, &yawMotor2,
-// YAW_MOTOR_CONFIG);
-
-// src::control::turret::TurretMotor* yawMotor = &yawTurretMotor;
-
 #endif
 
 /**
