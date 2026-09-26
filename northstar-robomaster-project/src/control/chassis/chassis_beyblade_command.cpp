@@ -87,6 +87,6 @@ float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uin
         }
         accumTime = 0;
     }
-    return calcSpeed * maxSpeed * direction;
+    return calcSpeed * maxSpeed;
 }
 }  // namespace src::control::chassis

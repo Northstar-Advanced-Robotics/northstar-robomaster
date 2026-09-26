@@ -245,13 +245,12 @@ private:
      * Runs the chassis' auto drive rotation PID to turn the robot toward a point, storing the
      * result in `desiredRotation`.
      *
-     * @warning Likely sign-inverted, and untested since the coordinate frame refactor.
-     *      `getDifferenceToTargetAngle` yields a **counterclockwise** error and
-     *      `chassisSpeedRotationAutoDrivePID` returns a counterclockwise-positive output, but
-     *      `desiredRotation` is eventually passed to the chassis as `rotational`, which is
-     *      **clockwise** positive. As written the robot should turn away from the lookahead point.
-     *      The fix is to negate the PID's whole output here (negating only the input would flip P
-     *      but not D). Verify with a path-follow on the robot before relying on this.
+     * @warning Likely sign-inverted, and untested since the coordinate frame refactor. The PID
+     *      output is counterclockwise positive, matching `rotational`, but it is negated below to
+     *      preserve the behavior from before `rotational` became counterclockwise positive (when
+     *      it was clockwise). As written the robot should turn away from the lookahead point. The
+     *      fix is to drop that negation; verify with a path-follow on the robot before relying on
+     *      this.
      *
      * @param[in] localPoint The direction to face, as a **field-frame** vector from the robot to
      *      the point (despite the name, not chassis-local).
@@ -266,7 +265,7 @@ private:
             tap::algorithms::WrappedFloat(differenceInDesiredFacingRadians, -M_PI_4, M_PI_4)
                 .getWrappedValue());
 
-        desiredRotation = rotationFromPID;
+        desiredRotation = -rotationFromPID;
     }
 };
 

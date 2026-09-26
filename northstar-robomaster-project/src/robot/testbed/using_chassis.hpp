@@ -104,7 +104,7 @@ ChassisOrientDriveCommand chassisOrientDriveCommand(
 ChassisBeybladeCommand chassisBeyBladeCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface,
-    1,
+    -1,
     true);
 
 // chassis Mappings

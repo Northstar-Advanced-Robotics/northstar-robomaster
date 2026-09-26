@@ -48,9 +48,9 @@ struct ChassisConfig
  *
  * Resolves a translation and rotation request into four wheel speeds, ramps them so the robot does
  * not draw a current spike, scales them down to stay inside the referee system's power limit, and
- * runs a velocity PID per wheel. A positive `rotational` commands all four motors positive; the
- * right-side motors are mirrored, so this pushes the left side forward and the right side back --
- * a clockwise pivot.
+ * runs a velocity PID per wheel. Positive output on all four motors pushes the left side forward
+ * and the right side back (the right-side motors are mirrored) -- a clockwise pivot -- so
+ * `rotational` is negated before it reaches the wheels to make it counterclockwise positive.
  *
  * Translation is never interpreted in the chassis frame directly -- both drive methods supply a
  * heading and rotate the request into it, which is what makes turret-relative and field-relative
@@ -135,7 +135,7 @@ private:
      *
      * @param[in] forward Desired forward velocity in the frame named by `heading`, in m/s.
      * @param[in] sideways Desired leftward velocity in the frame named by `heading`, in m/s.
-     * @param[in] rotational Desired rotational velocity, in radians/second, **clockwise**
+     * @param[in] rotational Desired rotational velocity, in radians/second, counterclockwise
      *      positive. Not affected by `heading`.
      * @param[in] heading The angle, in radians, that the translation request is expressed relative
      *      to: 0 means it is already in the chassis frame, and larger values rotate it

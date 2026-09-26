@@ -13,10 +13,7 @@ using tap::motor::DjiMotor;
     Chassis subsystem uses right hand rule, causing the following.
     +X: Forward
     +Y: Left
-    +Rotation: CCW (headings, getChassisYaw, getChassisRotationSpeed)
-
-    Exception: the `rotational` argument of the drive methods is CW positive. See the class
-    documentation in chassis_subsystem.hpp.
+    +Rotation: CCW (headings, getChassisYaw, getChassisRotationSpeed, `rotational`)
 */
 
 namespace src::control::chassis
@@ -191,7 +188,8 @@ void HolonomicChassisSubsystem::driveBasedOnHeading(
 
     setPeeking(abs(vy_local) > 0.1, vy_local > 0);
 
-    float rotationalComponent = rampedRotational * DIST_TO_CENTER * M_SQRT2;
+    // Positive wheel output pivots the chassis CW, so negate to make `rotational` CCW positive.
+    float rotationalComponent = -rampedRotational * DIST_TO_CENTER * M_SQRT2;
     float LFSpeed = mpsToRpm((vx_local - vy_local) / M_SQRT2 + rotationalComponent);
     float RFSpeed = mpsToRpm((-vx_local - vy_local) / M_SQRT2 + rotationalComponent);
     float RBSpeed = mpsToRpm((-vx_local + vy_local) / M_SQRT2 + rotationalComponent);
