@@ -76,7 +76,7 @@ src::control::chassis::ChassisOdometry* chassisOdometry = new src::control::chas
     src::control::chassis::DIST_TO_CENTER,
     src::control::chassis::WHEEL_DIAMETER_M);
 
-ChassisSubsystem chassisSubsystem(
+HolonomicChassisSubsystem chassisSubsystem(
     drivers(),
     src::control::chassis::ChassisConfig{
         .leftFrontId = src::control::chassis::LEFT_FRONT_MOTOR_ID,
@@ -88,7 +88,8 @@ ChassisSubsystem chassisSubsystem(
             src::control::chassis::VELOCITY_PID_KP,
             src::control::chassis::VELOCITY_PID_KI,
             src::control::chassis::VELOCITY_PID_KD,
-            src::control::chassis::VELOCITY_PID_MAX_ERROR_SUM),
+            src::control::chassis::VELOCITY_PID_MAX_ERROR_SUM,
+            src::control::chassis::VELOCITY_PID_MAX_OUTPUT),
     },
     &drivers()->turretMCBCanCommBus2,
     yawMotor,

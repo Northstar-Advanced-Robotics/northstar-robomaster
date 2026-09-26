@@ -27,12 +27,13 @@
 #include "tap/architecture/clock.hpp"
 #include "tap/drivers.hpp"
 
-#include "control/chassis/chassis_subsystem.hpp"
+#include "control/chassis/chassis_power.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 
 using src::control::chassis::CHASSIS_GEAR_RATIO;
 using src::control::chassis::CHASSIS_WALK_SPEED_MPS;
-using src::control::chassis::ChassisSubsystem;
+using src::control::chassis::getChassisPowerLimit;
+using src::control::chassis::getMaxWheelSpeed;
 using src::control::chassis::WHEEL_DIAMETER_M;
 using tap::algorithms::compareFloatClose;
 using tap::algorithms::limitVal;
@@ -81,9 +82,9 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
 
-    float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
+    float maxWheelSpeedMPS = getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
-                                 ChassisSubsystem::getChassisPowerLimit(drivers)) *
+                                 getChassisPowerLimit(drivers)) *
                              (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
 
     if (prevUpdateCounterY != updateCounter)
@@ -135,9 +136,9 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
 
-    float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
+    float maxWheelSpeedMPS = getMaxWheelSpeed(
                                  drivers->refSerial.getRefSerialReceivingData(),
-                                 ChassisSubsystem::getChassisPowerLimit(drivers)) *
+                                 getChassisPowerLimit(drivers)) *
                              (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
 
     if (prevUpdateCounterX != updateCounter)

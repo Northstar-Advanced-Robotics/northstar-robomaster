@@ -29,7 +29,7 @@
 #include "control/chassis/chassis_drive_to_point_command.hpp"
 #include "control/chassis/chassis_field_command.hpp"
 #include "control/chassis/chassis_orient_drive_command.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
+#include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/chassis/chassis_wiggle_command.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 
@@ -355,7 +355,7 @@ src::control::chassis::ChassisOdometry *chassisOdometry =
 // chassis subsystem
 // TODO unfuck cordiate frame, make right hand rule.
 // TODO get curent and voltage sensors and make good power limiting
-src::control::chassis::ChassisSubsystem chassisSubsystem(
+src::control::chassis::HolonomicChassisSubsystem chassisSubsystem(
     drivers(),
     src::control::chassis::ChassisConfig{
         .leftFrontId = src::control::chassis::LEFT_FRONT_MOTOR_ID,
@@ -367,7 +367,8 @@ src::control::chassis::ChassisSubsystem chassisSubsystem(
             src::control::chassis::VELOCITY_PID_KP,
             src::control::chassis::VELOCITY_PID_KI,
             src::control::chassis::VELOCITY_PID_KD,
-            src::control::chassis::VELOCITY_PID_MAX_ERROR_SUM),
+            src::control::chassis::VELOCITY_PID_MAX_ERROR_SUM,
+            src::control::chassis::VELOCITY_PID_MAX_OUTPUT),
     },
     &turret.yawMotor,
     chassisOdometry);

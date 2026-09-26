@@ -8,7 +8,6 @@
 #include "control/turret/constants/turret_constants.hpp"
 #include "robot/turret/turret_drivers.hpp"
 
-#include "control/chassis/chassis_subsystem.hpp"
 #include "control/chassis/chassis_drive_command.hpp"
 
 using namespace src::robot::turret;

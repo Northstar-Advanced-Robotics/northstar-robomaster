@@ -46,7 +46,7 @@ src::control::DummySubsystem dummySubsystem(drivers());
 #include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_drive_command.hpp"
 #include "control/chassis/chassis_orient_drive_command.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
+#include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/chassis/chassis_wiggle_command.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 #include "control/turret/constants/turret_constants.hpp"

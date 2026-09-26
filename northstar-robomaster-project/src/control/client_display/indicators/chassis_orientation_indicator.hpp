@@ -65,21 +65,21 @@ public:
         UISubsystem::fixAngle(&front.startAngle);
         front.endAngle = front.startAngle + INNER_ARC_LEN;
 
-        side.setHidden(!chassis->isPeeking);
+        side.setHidden(!chassis->isPeeking());
 #if defined(TARGET_STANDARD)
         // side arc is concave (because flyswatters), so angle is flipped
-        side.startAngle = (chassis->isPeekingLeft ? 90 : 270) + heading - INNER_ARC_LEN / 2;
+        side.startAngle = (chassis->isPeekingLeft() ? 90 : 270) + heading - INNER_ARC_LEN / 2;
         UISubsystem::fixAngle(&side.startAngle);
         side.endAngle = side.startAngle + INNER_ARC_LEN;
 
         // and xy location isn't the center
-        float angleRadians = (chassis->isPeekingLeft ? PI / 2 : 3 * PI / 2) +
+        float angleRadians = (chassis->isPeekingLeft() ? PI / 2 : 3 * PI / 2) +
                              turret->yawMotor.getChassisFrameMeasuredAngle().getWrappedValue();
         side.cx = front.cx - 2 * side.width * sin(angleRadians);
         side.cy = front.cy - 2 * side.width * cos(angleRadians);
 #else
         // side arc is like the front one, convex
-        side.startAngle = (chassis->isPeekingLeft ? 270 : 90) + heading - INNER_ARC_LEN / 2;
+        side.startAngle = (chassis->isPeekingLeft() ? 270 : 90) + heading - INNER_ARC_LEN / 2;
         UISubsystem::fixAngle(&side.startAngle);
         side.endAngle = side.startAngle + INNER_ARC_LEN;
 #endif
@@ -94,8 +94,8 @@ public:
 
         if (showPlsSpin)
         {
-            plsSpinText.setHidden(chassis->beyBladeCommandRunning);
-            // plsSpinBox.setHidden(!chassis->isPeeking && !chassis->isBeybladingOnly);
+            plsSpinText.setHidden(chassis->isBeybladeCommandRunning());
+            // plsSpinBox.setHidden(!chassis->isPeeking() && !chassis->isBeybladingOnly);
 
             plsSpinText.x = UISubsystem::HALF_SCREEN_WIDTH - plsSpinText.width / 2;
             // plsSpinBox.x1 = plsSpinText.x-TEXT_THICKNESS;

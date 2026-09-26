@@ -39,7 +39,7 @@ public:
     /// not peeking.
     void update()
     {
-        if (chassis->isPeeking)
+        if (chassis->isPeeking())
         {
             Vector3d vs{MAGNITUDE, 0, 0};
             Vector3d temp;

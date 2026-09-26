@@ -7,7 +7,6 @@
 
 #include "control/chassis/chassis_auto_drive.hpp"
 #include "control/chassis/chassis_odometry.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
 #include "control/turret/constants/turret_constants.hpp"
 
 #include "uart_constants.hpp"

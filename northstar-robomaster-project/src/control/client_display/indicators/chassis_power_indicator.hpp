@@ -1,5 +1,6 @@
 #pragma once
 
+#include "control/chassis/chassis_power.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 #include "control/client_display/graphics_objects/atomic_graphics_objects.hpp"
 #include "control/client_display/graphics_objects/graphics_container.hpp"
@@ -35,7 +36,7 @@ public:
     /// over the referee system's limit.
     void update()
     {
-        float rawPower = chassis->getChassisPowerDraw();  // chassis->getWheelRpm();
+        float rawPower = chassis->getChassisPowerDraw();
 
         powerBuffer[bufferIndex] = rawPower;
         bufferIndex = (bufferIndex + 1) % BUFFER_SIZE;
@@ -51,11 +52,11 @@ public:
         powerDraw.calculateNumbers();
         powerDraw.x = X_POSITION - powerDraw.width / 2;
 
-        if (chassisPower > chassis->ChassisSubsystem::getChassisPowerLimit(drivers))
+        if (chassisPower > src::control::chassis::getChassisPowerLimit(drivers))
         {
             powerDraw.color = UISubsystem::Color::RED_AND_BLUE;
             energyInBuffer -=
-                (rawPower - chassis->ChassisSubsystem::getChassisPowerLimit(drivers)) *
+                (rawPower - src::control::chassis::getChassisPowerLimit(drivers)) *
                 drivers->DT / 1000.0f;
         }
         else

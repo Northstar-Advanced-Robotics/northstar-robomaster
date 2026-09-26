@@ -1,6 +1,5 @@
 #pragma once
 
-#include "control/chassis/chassis_subsystem.hpp"
 #include "control/client_display/graphics_objects/atomic_graphics_objects.hpp"
 #include "control/client_display/graphics_objects/graphics_container.hpp"
 #include "control/client_display/ui_subsystem.hpp"
@@ -18,7 +17,7 @@ namespace src::control::client_display
 class ShotsRemainingIndicator : public GraphicsContainer
 {
 public:
-    ShotsRemainingIndicator(tap::Drivers* drivers) : drivers(drivers), chassis(chassis)
+    ShotsRemainingIndicator(tap::Drivers* drivers) : drivers(drivers)
     {
         addGraphicsObject(&shotsRemaining);
         shotsRemaining.x = X_POSITION;
@@ -48,8 +47,6 @@ public:
 
 private:
     tap::Drivers* drivers;
-
-    src::control::chassis::ChassisSubsystem* chassis;
 
     static constexpr uint16_t X_POSITION =
         600;  // pixels, all numbers at the same y level on screen

@@ -6,7 +6,6 @@
 #include "tap/util_macros.hpp"
 
 #include "control/chassis/chassis_auto_drive.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
 
 namespace src::control::algorithms
 {

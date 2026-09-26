@@ -38,7 +38,7 @@ public:
         number.calculateNumbers();
         number.x = CENTER_X - number.width / 2;
 
-        if (chassis->isBeybladingOnly)
+        if (chassis->isBeybladingOnly())
         {
             number.show();
             number.color = UISubsystem::Color::GREEN;

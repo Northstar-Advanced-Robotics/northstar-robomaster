@@ -44,9 +44,9 @@ void StateMachineSubsystem::refresh()
         {
             if (beyblade && beybladeCommand != nullptr)
             {
-                float maxRot = chassisSubsystem->calculateMaxRotationSpeed(0, 0);
+                float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
                 float rotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
-                chassisSubsystem->isBeybladingOnly = true;
+                chassisSubsystem->setBeybladingOnly(true);
                 chassisSubsystem->setVelocityFieldDrive(
                     0,
                     0,
@@ -65,32 +65,24 @@ void StateMachineSubsystem::refresh()
 
         if (beyblade && beybladeCommand != nullptr)
         {
-            float maxRot = chassisSubsystem->calculateMaxRotationSpeed(
-                desiredGlobalVelocity.x,
-                desiredGlobalVelocity.y);
+            float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
             desiredRotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
 
             if (chassisSubsystem->getChassisOdometry()->getVelocityLocal().getLength() < 0.3f)
             {
-                chassisSubsystem->isBeybladingOnly = true;
+                chassisSubsystem->setBeybladingOnly(true);
                 desiredRotation *= src::control::chassis::BEYBLADE_SPEEDUP_FACTOR;
             }
             else
             {
-                chassisSubsystem->isBeybladingOnly = false;
+                chassisSubsystem->setBeybladingOnly(false);
             }
         }
 
-        chassisSubsystem->setIsSprinting(true);
         chassisSubsystem->setVelocityFieldDrive(
             desiredGlobalVelocity.x,
             desiredGlobalVelocity.y,
             desiredRotation);
-    }
-    else
-    {
-        chassisSubsystem->setIsSprinting(false);
-        return;
     }
 }
 
