@@ -108,8 +108,10 @@ public:
     /// attached.
     float calculateMaxRotationSpeed() override;
 
-    /// Derived from each motor's **commanded** output and measured speed, not from a current
-    /// sensor, so it tracks the real draw only as well as the motor model does.
+    /// A model, not a sensor: built from each motor's measured current and speed using the
+    /// power model in `chassis_constants.hpp`, so it tracks the real draw only as well as that
+    /// model is calibrated. Replace with taproot's `PowerLimiter` and current/voltage sensors once
+    /// the chassis has them.
     float getChassisPowerDraw() override;
 
     /// Runs each wheel's velocity PID against the speeds computed by the last drive call, then

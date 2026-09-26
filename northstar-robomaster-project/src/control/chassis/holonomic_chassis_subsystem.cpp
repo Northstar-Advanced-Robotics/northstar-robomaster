@@ -1,5 +1,6 @@
 #include "holonomic_chassis_subsystem.hpp"
 
+#include <algorithm>
 #include <cmath>
 
 #include "tap/algorithms/math_user_utils.hpp"
@@ -7,7 +8,6 @@
 #include "chassis_power.hpp"
 
 using tap::algorithms::limitVal;
-using tap::motor::DjiMotor;
 
 /*
     Chassis subsystem uses right hand rule, causing the following.
@@ -100,16 +100,18 @@ void HolonomicChassisSubsystem::setVelocityFieldDrive(float forward, float sidew
 
 float HolonomicChassisSubsystem::getChassisPowerDraw()
 {
-    float powerSum = 0.0f;
+    float powerSum = POWER_MODEL_STATIC_W;
     for (const Motor& motor : motors)
     {
-        powerSum += abs(
-            (((float)motor.getOutputDesired() / DjiMotor::MAX_OUTPUT_C620) * 20.0f) *
-            (((motor.getEncoder()->getVelocity() * 60.0f / M_TWOPI / CHASSIS_GEAR_RATIO) /
-              MAX_M3508_RPM_CHASSIS) *
-             24.0f));
+        float current = motor.getTorque() * AMPS_DESIRED_OUTPUT_RATIO;  // A, measured
+        float velocity = motor.getEncoder()->getVelocity();              // rad/s, wheel shaft
+
+        powerSum += M3508_TORQUE_CONSTANT_NM_PER_A * current * velocity  // mechanical
+                    + POWER_MODEL_COPPER_LOSS_W_PER_A2 * current * current
+                    + POWER_MODEL_SPEED_LOSS_W_PER_RAD2 * velocity * velocity;
     }
-    return powerSum;
+    // Braking makes the mechanical term negative; the total draw can't be.
+    return std::max(powerSum, 0.0f);
 }
 
 void HolonomicChassisSubsystem::applyAccelerationToRamp(
@@ -189,7 +191,8 @@ void HolonomicChassisSubsystem::driveBasedOnHeading(
     setPeeking(abs(vy_local) > 0.1, vy_local > 0);
 
     // Positive wheel output pivots the chassis CW, so negate to make `rotational` CCW positive.
-    float rotationalComponent = -rampedRotational * DIST_TO_CENTER * M_SQRT2;
+    // Wheel speed from rotation is w*R, R = DIST_TO_CENTER (center to wheel).
+    float rotationalComponent = -rampedRotational * DIST_TO_CENTER;
     float LFSpeed = mpsToRpm((vx_local - vy_local) / M_SQRT2 + rotationalComponent);
     float RFSpeed = mpsToRpm((-vx_local - vy_local) / M_SQRT2 + rotationalComponent);
     float RBSpeed = mpsToRpm((-vx_local + vy_local) / M_SQRT2 + rotationalComponent);

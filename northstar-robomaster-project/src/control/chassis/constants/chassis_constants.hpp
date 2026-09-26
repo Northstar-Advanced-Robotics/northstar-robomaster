@@ -41,6 +41,29 @@ static constexpr tap::motor::MotorId RIGHT_BACK_MOTOR_ID = tap::motor::MOTOR4;
 static constexpr float AMPS_DESIRED_OUTPUT_RATIO = 20.0f / 16384.0f;  // I/Output
 /// Nominal chassis bus voltage, in volts.
 static constexpr float CHASSIS_VOLTAGE = 24.0f;
+
+/**
+ * Power model used by `getChassisPowerDraw` until the chassis has real power sensors. Per motor:
+ *
+ *     P = Kt * I * w  +  k1 * I^2  +  k2 * w^2
+ *
+ * summed over the motors, plus a static draw. `I` is the C620's measured current (A) and `w` the
+ * wheel shaft speed (rad/s).
+ *
+ * @warning `k1`, `k2`, and the static draw are starting guesses, not measured. Calibrate them by
+ *      driving over the power limit and matching the model to the referee system's power buffer,
+ *      which falls at `(P - limit)` watts, or against a bench power meter.
+ */
+/// M3508 torque constant at the output shaft (after the gearbox), in N*m/A. Matches taproot's
+/// `M3508Constants::getTorqueConstant()`.
+static constexpr float M3508_TORQUE_CONSTANT_NM_PER_A = 0.3f;
+/// Copper loss coefficient, in W/A^2. Starting value 1.5 * 0.194 ohm (M3508 phase resistance).
+/// Calibrate.
+static constexpr float POWER_MODEL_COPPER_LOSS_W_PER_A2 = 1.5f * 0.194f;
+/// Speed-dependent loss (friction, iron loss) coefficient, in W/(rad/s)^2. Calibrate.
+static constexpr float POWER_MODEL_SPEED_LOSS_W_PER_RAD2 = 0.0f;
+/// Draw of the whole drivetrain at rest (motor controllers idling), in watts. Calibrate.
+static constexpr float POWER_MODEL_STATIC_W = 0.0f;
 /// Top speed of an M3508 at the **motor shaft**, in RPM: its 482 RPM free-running output speed
 /// scaled up through the 3591:187 gearbox. Roughly 9256. These are the units `mpsToRpm` and the
 /// wheel velocity PID work in.
