@@ -264,10 +264,8 @@ float debugRotationBudgetFraction;
 
 void HolonomicChassisSubsystem::refresh()
 {
-    uint32_t nowUs = tap::arch::clock::getTimeMicroseconds();
-    float dt = (prevRefreshTimeUs == 0) ? static_cast<float>(tap::Drivers::DT) / 1E3F
-                                        : (nowUs - prevRefreshTimeUs) / 1E6F;
-    prevRefreshTimeUs = nowUs;
+    // Main loop period, in seconds.
+    const float dt = static_cast<float>(tap::Drivers::DT) / 1E3F;
 
     PowerModel model;
     for (size_t i = 0; i < NUM_MOTORS; i++)

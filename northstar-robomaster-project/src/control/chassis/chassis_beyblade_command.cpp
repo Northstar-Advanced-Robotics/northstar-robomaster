@@ -46,15 +46,11 @@ void ChassisBeybladeCommand::execute()
     calcedRot = calculateBeyBladeRotationSpeed(
         chassis->calculateMaxRotationSpeed(),
         dt);
-    if (chassis->getChassisOdometry()->getVelocityLocal().getLength() <
-        beyBladeFastSpinSpeedThreshold)
-    {
-        chassis->setBeybladingOnly(true);
-    }
-    else
-    {
-        chassis->setBeybladingOnly(false);
-    }
+    // Measured speed when odometry is attached, otherwise the operator's requested speed.
+    ChassisOdometry* odometry = chassis->getChassisOdometry();
+    float speed = (odometry != nullptr) ? odometry->getVelocityLocal().getLength()
+                                        : hypotf(verticalSpeed, horizontalSpeed);
+    chassis->setBeybladingOnly(speed < beyBladeFastSpinSpeedThreshold);
     chassis->setVelocityTurretDrive(verticalSpeed, horizontalSpeed, calcedRot);
 }
 

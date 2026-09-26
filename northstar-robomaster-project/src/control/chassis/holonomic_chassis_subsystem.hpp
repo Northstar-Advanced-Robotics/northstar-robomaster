@@ -217,9 +217,6 @@ private:
     /// The `rotational` argument of the last drive call, in radians/second.
     float lastRotationalCommand = 0.0f;
 
-    /// Time of the last `refresh`, in microseconds. Zero before the first.
-    uint32_t prevRefreshTimeUs = 0;
-
 protected:
     /// The four drive motors. Indexed by `MotorId`.
     std::array<Motor, NUM_MOTORS> motors;
