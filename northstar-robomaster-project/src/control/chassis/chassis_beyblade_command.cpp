@@ -50,7 +50,6 @@ void ChassisBeybladeCommand::execute()
         beyBladeFastSpinSpeedThreshold)
     {
         chassis->setBeybladingOnly(true);
-        calcedRot *= BEYBLADE_SPEEDUP_FACTOR;
     }
     else
     {

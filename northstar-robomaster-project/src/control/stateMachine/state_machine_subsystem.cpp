@@ -47,10 +47,7 @@ void StateMachineSubsystem::refresh()
                 float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
                 float rotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
                 chassisSubsystem->setBeybladingOnly(true);
-                chassisSubsystem->setVelocityFieldDrive(
-                    0,
-                    0,
-                    rotation * src::control::chassis::BEYBLADE_SPEEDUP_FACTOR);
+                chassisSubsystem->setVelocityFieldDrive(0, 0, rotation);
             }
             else
             {
@@ -71,7 +68,6 @@ void StateMachineSubsystem::refresh()
             if (chassisSubsystem->getChassisOdometry()->getVelocityLocal().getLength() < 0.3f)
             {
                 chassisSubsystem->setBeybladingOnly(true);
-                desiredRotation *= src::control::chassis::BEYBLADE_SPEEDUP_FACTOR;
             }
             else
             {

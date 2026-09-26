@@ -92,13 +92,14 @@ public:
     virtual float getChassisRotationSpeed() = 0;
 
     /**
-     * How much rotational speed is left over once translation has been paid for.
+     * The rotational speed beyblade should spin at.
      *
-     * Translation and rotation compete for the same finite wheel speed, so beyblade uses this to
-     * spin as fast as the remaining budget allows.
+     * Translation and rotation compete for the same wheel speed and power. This is the wheel speed
+     * left once translation is paid for, backed off while power is limiting so translation gets
+     * priority. Beyblade can ask for it outright; the power loop keeps the actual spin legal.
      *
-     * @return The largest rotational speed the chassis can still produce, in radians/second.
-     *      A magnitude: never negative, and valid in either direction.
+     * @return The rotational speed to request, in radians/second. A magnitude: never negative,
+     *      and valid in either direction.
      */
     virtual float calculateMaxRotationSpeed() = 0;
 
@@ -177,8 +178,7 @@ public:
     bool isBeybladeCommandRunning() const { return beybladeCommandRunning; }
 
     /// Set by beyblade and the sentry state machine while the robot is spinning but barely
-    /// translating. Lets the drivetrain raise its power budget, since wheel speed not spent on
-    /// translation is available for rotation.
+    /// translating. Read by the HUD to show the robot's speed while beyblading in place.
     void setBeybladingOnly(bool beybladingOnly) { this->beybladingOnly = beybladingOnly; }
     bool isBeybladingOnly() const { return beybladingOnly; }
 

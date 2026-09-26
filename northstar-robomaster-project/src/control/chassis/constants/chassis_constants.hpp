@@ -3,6 +3,8 @@
 
 #include "tap/motor/dji_motor.hpp"
 
+#include "modm/container/pair.hpp"
+
 /**
  * Selects the chassis constants for the robot currently being built, and defines the constants
  * shared by every chassis.
@@ -64,6 +66,47 @@ static constexpr float POWER_MODEL_COPPER_LOSS_W_PER_A2 = 1.5f * 0.194f;
 static constexpr float POWER_MODEL_SPEED_LOSS_W_PER_RAD2 = 0.0f;
 /// Draw of the whole drivetrain at rest (motor controllers idling), in watts. Calibrate.
 static constexpr float POWER_MODEL_STATIC_W = 0.0f;
+
+/// Power target used when the referee system is offline, in watts, so an unplugged referee
+/// system slows the robot rather than letting it draw freely. The ARCC 2026 default (HP Priority)
+/// Infantry limit, and the lowest of the robot limits.
+static constexpr float POWER_FALLBACK_LIMIT_W = 75.0f;
+
+/**
+ * Referee power buffer protection. Per the ARCC 2026 rules (Events Manual 3.3.1.4), chassis power
+ * over the limit drains a buffer capped at 60 J, and if the buffer is empty while still over the
+ * limit **the chassis is powered off for 5 seconds**. The power loop therefore never plans to
+ * spend the buffer: it runs at the limit while the buffer is within `POWER_BUFFER_DEADBAND_J` of
+ * full, and below that cuts the target in proportion so the buffer refills long before it empties.
+ */
+/// The referee's buffer energy limit, in joules.
+static constexpr float POWER_BUFFER_FULL_J = 60.0f;
+/// How far the buffer may fall below full before the power target is cut, in joules. Absorbs
+/// small, brief overshoots without slowing the robot.
+static constexpr float POWER_BUFFER_DEADBAND_J = 10.0f;
+/// How much the power target drops per joule the buffer is below the deadband, in watts per joule.
+/// This feedback is what corrects for error in the power model.
+static constexpr float POWER_BUFFER_GAIN_W_PER_J = 3.0f;
+
+/// How far the rotation ramp may run ahead of the measured rotation speed while the power loop is
+/// limiting, in radians/second. The rotational counterpart of `RAMP_WINDUP_MARGIN_MPS`: stops
+/// beyblade's large request from winding the ramp up so the spin stops soon after release.
+static constexpr float ROTATION_WINDUP_MARGIN_RADPS = 2.0f;
+
+/// How far a translation ramp may run ahead of the measured chassis velocity while the power loop
+/// is limiting, in m/s. Keeps the setpoint from winding up beyond what the robot can reach (so it
+/// stops promptly on release) while still letting it start moving when another demand, such as
+/// beyblade spin, is what is using the power.
+static constexpr float RAMP_WINDUP_MARGIN_MPS = 0.5f;
+
+/// How fast the beyblade's share of the rotation budget shrinks while the power loop is limiting,
+/// as a fraction of the budget per second. Backing spin off is what gives translation priority.
+static constexpr float BEYBLADE_BUDGET_DOWN_RATE = 1.0f;
+/// How fast the beyblade's share of the rotation budget recovers while power is not limiting, as
+/// a fraction of the budget per second.
+static constexpr float BEYBLADE_BUDGET_UP_RATE = 0.3f;
+/// Smallest share of the rotation budget beyblade is ever backed off to.
+static constexpr float BEYBLADE_BUDGET_MIN_FRACTION = 0.2f;
 /// Top speed of an M3508 at the **motor shaft**, in RPM: its 482 RPM free-running output speed
 /// scaled up through the 3591:187 gearbox. Roughly 9256. These are the units `mpsToRpm` and the
 /// wheel velocity PID work in.

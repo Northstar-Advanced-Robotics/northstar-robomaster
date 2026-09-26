@@ -65,24 +65,17 @@ float HolonomicChassisSubsystem::getChassisRotationSpeed()
 
 float HolonomicChassisSubsystem::calculateMaxRotationSpeed()
 {
-    float maxWheelSpeed =
-        getMaxWheelSpeed(drivers->refSerial.getRefSerialReceivingData(), getChassisPowerLimit(drivers));
-
-    float linearSpeedRPM =
+    float translationSpeed =
         (chassisOdometry != nullptr)
-            ? mpsToRpm(chassisOdometry->getVelocityLocal().getLength())
-            : mpsToRpm(sqrtf(
+            ? chassisOdometry->getVelocityLocal().getLength()
+            : sqrtf(
                   rampControllers[0].getValue() * rampControllers[0].getValue() +
-                  rampControllers[1].getValue() * rampControllers[1].getValue()));
+                  rampControllers[1].getValue() * rampControllers[1].getValue());
 
-    float allowedWheelSpeed = maxWheelSpeed - linearSpeedRPM / 1.4142;
+    // While spinning, every wheel eventually carries the whole translation, so reserve all of it.
+    float availableWheelSpeed = std::max(rpmToMps(MAX_M3508_RPM_CHASSIS) - translationSpeed, 0.0f);
 
-    if (allowedWheelSpeed < 0.0f)
-    {
-        allowedWheelSpeed = 0.0f;
-    }
-    return (allowedWheelSpeed * (CHASSIS_GEAR_RATIO) * (M_TWOPI / 60.0f) * (WHEEL_DIAMETER_M / 2)) /
-           DIST_TO_CENTER;
+    return rotationBudgetFraction * availableWheelSpeed / DIST_TO_CENTER;
 }
 
 void HolonomicChassisSubsystem::setVelocityTurretDrive(
@@ -100,36 +93,58 @@ void HolonomicChassisSubsystem::setVelocityFieldDrive(float forward, float sidew
 
 float HolonomicChassisSubsystem::getChassisPowerDraw()
 {
-    float powerSum = POWER_MODEL_STATIC_W;
+    // SUPERCAP: if (capacitorBank && capacitorBank->isEnabled()) the cap board measures the
+    // chassis-side power directly; return that instead of the model below.
+    PowerModel model;
     for (const Motor& motor : motors)
     {
-        float current = motor.getTorque() * AMPS_DESIRED_OUTPUT_RATIO;  // A, measured
-        float velocity = motor.getEncoder()->getVelocity();              // rad/s, wheel shaft
-
-        powerSum += M3508_TORQUE_CONSTANT_NM_PER_A * current * velocity  // mechanical
-                    + POWER_MODEL_COPPER_LOSS_W_PER_A2 * current * current
-                    + POWER_MODEL_SPEED_LOSS_W_PER_RAD2 * velocity * velocity;
+        // Measured current, not the command.
+        model.addMotor(motor.getTorque() * AMPS_DESIRED_OUTPUT_RATIO, motor.getEncoder()->getVelocity());
     }
     // Braking makes the mechanical term negative; the total draw can't be.
-    return std::max(powerSum, 0.0f);
+    return std::max(model.at(1.0f), 0.0f);
+}
+
+void HolonomicChassisSubsystem::resetDriveState()
+{
+    for (auto& ramp : rampControllers)
+    {
+        ramp.reset(0.0f);
+    }
+    desiredOutput.fill(0.0f);
+    for (auto& pid : pidControllers)
+    {
+        pid.reset();
+    }
+    lastRotationalCommand = 0.0f;
+    powerLimitScale = 1.0f;
+}
+
+void HolonomicChassisSubsystem::refreshSafeDisconnect()
+{
+    resetDriveState();
+    for (auto& motor : motors)
+    {
+        motor.setDesiredOutput(0);
+    }
 }
 
 void HolonomicChassisSubsystem::applyAccelerationToRamp(
     tap::algorithms::Ramp& ramp,
     float maxAcceleration,
     float maxDeceleration,
-    float dt)
+    float dt,
+    bool allowAcceleration)
 {
-    if (tap::algorithms::getSign(ramp.getTarget()) == tap::algorithms::getSign(ramp.getValue()) &&
-        abs(ramp.getTarget()) > abs(ramp.getValue()))
+    bool accelerating = ramp.getTarget() * ramp.getValue() >= 0.0f &&
+                        abs(ramp.getTarget()) > abs(ramp.getValue());
+    if (!accelerating)
     {
-        // we are trying to speed up
-        ramp.update(maxAcceleration * dt);
-    }
-    else
-    {
-        // we are trying to slow down
         ramp.update(maxDeceleration * dt);
+    }
+    else if (allowAcceleration)
+    {
+        ramp.update(maxAcceleration * dt);
     }
 }
 
@@ -142,48 +157,71 @@ void HolonomicChassisSubsystem::driveBasedOnHeading(
     if (!motors[0].isMotorOnline() && !motors[1].isMotorOnline() && !motors[2].isMotorOnline() &&
         !motors[3].isMotorOnline())
     {
-        forward = 0;
-        sideways = 0;
-        rotational = 0;
+        resetDriveState();
+        return;
     }
+    lastRotationalCommand = rotational;
 
-    float maxWheelSpeed =
-        getMaxWheelSpeed(drivers->refSerial.getRefSerialReceivingData(), getChassisPowerLimit(drivers));
+    float cos_theta = cos(heading);
+    float sin_theta = sin(heading);
 
     float dynamicAccel = CHASSIS_ACCEL_VALUE;
+    // Measured velocity in the request's frame, for ramp anti-windup. Assume it keeps up when
+    // there is no odometry.
+    float measuredForward = rampControllers[0].getValue();
+    float measuredSideways = rampControllers[1].getValue();
     if (chassisOdometry != nullptr)
     {
         auto vel = chassisOdometry->getVelocityLocal();
-        float currentSpeed = sqrtf(vel.x * vel.x + vel.y * vel.y);
-        float maxSpeedMPS = maxWheelSpeed * (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO);
-        float speedFraction = limitVal<float>(currentSpeed / maxSpeedMPS, 0.0f, 1.0f);
+        float speedFraction = limitVal<float>(vel.getLength() / MAX_CHASSIS_SPEED_MPS, 0.0f, 1.0f);
         dynamicAccel = CHASSIS_ACCEL_VALUE * (1.0f - ACCEL_TAPER_FACTOR * speedFraction);
-    }
 
-    float maxRotSpeed =
-        (maxWheelSpeed * CHASSIS_GEAR_RATIO * M_TWOPI / 60.0f * (WHEEL_DIAMETER_M / 2.0f)) /
-        DIST_TO_CENTER;
-    float rotFraction = limitVal<float>(abs(getChassisRotationSpeed()) / maxRotSpeed, 0.0f, 1.0f);
-    float dynamicRotAccel =
-        ROTATION_ACCEL_VALUE * (1.0f - ROTATION_ACCEL_TAPER_FACTOR * rotFraction);
+        // Rotate by -heading: the inverse of the request-to-chassis rotation below.
+        measuredForward = vel.x * cos_theta + vel.y * sin_theta;
+        measuredSideways = -vel.x * sin_theta + vel.y * cos_theta;
+    }
 
     const float dt = static_cast<float>(tap::Drivers::DT) / 1E3F;
 
+    // While power limited, don't let a ramp run further ahead of the robot than the margin, so the
+    // setpoint doesn't wind up and the robot stops promptly on release.
+    bool limited = powerLimitScale < 1.0f;
     rampControllers[0].setTarget(forward);
-    applyAccelerationToRamp(rampControllers[0], dynamicAccel, CHASSIS_DECCEL_VALUE, dt);
+    applyAccelerationToRamp(
+        rampControllers[0],
+        dynamicAccel,
+        CHASSIS_DECCEL_VALUE,
+        dt,
+        !limited ||
+            abs(rampControllers[0].getValue()) < abs(measuredForward) + RAMP_WINDUP_MARGIN_MPS);
 
     rampControllers[1].setTarget(sideways);
-    applyAccelerationToRamp(rampControllers[1], dynamicAccel, CHASSIS_DECCEL_VALUE, dt);
+    applyAccelerationToRamp(
+        rampControllers[1],
+        dynamicAccel,
+        CHASSIS_DECCEL_VALUE,
+        dt,
+        !limited ||
+            abs(rampControllers[1].getValue()) < abs(measuredSideways) + RAMP_WINDUP_MARGIN_MPS);
+
+    float measuredRotation = getChassisRotationSpeed();
+    float maxRotationSpeed = MAX_CHASSIS_SPEED_MPS / DIST_TO_CENTER;
+    float rotFraction = limitVal<float>(abs(measuredRotation) / maxRotationSpeed, 0.0f, 1.0f);
+    float dynamicRotAccel =
+        ROTATION_ACCEL_VALUE * (1.0f - ROTATION_ACCEL_TAPER_FACTOR * rotFraction);
 
     rampControllers[2].setTarget(rotational);
-    applyAccelerationToRamp(rampControllers[2], dynamicRotAccel, ROTATION_ACCEL_VALUE, dt);
+    applyAccelerationToRamp(
+        rampControllers[2],
+        dynamicRotAccel,
+        ROTATION_ACCEL_VALUE,
+        dt,
+        !limited || abs(rampControllers[2].getValue()) <
+                        abs(measuredRotation) + ROTATION_WINDUP_MARGIN_RADPS);
 
     float rampedXVelocity = rampControllers[0].getValue();
     float rampedYVelocity = rampControllers[1].getValue();
     float rampedRotational = rampControllers[2].getValue();
-
-    float cos_theta = cos(heading);
-    float sin_theta = sin(heading);
 
     float vx_local = rampedXVelocity * cos_theta - rampedYVelocity * sin_theta;
     float vy_local = rampedXVelocity * sin_theta + rampedYVelocity * cos_theta;
@@ -193,41 +231,79 @@ void HolonomicChassisSubsystem::driveBasedOnHeading(
     // Positive wheel output pivots the chassis CW, so negate to make `rotational` CCW positive.
     // Wheel speed from rotation is w*R, R = DIST_TO_CENTER (center to wheel).
     float rotationalComponent = -rampedRotational * DIST_TO_CENTER;
-    float LFSpeed = mpsToRpm((vx_local - vy_local) / M_SQRT2 + rotationalComponent);
-    float RFSpeed = mpsToRpm((-vx_local - vy_local) / M_SQRT2 + rotationalComponent);
-    float RBSpeed = mpsToRpm((-vx_local + vy_local) / M_SQRT2 + rotationalComponent);
-    float LBSpeed = mpsToRpm((vx_local + vy_local) / M_SQRT2 + rotationalComponent);
+    std::array<float, NUM_MOTORS> wheelSpeeds;
+    wheelSpeeds[static_cast<int>(MotorId::LF)] =
+        mpsToRpm((vx_local - vy_local) / M_SQRT2 + rotationalComponent);
+    wheelSpeeds[static_cast<int>(MotorId::RF)] =
+        mpsToRpm((-vx_local - vy_local) / M_SQRT2 + rotationalComponent);
+    wheelSpeeds[static_cast<int>(MotorId::RB)] =
+        mpsToRpm((-vx_local + vy_local) / M_SQRT2 + rotationalComponent);
+    wheelSpeeds[static_cast<int>(MotorId::LB)] =
+        mpsToRpm((vx_local + vy_local) / M_SQRT2 + rotationalComponent);
 
-    float calculatedMaxRPMPower =
-        limitVal<float>(maxWheelSpeed, -MAX_M3508_RPM_CHASSIS, MAX_M3508_RPM_CHASSIS);
-
-    float sumSpeed = std::abs(LFSpeed) + std::abs(LBSpeed) + std::abs(RFSpeed) + std::abs(RBSpeed);
-    float powerBudget = calculatedMaxRPMPower * 4.0f;
-    if (isBeybladingOnly())
+    // If any wheel asks for more than the motor can do, slow all four together so the direction
+    // of motion is kept.
+    float fastestWheel = 0.0f;
+    for (float speed : wheelSpeeds)
     {
-        powerBudget *= BEYBLADE_SPEEDUP_FACTOR;
+        fastestWheel = std::max(fastestWheel, abs(speed));
     }
-    float scale = (sumSpeed > powerBudget && sumSpeed > 0.0f) ? powerBudget / sumSpeed : 1.0f;
-    desiredOutput[static_cast<int>(MotorId::LF)] = LFSpeed * scale;
-    desiredOutput[static_cast<int>(MotorId::LB)] = LBSpeed * scale;
-    desiredOutput[static_cast<int>(MotorId::RF)] = RFSpeed * scale;
-    desiredOutput[static_cast<int>(MotorId::RB)] = RBSpeed * scale;
+    float scale = fastestWheel > MAX_M3508_RPM_CHASSIS ? MAX_M3508_RPM_CHASSIS / fastestWheel : 1.0f;
+    for (size_t i = 0; i < NUM_MOTORS; i++)
+    {
+        desiredOutput[i] = wheelSpeeds[i] * scale;
+    }
 }
 
 // Debugger watch variables. Left non-static so the optimizer keeps them.
 modm::Vector2f debugGlobalPose;
 modm::Vector2f debugGlobalvelocity;
 modm::Vector2f debugLocalvelocity;
+float debugPowerLimitScale;
+float debugRotationBudgetFraction;
 
 void HolonomicChassisSubsystem::refresh()
 {
+    uint32_t nowUs = tap::arch::clock::getTimeMicroseconds();
+    float dt = (prevRefreshTimeUs == 0) ? static_cast<float>(tap::Drivers::DT) / 1E3F
+                                        : (nowUs - prevRefreshTimeUs) / 1E6F;
+    prevRefreshTimeUs = nowUs;
+
+    PowerModel model;
     for (size_t i = 0; i < NUM_MOTORS; i++)
     {
         pidControllers[i].update(
             desiredOutput[i] -
             motors[i].getEncoder()->getVelocity() * 60.0f / M_TWOPI / CHASSIS_GEAR_RATIO);
-        motors[i].setDesiredOutput(pidControllers[i].getValue());
+        model.addMotor(
+            pidControllers[i].getValue() * AMPS_DESIRED_OUTPUT_RATIO,
+            motors[i].getEncoder()->getVelocity());
     }
+
+    // Power loop: scale every output together so the modelled draw meets the target.
+    // SUPERCAP: with a cap enabled, limit to the cap board's output budget (see
+    // getChassisPowerTarget) and prefer its measured power over the model for the feedback.
+    powerLimitScale = solvePowerScale(model, getChassisPowerTarget(drivers));
+    for (size_t i = 0; i < NUM_MOTORS; i++)
+    {
+        motors[i].setDesiredOutput(pidControllers[i].getValue() * powerLimitScale);
+    }
+
+    // Translation priority: while power is limiting a rotating chassis, back beyblade's rotation
+    // budget off so translation gets the power; let it recover once power stops limiting.
+    if (powerLimitScale >= 1.0f)
+    {
+        rotationBudgetFraction += BEYBLADE_BUDGET_UP_RATE * dt;
+    }
+    else if (abs(lastRotationalCommand) > 1.0f)
+    {
+        rotationBudgetFraction -= BEYBLADE_BUDGET_DOWN_RATE * dt;
+    }
+    rotationBudgetFraction =
+        limitVal<float>(rotationBudgetFraction, BEYBLADE_BUDGET_MIN_FRACTION, 1.0f);
+
+    debugPowerLimitScale = powerLimitScale;
+    debugRotationBudgetFraction = rotationBudgetFraction;
 
     if (chassisOdometry != nullptr)
     {

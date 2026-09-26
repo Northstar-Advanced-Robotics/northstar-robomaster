@@ -105,8 +105,8 @@ private:
     /// The current spin rate as a fraction of the maximum, held between re-randomizations.
     float calcSpeed;
 
-    /// Chassis speed in meters/second below which the robot counts as stationary and the spin
-    /// rate is boosted.
+    /// Chassis speed in meters/second below which the robot counts as beyblading in place (see
+    /// `ChassisSubsystem::setBeybladingOnly`).
     float beyBladeFastSpinSpeedThreshold = 0.3f;
 };
 }  // namespace src::control::chassis

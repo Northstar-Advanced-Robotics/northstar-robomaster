@@ -46,9 +46,9 @@ struct ChassisConfig
  *
  * The four-wheel omnidirectional drivetrain, with wheels mounted at 45 degrees on the corners.
  *
- * Resolves a translation and rotation request into four wheel speeds, ramps them so the robot does
- * not draw a current spike, scales them down to stay inside the referee system's power limit, and
- * runs a velocity PID per wheel. Positive output on all four motors pushes the left side forward
+ * Resolves a translation and rotation request into four wheel speeds, ramping the translation so
+ * the robot does not lurch, and runs a velocity PID per wheel. Power is limited in `refresh` by
+ * scaling the PID outputs so the modelled draw meets `getChassisPowerTarget`. Positive output on all four motors pushes the left side forward
  * and the right side back (the right-side motors are mirrored) -- a clockwise pivot -- so
  * `rotational` is negated before it reaches the wheels to make it counterclockwise positive.
  *
@@ -104,8 +104,8 @@ public:
     /// Sign is inverted relative to the wheel sum, so the result is counterclockwise positive.
     float getChassisRotationSpeed() override;
 
-    /// Takes the robot's speed from odometry, or from the ramped setpoints when no odometry is
-    /// attached.
+    /// The motor's top wheel speed, less the robot's translation speed (from odometry, or from the
+    /// ramped setpoints when no odometry is attached), scaled by `rotationBudgetFraction`.
     float calculateMaxRotationSpeed() override;
 
     /// A model, not a sensor: built from each motor's measured current and speed using the
@@ -114,36 +114,39 @@ public:
     /// the chassis has them.
     float getChassisPowerDraw() override;
 
-    /// Runs each wheel's velocity PID against the speeds computed by the last drive call, then
-    /// advances the attached odometry. Called once per control loop iteration by the scheduler.
+    /// Runs each wheel's velocity PID against the speeds computed by the last drive call, scales
+    /// the outputs so the modelled power meets `getChassisPowerTarget`, adapts
+    /// `rotationBudgetFraction`, then advances the attached odometry. Called once per control loop
+    /// iteration by the scheduler.
     void refresh() override;
 
-    /// Cuts all four motors' output. Called instead of `refresh` when the remote disconnects, so
-    /// the robot coasts to a stop rather than continuing on its last command.
-    void refreshSafeDisconnect() override
-    {
-        for (auto& motor : motors)
-        {
-            motor.setDesiredOutput(0);
-        }
-    }
+    /// Cuts all four motors' output and resets the ramps and wheel PIDs. Called instead of
+    /// `refresh` when the remote disconnects, so the robot coasts to a stop rather than continuing
+    /// on its last command, and starts from rest when the remote comes back.
+    void refreshSafeDisconnect() override;
 
 private:
     /**
-     * The one drive path: rotates a translation request by `heading` into the chassis frame, ramps
-     * it, resolves it to four wheel speeds, and scales those down to fit the power budget.
+     * The one drive path: ramps the request, rotates the translation by `heading` into the chassis
+     * frame, and resolves it and the rotation into four wheel speeds, scaled down together if any
+     * exceeds what the motor can reach. Power limiting happens in `refresh`.
      *
-     * Commands the wheels to a stop if all four motors are offline.
+     * If all four motors are offline, resets the drive state (see `resetDriveState`) instead, so
+     * driving starts from rest when they come back.
      *
      * @param[in] forward Desired forward velocity in the frame named by `heading`, in m/s.
      * @param[in] sideways Desired leftward velocity in the frame named by `heading`, in m/s.
      * @param[in] rotational Desired rotational velocity, in radians/second, counterclockwise
-     *      positive. Not affected by `heading`.
+     *      positive. Ramped, and not affected by `heading`.
      * @param[in] heading The angle, in radians, that the translation request is expressed relative
      *      to: 0 means it is already in the chassis frame, and larger values rotate it
      *      counterclockwise.
      */
     void driveBasedOnHeading(float forward, float sideways, float rotational, float heading);
+
+    /// Zeros the ramps, wheel setpoints, and wheel PIDs, so the next drive starts from rest rather
+    /// than resuming a stale setpoint.
+    void resetDriveState();
 
     /**
      * Steps a ramp one iteration toward its target, choosing the acceleration limit by whether
@@ -151,7 +154,8 @@ private:
      *
      * Braking is allowed to be more aggressive than accelerating, which is why the two limits are
      * separate. Both are **magnitudes**: `Ramp::update` takes the sign from the direction of
-     * travel, so passing a negative value here has no effect.
+     * travel, so passing a negative value here has no effect. Starting from zero counts as
+     * accelerating.
      *
      * @param[in,out] ramp The ramp to advance, in m/s for translation or radians/second for
      *      rotation.
@@ -160,12 +164,15 @@ private:
      * @param[in] maxDeceleration Limit applied when the ramp is moving toward zero or reversing,
      *      in ramp-units per second squared.
      * @param[in] dt Time since this ramp was last advanced, in **seconds**.
+     * @param[in] allowAcceleration When `false`, the ramp holds instead of accelerating.
+     *      Deceleration is always allowed.
      */
     static void applyAccelerationToRamp(
         tap::algorithms::Ramp& ramp,
         float maxAcceleration,
         float maxDeceleration,
-        float dt);
+        float dt,
+        bool allowAcceleration);
 
     /**
      * Converts a desired wheel surface speed into the motor speed that produces it.
@@ -179,6 +186,12 @@ private:
         return mps / (M_PI * WHEEL_DIAMETER_M) * 60.0f / CHASSIS_GEAR_RATIO;
     }
 
+    /// The inverse of `mpsToRpm`: motor-shaft RPM to wheel surface speed in m/s.
+    static float rpmToMps(float rpm)
+    {
+        return rpm * CHASSIS_GEAR_RATIO / 60.0f * (M_PI * WHEEL_DIAMETER_M);
+    }
+
     static constexpr size_t NUM_MOTORS = static_cast<size_t>(MotorId::NUM_MOTORS);
 
     /// Per-wheel target speeds in motor RPM, produced by the last drive call and consumed by
@@ -188,9 +201,24 @@ private:
     /// Per-wheel velocity controllers. Indexed by `MotorId`.
     std::array<Pid, NUM_MOTORS> pidControllers;
 
-    /// Rate limiters for the three velocity axes, in order: forward, sideways, rotational. Ramping
-    /// the request rather than stepping it is what keeps the current draw bounded.
+    /// Rate limiters for the three velocity axes, in order: forward, sideways (in the frame the
+    /// request was made in), rotational.
     std::array<tap::algorithms::Ramp, 3> rampControllers;
+
+    /// The factor the last `refresh` scaled every motor output by to meet the power target, in
+    /// [0, 1]. Below 1 means the power loop is limiting.
+    float powerLimitScale = 1.0f;
+
+    /// Share of the physical rotation limit that `calculateMaxRotationSpeed` offers beyblade, in
+    /// [`BEYBLADE_BUDGET_MIN_FRACTION`, 1]. Backs off while the power loop limits a rotating
+    /// chassis, which leaves power for translation, and recovers when it stops limiting.
+    float rotationBudgetFraction = 1.0f;
+
+    /// The `rotational` argument of the last drive call, in radians/second.
+    float lastRotationalCommand = 0.0f;
+
+    /// Time of the last `refresh`, in microseconds. Zero before the first.
+    uint32_t prevRefreshTimeUs = 0;
 
 protected:
     /// The four drive motors. Indexed by `MotorId`.
