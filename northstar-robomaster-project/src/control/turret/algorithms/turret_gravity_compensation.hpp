@@ -28,22 +28,24 @@
 namespace src::control::turret::algorithms
 {
 /**
- * @param[in] cgX The center of gravity relative to the center of the turret's pitch pivot point
- *      in the X (forward/back) direction. The "X" direction lies along the plane that the turret
- *      is pointing. Units in millimeters. Positive is forward, negative is backwards.
- * @param[in] cgZ The center of gravity relative to the center of the turret's pitch pivot point,
- *      in the Z (up/down) direction. The "Z" direction lies perpendicular to the plane that the
- *      turret is pointing. Units in millimeters. Positive is upwards, negative is downwards.
- * @param[in] pitchAngleFromCenter The angle in radians of the turret pitch, relative to the
- *      horizontal plane.
- * @param[in] gravityCompensationMotorOutputMax The maximum output that will be returned by this
- *      function. Should be equivalent to the output to offset gravity when the center of mass lies
- *      on the same xy-plane as the pivot (i.e.: when the turret's mass exerts the most torque about
- *      it's pivot).
- * @return The gravitational force offset necessary to cancel out gravitational
- *      force of the turret, between [-gravityCompensatorMax, gravityCompensatorMax].
- *      The gravitational force offset is a function of the location of the CG and
- *      the current pitch angle.
+ * Computes the motor output needed to hold the turret's pitch against gravity.
+ *
+ * Without this the pitch axis sags below its setpoint and the PID has to carry a standing error to
+ * hold aim. The offset peaks when the centre of gravity is level with the pivot -- where the mass
+ * exerts the most torque -- and falls to zero when it is directly above or below it.
+ *
+ * @param[in] cgX Centre of gravity relative to the pitch pivot along the barrel, positive forward.
+ * @param[in] cgZ Centre of gravity relative to the pitch pivot perpendicular to the barrel,
+ *      positive up.
+ * @param[in] pitchAngleFromCenter Turret pitch relative to horizontal, in radians.
+ * @param[in] gravityCompensatorMax The peak output this function may return, i.e. what it takes to
+ *      hold the turret level.
+ * @return The output to add to the pitch controller, in [-`gravityCompensatorMax`,
+ *      `gravityCompensatorMax`].
+ *
+ * @note `cgX` and `cgZ` only enter as the ratio `atan(cgZ / cgX)`, so their scale cancels -- any
+ *      consistent length unit works, and the values in the robot constants are not literally
+ *      millimetres.
  */
 float computeGravitationalForceOffset(
     const float cgX,

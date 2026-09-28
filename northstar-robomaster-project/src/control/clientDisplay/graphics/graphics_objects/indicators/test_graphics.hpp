@@ -6,6 +6,14 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Draws one of each graphic type alongside the bounding boxes computed for them.
+ *
+ * Used to check `TextSizer`'s width estimates against what the server actually renders, by drawing
+ * the predicted box and the real text together and seeing whether they line up.
+ */
 class TestGraphics : public GraphicsContainer
 {
 public:

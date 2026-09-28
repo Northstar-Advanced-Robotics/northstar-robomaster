@@ -30,7 +30,7 @@ static constexpr uint32_t TIME_BEFORE_SENDING_HEALTH_MSG =
     TIME_BTWN_SENDING_HEALTH_MSG + TIME_BEFORE_UART_START;
 static tap::arch::PeriodicMilliTimer sendHealthMsgTimeout{TIME_BTWN_SENDING_HEALTH_MSG};
 
-/** Time in ms between sending the Robot Health message. */
+/** Time in ms between sending the referee-system turret data message. */
 static constexpr uint32_t TIME_BTWN_SENDING_REF_TURRET_DATA_MSG = 5 * primeScaleFactor;
 static constexpr uint32_t TIME_BEFORE_SENDING_REF_TURRET_DATA_MSG =
     TIME_BTWN_SENDING_REF_TURRET_DATA_MSG + TIME_BEFORE_UART_START;

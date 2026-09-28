@@ -6,9 +6,21 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * A `GraphicsObject` that holds other graphics objects, including other containers.
+ *
+ * Grouping graphics lets a whole HUD element be hidden, shown, or cleared with one call, and lets
+ * the `UISubsystem` walk an arbitrarily nested display as a flat sequence when assembling batches
+ * to send. Every operation is simply forwarded to the children.
+ *
+ * Contained objects are held by raw pointer and not owned, so they must outlive the container.
+ */
 class GraphicsContainer : public GraphicsObject
 {
 public:
+    /// @return How many graphics in this container, at any depth, need to be redrawn.
     int countNeedRedrawn() final
     {  // final here means no more overriding, if more overriding is wanted replace final with
        // override
@@ -21,6 +33,14 @@ public:
         return r;
     }
 
+    /**
+     * Hands out the next graphic in this container that needs redrawing, descending into nested
+     * containers. The index is only advanced past a child once that child reports it has nothing
+     * left, so a child with several graphics to send is revisited until it is exhausted.
+     *
+     * @return The next graphic needing redraw, or `nullptr` once this traversal has exhausted the
+     *      container. Call `resetIteration` to start over.
+     */
     GraphicsObject* getNext() final
     {
         GraphicsObject* r = nullptr;
@@ -41,6 +61,8 @@ public:
     }
 
     // not just objects.size() because containers can contain other containers
+    /// @return The total number of graphics in this container, counting through nested containers
+    /// rather than just the immediate children.
     int size() final
     {
         int r = 0;
@@ -51,6 +73,8 @@ public:
         return r;
     }
 
+    /// Rewinds this container and everything it holds, so the next traversal starts from the
+    /// beginning.
     void resetIteration() final
     {
         countIndex = 0;
@@ -60,9 +84,20 @@ public:
         }
     }
 
-    /* When adding, make sure you don't lose the object from leaving scope */
+    /** When adding, make sure you don't lose the object from leaving scope */
+    /**
+     * Adds an object to this container.
+     *
+     * @param[in] obj The object to add. Not owned; it must outlive this container, so take care
+     *      not to pass something that goes out of scope.
+     */
     void addGraphicsObject(GraphicsObject* obj) { objects.push_back(obj); }
 
+    /**
+     * Tells everything in this container that a layer was cleared.
+     *
+     * @param[in] layer The layer that was cleared.
+     */
     void layerHasBeenCleared(int8_t layer) final
     {
         for (GraphicsObject* p : objects)
@@ -71,6 +106,7 @@ public:
         }
     }
 
+    /// Tells everything in this container that every layer was cleared.
     void allLayersCleared() final
     {
         for (GraphicsObject* p : objects)
@@ -79,6 +115,7 @@ public:
         }
     }
 
+    /// Hides everything in this container.
     void hide() final
     {
         for (GraphicsObject* p : objects)
@@ -87,6 +124,7 @@ public:
         }
     }
 
+    /// Shows everything in this container.
     void show() final
     {
         for (GraphicsObject* p : objects)
@@ -95,6 +133,8 @@ public:
         }
     }
 
+    /// Clears the draw marks on everything in this container, making them eligible for the next
+    /// batch.
     void resetDrawMarks() final
     {
         for (GraphicsObject* p : objects)
@@ -104,6 +144,7 @@ public:
     }
 
 private:
+    /// The contained objects, in the order they are traversed. Not owned.
     std::vector<GraphicsObject*> objects;
 };
 

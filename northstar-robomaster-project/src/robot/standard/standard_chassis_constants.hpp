@@ -1,3 +1,12 @@
+/**
+ * Chassis constants for the standard.
+ *
+ * Drive motor PID gains, chassis geometry, acceleration limits, and the power-to-speed lookup the
+ * referee system's power limit is enforced against.
+ *
+ * Include `chassis_constants.hpp` rather than this file; it picks the right robot's constants for
+ * the build target, and this header refuses to compile on its own.
+ */
 #ifndef STANDARD_CHASSIS_CONSTANTS_HPP_
 #define STANDARD_CHASSIS_CONSTANTS_HPP_
 

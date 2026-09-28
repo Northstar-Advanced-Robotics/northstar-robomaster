@@ -16,6 +16,16 @@
 using namespace tap::communication::serial;
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Draws the aiming reticle: a series of horizontal marks showing where a projectile lands at
+ * different distances.
+ *
+ * The mark the operator aims with depends on how far away the target is, since the projectile drops
+ * over its flight. The positions come from measurements taken at known distances rather than from a
+ * ballistics model.
+ */
 class Reticle : public GraphicsContainer
 {
 public:  // important constants and enums

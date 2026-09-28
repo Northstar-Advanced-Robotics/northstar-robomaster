@@ -17,6 +17,16 @@
 
 namespace src::standard
 {
+/**
+ * @ingroup robots
+ *
+ * The drivers object for the standard, extending taproot's with the peripherals and interfaces this
+ * robot actually has.
+ *
+ * There is exactly one instance, owned by `DriversSingleton`; the constructor is private so no
+ * other copy can be made, which is what keeps two pieces of code from independently claiming the
+ * same peripheral. Unit tests are the exception, and are allowed to construct their own.
+ */
 class Drivers : public tap::Drivers
 {
     friend class DriversSingleton;
@@ -24,6 +34,8 @@ class Drivers : public tap::Drivers
 #ifdef ENV_UNIT_TESTS
 public:
 #endif
+    /// Constructs this robot's drivers. Private outside of unit tests; use `DriversSingleton` to
+    /// obtain the single instance.
     Drivers()
         : tap::Drivers(),
           controlOperatorInterface(this),

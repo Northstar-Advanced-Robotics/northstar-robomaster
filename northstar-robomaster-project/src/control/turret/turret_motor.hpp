@@ -12,6 +12,8 @@
 namespace src::control::turret
 {
 /**
+ * @ingroup turret
+ *
  * Logic encapsulating the control of a single axis of a turret gimbal motor. Contains logic for
  * storing chassis relative position measurements and setpoints and logic for limiting the angle
  * setpoint.
@@ -25,21 +27,21 @@ class TurretMotor
 public:
     virtual ~TurretMotor() = default;
 
-    /**
-     * Construct a turret motor with some particular hardware motor interface and a motor
-     * configuration struct.
-     */
+    /// Brings the underlying hardware motor up. Must be called before the axis can be driven.
     virtual inline void initialize() = 0;
 
-    /// Updates the measured motor angle
+    /// Samples the encoder and refreshes the cached chassis-frame angle. Implementations fall back
+    /// to `config.startAngle` while the motor is offline. Call once per control loop iteration,
+    /// before reading any measurement.
     virtual void updateMotorAngle() = 0;
 
     /**
-     * Set the motor's desired output when the motor is online. The output is expected to be in the
-     * motor's unitless form. For the GM6020, the motor output is limited between [-MAX_OUT_6020,
-     * MAX_OUT_6020].
+     * Commands the hardware motor, if it is online. Ignored while offline.
      *
-     * @param[in] out The desired motor output.
+     * @param[in] out The desired output in the motor's own command units. Implementations clamp
+     *      this to their own ceiling -- `TurretMotorDJI` uses +/-30,000 for the GM6020. Note the
+     *      PID controllers upstream are separately capped at each robot's `MAX_OUTPUT_GM6020`
+     *      (25,000 on the standard), so in practice the clamp here is rarely the binding one.
      */
     virtual void setMotorOutput(float out) = 0;
 
@@ -52,10 +54,12 @@ public:
     virtual inline void attachTurretController(
         const algorithms::TurretControllerInterface *turretController) = 0;
     /**
-     * Sets (and limits!) the chassis frame turret measurement.
+     * Sets the chassis-frame angle this axis should be driven to.
      *
-     * The setpoint is limited between the min and max config angles as specified in the
-     * constructor.
+     * Clamped to [`config.minAngle`, `config.maxAngle`], but **only** when
+     * `config.limitMotorAngles` is set; a freely rotating axis stores the setpoint unchanged.
+     *
+     * @param[in] setpoint The desired chassis-frame angle, in radians.
      */
     virtual void setChassisFrameSetpoint(WrappedFloat setpoint) = 0;
 
@@ -72,51 +76,56 @@ public:
     virtual inline const WrappedFloat &getChassisFrameMeasuredAngle() const = 0;
 
     /**
-     * @return angular velocity of the turret, in rad/sec, positive rotation is defined by the
-     * motor.
+     * @return This axis' angular velocity in rad/s, positive in the motor's own direction of
+     *      rotation.
+     *
+     * @warning Unlike `getChassisFrameMeasuredAngle`, this is **not** scaled by `config.ratio`, so
+     *      on a geared axis the position and velocity getters are in different units.
      */
     virtual inline float getChassisFrameVelocity() const = 0;
 
-    /// @return turret controller controlling this motor (as specified by `attachTurretController`)
+    /// @return The controller currently driving this axis, as set by `attachTurretController`, or
+    /// `nullptr` if none. Lets a command discover which controller is running, since controllers
+    /// outlive the commands that use them.
     virtual const algorithms::TurretControllerInterface *getTurretController() const = 0;
 
     /**
-     * @return Valid minimum error between the chassis relative setpoint and measurement, in
-     * radians.
+     * @return How far this axis is from its own stored setpoint, in radians. **Signed**: positive
+     *      means the setpoint is counterclockwise of the measurement.
      *
-     * @note A valid measurement error is either:
-     * - The shortest wrapped distance between the chassis frame measurement and setpoint
-     *   if the turret motor is not limited to some min/max values.
-     * - The absolute difference between the chassis frame measurement and setpoint if the
-     *   turret motor is limited to some min/max values.
+     * @note Which distance is returned depends on whether the axis is angle-limited:
+     * - Unlimited: the shortest wrapped distance, in [-PI, PI]. Rotating either way is allowed, so
+     *   the short way round is always the right answer.
+     * - Limited: the unwrapped difference, which may exceed PI. A limited axis cannot pass through
+     *   its endstops, so the short way round is not necessarily reachable.
      */
     virtual float getValidChassisMeasurementError() const = 0;
 
     /**
-     * @param[in] measurement A turret measurement in the chassis frame, an angle in radians. This
-     * can be encoder based (via getChassisFrameMeasuredAngle) or can be measured by some other
-     * means (for example, an IMU on the turret that is than transformed to the chassis frame).
+     * The same error calculation as `getValidChassisMeasurementError`, but against a caller-supplied
+     * setpoint and measurement rather than the ones this object stores.
      *
-     * @return The minimum error between the chassis frame setpoint and the specified measurement.
-     * If the turret motor is not limited, the error is wrapped between [0, 2*PI), otherwise the
-     * error is absolute.
+     * Use this when the measurement comes from somewhere other than the encoder -- typically a
+     * turret-mounted IMU transformed into the chassis frame -- which is what the world-frame
+     * controllers do.
      *
-     * @note Call getValidChassisMeasurementError if you want the error between the chassis-frame
-     * setpoint and measurement
+     * @param[in] setpoint The setpoint to measure from, in radians.
+     * @param[in] measurement A chassis-frame angle in radians.
+     * @return The **signed** error, positive when the setpoint is counterclockwise of the
+     *      measurement. Wrapped to [-PI, PI] when the axis is unlimited; unwrapped, and so possibly
+     *      larger than PI, when it is limited.
      *
-     * @note The measurement does not need to be normalized to [0, 2*PI]. In fact, if the turret
-     * motor is limited, an unwrapped measurement should be used in order to avoid unexpected
-     * wrapping errors.
-     *
-     * @note Before calling this function, you **must** first set the chassis frame setpoint before
-     * calling this function (i.e. call `setChassisFrameSetpoint`).
+     * @note `measurement` need not be wrapped. For a limited axis it specifically should **not**
+     *      be, or the endstop logic will wrap the wrong way.
      */
     virtual float getValidMinError(const WrappedFloat setpoint, const WrappedFloat measurement)
         const = 0;
 
+    /// @return The output last written to the hardware motor, in the motor's unitless command
+    /// range.
     virtual int16_t getMotorOutput() const = 0;
 
-    /// @return The turret motor config struct associated with this motor
+    /// @return The mounting and travel-limit configuration this axis was constructed with.
     virtual const TurretMotorConfig &getConfig() const = 0;
 };
 }  // namespace src::control::turret

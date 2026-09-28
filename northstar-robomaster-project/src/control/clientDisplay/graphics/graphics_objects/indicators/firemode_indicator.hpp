@@ -8,8 +8,15 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Reports the selected fire mode, as text down the left side of the screen.
+ *
+ * The fire mode is cycled through several options from a single input, so there is no way to tell
+ * which is selected from the remote alone. The text is also colored by whether the flywheels are
+ * spun up, since a fire mode is of no use without them.
+ */
 class FiremodeIndicator : public GraphicsContainer
 {
 public:
@@ -24,6 +31,7 @@ public:
         addGraphicsObject(&firemode);
     }
 
+    /// Sets the text to the selected launch mode and colors it by whether the flywheels are ready.
     void update()
     {
         // if(drivers->remote.keyPressed(Remote::Key::R))

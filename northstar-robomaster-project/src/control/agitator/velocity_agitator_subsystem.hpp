@@ -25,6 +25,8 @@ class Drivers;
 namespace src::agitator
 {
 /**
+ * @ingroup agitator
+ *
  * Subsystem whose primary purpose is to encapsulate an agitator motor that operates using a
  * velocity controller. Also keeps track of absolute position to allow commands to rotate the
  * agitator some specific displacement.
@@ -42,10 +44,11 @@ public:
      * Construct an agitator with the passed in velocity PID parameters, gear ratio, and
      * agitator-specific configuration.
      *
-     * @param[in] drivers pointer to src drivers struct
-     * @param[in] pidParams Position PID configuration struct for the agitator motor controller.
-     * @param[in] agitatorSubsystemConfig Agitator configuration struct that contains
-     * agitator-specific parameters including motor ID and unjam parameters.
+     * @param[in] drivers Pointer to the global `tap::Drivers` object.
+     * @param[in] pidParams **Velocity** PID configuration for the agitator motor controller.
+     * @param[in] agitatorSubsystemConfig Motor ID, CAN bus, gearing, and jam-detection thresholds.
+     *      Note unjamming parameters are **not** here -- those live in
+     *      `UnjamSpokeAgitatorCommand::Config`.
      */
     VelocityAgitatorSubsystem(
         tap::Drivers* drivers,
@@ -87,16 +90,17 @@ public:
     inline float getJamSetpointTolerance() const override { return 0; }
 
     /**
-     * Attempts to calibrate the agitator at the current position, such that `getPosition` will
-     * return 0 radians at this position.
+     * Zeroes the agitator's accumulated rotation at its current position, so
+     * `getCurrentValueIntegral` reads 0 radians from here.
      *
-     * @return `true` if the agitator has been successfully calibrated, `false` otherwise.
+     * @return `true` if the agitator has been successfully calibrated, `false` otherwise (for
+     *      example while the motor is offline).
      */
     bool calibrateHere() override;
 
     /**
-     * @return `true` if the agitator unjam timer has expired, signaling that the agitator has
-     * jammed, `false` otherwise.
+     * @return `true` if the jam timer has expired, signaling that the agitator is jammed. Always
+     *      `false` when `config.jamLogicEnabled` is unset, regardless of the timer.
      */
     bool isJammed() override { return config.jamLogicEnabled && subsystemJamStatus; }
 

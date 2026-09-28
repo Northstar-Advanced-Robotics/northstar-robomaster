@@ -29,12 +29,34 @@
 namespace src::control::governor
 {
 /**
- * A governor that allows a Command to run when a TurretCVCommand has acquired and is aiming at a
- * target.
+ * @ingroup governors
+ *
+ * Gates firing on auto-aim actually being on target.
+ *
+ * Consults the running `TurretCVControlCommandTemplate` for whether the turret is aimed closely
+ * enough that a projectile launched now would hit, so the agitator does not waste ammunition while
+ * vision is still slewing onto a plate.
+ *
+ * Two behaviours worth knowing:
+ * - On a non-sentry robot the aim check is only applied while gating is enabled; with it off,
+ *   `isReady` returns `true` regardless of aim, so the operator can always fire manually.
+ * - On the sentry the gating toggle is bypassed and aim is **always** required, even with vision
+ *   offline -- which means an offline vision computer stops the sentry firing entirely.
  */
 class CvOnTargetGovernor : public tap::control::governor::CommandGovernorInterface
 {
 public:
+    /**
+     * @param[in] drivers The global drivers object.
+     * @param[in] visionComms The vision link, consulted for whether vision is online.
+     * @param[in] turretCVCommand The CV control command asked whether the turret is on target.
+     * @param[in] turretID Which turret to ask about.
+     * @param[in] sentry `true` on the sentry, which always requires aim; see the class note.
+     *
+     * @warning `turretID` is marked `[[maybe_unused]]` and is **not stored**. The member of the
+     *      same name is left uninitialized and then read by `isReady`, so the turret actually
+     *      queried is indeterminate.
+     */
     CvOnTargetGovernor(
         tap::Drivers *drivers,
         src::serial::VisionComms &visionComms,

@@ -38,13 +38,22 @@ class TurretMotor;
 namespace src::control::turret::algorithms
 {
 /**
- * World frame turret yaw controller. Requires that a development board be mounted rigidly on the
- * turret and connected via the `TurretMCBCanComm` class. The development board's IMU is used to
- * determine the turret's world frame coordinates directly, making this controller better than the
- * `WorldFrameChassisImuTurretController`.
+ * @ingroup turret
  *
- * Runs a cascade PID controller (position PID output feeds into velocity PID controller, velocity
- * PID controller is desired motor output) to control the turret yaw.
+ * World frame turret yaw controller, driven by the onboard BMI088 IMU.
+ *
+ * Because the IMU measures orientation against the world rather than against the chassis, the
+ * turret holds its aim while the chassis moves underneath it -- which is what makes this preferable
+ * to `WorldFrameYawChassisImuTurretController`, where chassis rotation has to be subtracted out and
+ * any error in that estimate shows up as aim drift.
+ *
+ * Runs a cascade PID: the position loop's output is the velocity loop's setpoint, and the velocity
+ * loop's output is the motor command.
+ *
+ * @note Despite what earlier revisions of this comment claimed, this controller does **not** use a
+ *      turret-mounted board over `TurretMCBCanComm`. It reads `drivers.bmi088` directly. The
+ *      `TurretMCBCanComm` variant is `WorldFrameYawTurretCanImuCascadePidTurretController`, which
+ *      no robot currently builds.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  */
@@ -67,6 +76,7 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The unwrapped yaw desired setpoint in the world frame. Clamped
      * within chassis frame turret angle limits if applicable.
      */
@@ -113,13 +123,14 @@ private:
 };
 
 /**
- * World frame turret pitch controller. Requires that a development board be mounted rigidly on the
- * turret and connected via the `TurretMCBCanComm` class. The development board's IMU is used to
- * determine the turret's world frame coordinates directly, making this controller better than the
- * `WorldFrameChassisImuTurretController`.
+ * @ingroup turret
  *
- * Runs a cascade PID controller (position PID output feeds into velocity PID controller, velocity
- * PID controller is desired motor output) to control the turret pitch.
+ * World frame turret pitch controller, driven by the onboard BMI088 IMU.
+ *
+ * The pitch counterpart to `WorldFrameYawTurretImuCascadePidTurretController`; see that class for
+ * why a world-frame measurement beats a chassis-relative one. Runs the same cascade PID.
+ *
+ * @note Reads `drivers.bmi088` directly, not a turret-mounted board over `TurretMCBCanComm`.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  */
@@ -143,6 +154,7 @@ public:
 
     /**
      * @see TurretControllerInterface for more details.
+     * @param[in] dt Milliseconds since the previous call.
      * @param[in] desiredSetpoint The pitch desired setpoint in the world frame.
      */
     void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) final;
@@ -154,7 +166,7 @@ public:
     /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
     inline WrappedFloat getSetpoint() const final { return worldFrameSetpoint; }
 
-    /// @return World frame pitch angle setpoint, refer to top level documentation for more details.
+    /// @return World frame pitch angle measurement, taken from the IMU.
     WrappedFloat getMeasurement() const final;
 
     bool isOnline() const final;

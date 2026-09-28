@@ -1,3 +1,12 @@
+/**
+ * Declares the turret: the subsystem, its controllers, and the operator and CV control commands.
+ *
+ * `testbed_control.cpp` includes this file unconditionally; the `#if defined(USING_TURRET) &&
+ * !defined(USING_REV)` below is what actually selects it, and those switches are set in
+ * `test_def.hpp`. The REV-motor turret is declared elsewhere.
+ *
+ * Everything is declared at file scope, which is why exactly one translation unit may include it.
+ */
 #if defined(USING_TURRET) && !defined(USING_REV)
 
 #ifndef USING_TURRET_HPP_

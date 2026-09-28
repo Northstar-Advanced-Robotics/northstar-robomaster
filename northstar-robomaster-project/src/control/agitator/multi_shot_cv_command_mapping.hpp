@@ -37,16 +37,23 @@ class Drivers;
 namespace src::control::agitator
 {
 /**
- * Class that stores and allows the user to set some LaunchMode. Possible launch modes include
- * single, 10 Hz, or 20 Hz full auto mode.
+ * @ingroup agitator
  *
- * This object is a HoldRepeatCommandMapping. An instance of this object should be added to the
- * global CommandMapper to use it. This object contains a launch Command that it will schedule. How
- * often/when the launch Command will be schedule is based on the launch mode. This object controls
- * the fire rate and firing frequency of the launch Command based on the launch mode.
+ * Holds the operator's selected fire mode and schedules the launch command accordingly.
  *
- * If vision is running, the fire rate should not be limited and the launcher should be in full auto
- * mode, so this object checks the launchMode of a CvOnTargetGovernor when setting the fire rate.
+ * A `HoldRepeatCommandMapping`: add an instance to the global `CommandMapper` to use it. The
+ * selected `LaunchMode` decides both how many times the launch command is rescheduled while the
+ * input is held and what fire rate the reselection manager is set to.
+ *
+ * Modes are `SINGLE`, `NO_HEATING`, `LIMITED_10HZ`, `LIMITED_20HZ`, `FULL_AUTO` and `BURST`; on
+ * `TARGET_HERO` only `SINGLE` and `BURST` are compiled in.
+ *
+ * @warning `BURST` currently behaves identically to `FULL_AUTO` -- both reschedule without limit at
+ *      `MAX_FIRERATE_RPS`. The `getMaxBurst` helper that would bound a burst is never called.
+ *
+ * @warning The `cvOnTargetGovernor` this object is constructed with is stored but **never read**;
+ *      the fire rate is chosen purely from `launchMode`. Vision does not override the operator's
+ *      mode, contrary to what this comment previously claimed.
  */
 class MultiShotCvCommandMapping : public tap::control::HoldRepeatCommandMapping
 {
@@ -75,9 +82,9 @@ public:
      * @param[in] fireRateReselectionManager An optional argument, the fire rate reselection manager
      * that controls the fire rate of the launch command. If provided, the manager's fire rate is
      * updated based on the current LaunchMode.
-     * @param[in] cvOnTargetGovernor The governor whose state will be used to override the current
-     * LaunchMode. This allows us to override user-defined launch mode when CV is controlling the
-     * launching frequency.
+     * @param[in] cvOnTargetGovernor Retained but currently unused; see the class warning.
+     * @param[in] command Optional agitator command switched between discrete shots and constant
+     * rotation as the launch mode changes.
      */
     MultiShotCvCommandMapping(
         tap::Drivers &drivers,

@@ -29,7 +29,7 @@ static constexpr tap::algorithms::SmoothPidConfig AGITATOR_PID_CONFIG = {
 
 static constexpr int AGITATOR_NUM_POCKETS = 13;        // number of balls in one rotation
 static constexpr float AGITATOR_MAX_ROF = 10.0f;       // balls per second
-static constexpr float OVERSHOOT_FUDGE_FACTOR = 0.0f;  // how much agitator overshoots
+static constexpr float OVERSHOOT_FUDGE_FACTOR = 0.0f;  // radians the agitator overshoots by; subtracted from the per-pocket rotation
 
 static constexpr src::agitator::VelocityAgitatorSubsystemConfig AGITATOR_CONFIG = {
     .gearRatio = 25.0f / 80.0f,
@@ -58,7 +58,7 @@ static constexpr src::control::agitator::UnjamSpokeAgitatorCommand::Config AGITA
     .targetUnjamIntegralChange = UNJAM_DISTANCE,
     .unjamSetpoint = UNJAM_VELOCITY,
     /// Unjamming should take unjamDisplacement (radians) / unjamVelocity (radians / second)
-    /// seconds.Convert to ms, Add 100 ms extra tolerance.
+    /// seconds.Convert to ms, add 200 ms extra tolerance.
     .maxWaitTime = static_cast<uint32_t>(1000.0f * UNJAM_DISTANCE / UNJAM_VELOCITY) + 200,
     .targetCycleCount = 3,
 };

@@ -6,6 +6,23 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Projects points in the world onto the operator's screen, so the HUD can draw overlays that line
+ * up with what the camera sees.
+ *
+ * A chain of rigid transforms, each stripping one offset:
+ * `robotSpace -> pivotSpace -> vtmSpace -> screenSpace`, with `barrelSpace` as a side branch used
+ * when reasoning about where a shot leaves the barrel rather than where the camera is.
+ *
+ * Every space is right-handed with **+X right, +Y forward, +Z up**. This is **not** the chassis
+ * frame (+X forward, +Y left) that `ChassisSubsystem` and `ChassisOdometry` share, so anything taken
+ * from them must be converted before entering these transforms. All offsets are in meters and are
+ * robot-specific, selected below by build target.
+ *
+ * Used by `LaneAssistLines` and `PeekingLines`.
+ */
 class Projections
 {
 public:
@@ -29,8 +46,7 @@ public:
                  // is above the pitch pivot point
 
     static constexpr float OFFSET_X_PITCH_PIVOT_TO_BARREL =
-        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit. Exit velocity
-            // is in JetsonSubsystemConstants.hpp, as J
+        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit
     static constexpr float OFFSET_Y_PITCH_PIVOT_TO_BARREL = 0.107f;  // meters
     static constexpr float OFFSET_Z_PITCH_PIVOT_TO_BARREL = 0;       // meters
 #elif defined(TARGET_SENTRY)                                         // todo
@@ -53,8 +69,7 @@ public:
             // above the pitch pivot point
 
     static constexpr float OFFSET_X_PITCH_PIVOT_TO_BARREL =
-        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit. Exit velocity
-            // is in JetsonSubsystemConstants.hpp, as J
+        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit
     static constexpr float OFFSET_Y_PITCH_PIVOT_TO_BARREL = 0;  // meters
     static constexpr float OFFSET_Z_PITCH_PIVOT_TO_BARREL = 0;  // meters
 #elif defined(TARGET_STANDARD)                                       // todo
@@ -77,8 +92,7 @@ public:
                     // vtm is above the pitch pivot point
 
     static constexpr float OFFSET_X_PITCH_PIVOT_TO_BARREL =
-        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit. Exit velocity
-            // is in JetsonSubsystemConstants.hpp, as J
+        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit
     static constexpr float OFFSET_Y_PITCH_PIVOT_TO_BARREL = 0.1555;  // meters
     static constexpr float OFFSET_Z_PITCH_PIVOT_TO_BARREL = 0;       // meters
 #else                                                                // old infantry, todo
@@ -101,15 +115,22 @@ public:
             // above the pitch pivot point
 
     static constexpr float OFFSET_X_PITCH_PIVOT_TO_BARREL =
-        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit. Exit velocity
-            // is in JetsonSubsystemConstants.hpp
+        0;  // meters, like OFFSET_X_PITCH_PIVOT_TO_VTM but for where shots exit
     static constexpr float OFFSET_Y_PITCH_PIVOT_TO_BARREL = 0;  // meters
     static constexpr float OFFSET_Z_PITCH_PIVOT_TO_BARREL = 0;  // meters
 #endif
 
-    /** robot space is defined as: center of robot at (x, y)=(0, 0), ground at z=0,
-     * positive x is to the right, positive y is forward, positive z is above
-     * make sure to rotate pitch on the output*/
+    /**
+     * Robot space to pivot space.
+     *
+     * Robot space has the robot's center at (x, y) = (0, 0) and the ground at z = 0.
+     *
+     * @param[in] v A point in robot space, in meters.
+     * @return The same point in pivot space.
+     *
+     * @note The output is not yet rotated by the turret's pitch -- callers must apply that
+     *      themselves, since pivot space turns with the gimbal.
+     */
     static Vector3d robotSpaceToPivotSpace(Vector3d& v)
     {
         return Vector3d(
@@ -118,8 +139,14 @@ public:
             v.getZ() - OFFSET_Z_ROBOT_TO_PITCH_PIVOT);
     }
 
-    /** pivot space is defined as: center of pitch pivot point at origin,
-     * positive x is to the right, positive y is forward, positive z is above */
+    /**
+     * Pivot space to VTM (camera) space.
+     *
+     * Pivot space has the pitch pivot at the origin.
+     *
+     * @param[in] v A point in pivot space, in meters.
+     * @return The same point relative to the video transmission module's lens.
+     */
     static Vector3d pivotSpaceToVtmSpace(Vector3d& v)
     {
         return Vector3d(
@@ -128,9 +155,14 @@ public:
             v.getZ() - OFFSET_Z_PITCH_PIVOT_TO_VTM);
     }
 
-    /** barrel space is defined as: origin is where the projectile gets launched from at the
-     * initialShotVelocity from JetsonSubsystemConstants.hpp
-     * positive x is to the right, positive y is forward, positive z is above */
+    /**
+     * Pivot space to barrel space.
+     *
+     * Barrel space has the muzzle -- where the projectile leaves -- at the origin.
+     *
+     * @param[in] v A point in pivot space, in meters.
+     * @return The same point relative to the muzzle.
+     */
     static Vector3d pivotSpaceToBarrelSpace(Vector3d& v)
     {
         return Vector3d(
@@ -139,9 +171,16 @@ public:
             v.getZ() - OFFSET_Z_PITCH_PIVOT_TO_BARREL);
     }
 
-    /** barrel space is defined as: origin is where the projectile gets launched from at the
-     * initialShotVelocity from JetsonSubsystemConstants.hpp
-     * positive x is to the right, positive y is forward, positive z is above */
+    /**
+     * Barrel space back to pivot space.
+     *
+     * @param[in] v A point in barrel space, in meters.
+     * @return The same point relative to the pitch pivot.
+     *
+     * @warning This is **not** the inverse of `pivotSpaceToBarrelSpace`. That subtracts the offset,
+     *      so the inverse would add it; this computes `offset - v`, which also negates the vector.
+     *      Round-tripping a point through both does not return it.
+     */
     static Vector3d barrelSpaceToPivotSpace(Vector3d& v)
     {
         return Vector3d(
@@ -150,9 +189,20 @@ public:
             OFFSET_Z_PITCH_PIVOT_TO_BARREL - v.getZ());
     }
 
-    /** vtm space is defined as: vtm at origin, positive x is to the right, positive y is
-       forward, positive z is above these numbers are from aruw, projection_utils.hpp, and
-       aren't robot specific*/
+    /**
+     * VTM space to screen pixels -- a pinhole camera projection.
+     *
+     * Divides by forward distance so things further away land nearer the center, scales by the
+     * camera's focal lengths in pixels, and offsets by the principal point (960, 540), the center
+     * of the 1920x1080 display.
+     *
+     * @param[in] v A point in VTM space, in meters. Must have a positive y (be in front of the
+     *      camera); a point at or behind the lens divides by zero or projects nonsensically.
+     * @return The corresponding screen position, in pixels from the bottom-left.
+     *
+     * @note The focal lengths are the camera's own, taken from aruw's `projection_utils.hpp`, and
+     *      so are not robot specific.
+     */
     static Vector2d vtmSpaceToScreenSpace(Vector3d& v)
     {
         return Vector2d(

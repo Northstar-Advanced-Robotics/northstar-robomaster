@@ -12,7 +12,18 @@ BUILDDIR      = _build
 help:
 	@$(SPHINXBUILD) -M help "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
 
-.PHONY: help Makefile
+# Doxygen is run here rather than by exhale (exhaleExecutesDoxygen is False in conf.py) so that
+# gen_subsystem_pages.py can read the XML before sphinx-build starts. CI just calls `make html`.
+doxygen:
+	doxygen Doxyfile
+
+subsystems: doxygen
+	python3 gen_subsystem_pages.py
+
+html: subsystems
+	@$(SPHINXBUILD) -M html "$(SOURCEDIR)" "$(BUILDDIR)" $(SPHINXOPTS) $(O)
+
+.PHONY: help doxygen subsystems html Makefile
 
 # Catch-all target: route all unknown targets to Sphinx using the new
 # "make mode" option.  $(O) is meant as a shortcut for $(SPHINXOPTS).

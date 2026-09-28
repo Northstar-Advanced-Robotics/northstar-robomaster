@@ -1,3 +1,13 @@
+/**
+ * Declares the hero's agitator and the flywheels it feeds, which are tested together because the
+ * hero indexes a single large projectile rather than a stream of small ones.
+ *
+ * `testbed_control.cpp` includes this file unconditionally; the `#ifdef USING_HERO_AGITATOR` below
+ * is what actually selects it, and that switch is set in `test_def.hpp`. It is mutually exclusive
+ * with `USING_AGITATOR`, which selects the test bed's own agitator instead.
+ *
+ * Everything is declared at file scope, which is why exactly one translation unit may include it.
+ */
 #ifdef USING_HERO_AGITATOR
 
 #ifndef USING__HERO_AGITATOR_HPP_

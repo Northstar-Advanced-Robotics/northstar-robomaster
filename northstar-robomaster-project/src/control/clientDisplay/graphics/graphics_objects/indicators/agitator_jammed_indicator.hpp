@@ -7,8 +7,14 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Shows a large "JAMMED" warning above the crosshair while the agitator is stuck.
+ *
+ * A jam means the robot has silently stopped firing, which the operator will otherwise only notice
+ * by the absence of hits, so the warning is placed where they are already looking.
+ */
 class AgitatorJammedIndicator : public GraphicsContainer
 {
 public:
@@ -21,6 +27,7 @@ public:
         addGraphicsObject(&jammed);
     }
 
+    /// Shows or hides the warning according to whether the agitator is currently jammed.
     void update()
     {
         if (agitator->isJammed())

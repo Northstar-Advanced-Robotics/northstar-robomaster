@@ -17,3 +17,9 @@ docs/doxyoutput
 .sconsign
 
 .devcontainer/personal-extensions.txt
+docs/generated/
+docs/doxygen-awesome-css/
+docs/_build/
+docs/doxyoutput/
+docs/api/
+docs/subsystems/
