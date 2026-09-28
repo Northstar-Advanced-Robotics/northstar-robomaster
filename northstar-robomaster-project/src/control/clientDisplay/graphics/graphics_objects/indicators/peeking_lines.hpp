@@ -13,6 +13,15 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Draws vertical lines marking how far the robot can edge out from cover before it is exposed.
+ *
+ * Only drawn while peeking is engaged. The lines are computed from the chassis' footprint projected
+ * through the turret's current orientation, so they show where the robot's corners will appear
+ * rather than where its center is.
+ */
 class PeekingLines : public GraphicsContainer
 {
 public:
@@ -26,6 +35,8 @@ public:
         addGraphicsObject(&right);
     }
 
+    /// Recomputes the lines from the chassis footprint and turret orientation, and hides them when
+    /// not peeking.
     void update()
     {
         if (chassis->isPeeking)

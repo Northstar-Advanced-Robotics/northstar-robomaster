@@ -8,6 +8,14 @@
 
 namespace src::control::client_display::graphics
 {
+/**
+ * @ingroup client_display
+ *
+ * Shows the chassis' speed as a number on screen.
+ *
+ * Only drawn while the robot is beyblading in place, when the operator has no other cue for how
+ * fast it is actually going.
+ */
 class LinearVelocityIndicator : public GraphicsContainer
 {
 public:
@@ -21,6 +29,8 @@ public:
         number.height = HEIGHT;
     }
 
+    /// Reads the speed from odometry, recenters the number, and shows it only while the robot is
+    /// beyblading in place.
     void update()
     {
         modm::Vector<float, 2> localVelocity = odometry->getVelocityLocal();

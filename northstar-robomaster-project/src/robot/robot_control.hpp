@@ -36,8 +36,22 @@ namespace src::gyro
 namespace src::testbed
 #endif
 {
+/**
+ * Constructs this robot's subsystems, commands, and input mappings, and registers them with the
+ * scheduler.
+ *
+ * Each robot supplies its own definition in `robot/<target>/<target>_control.cpp`, and the
+ * namespace this declaration lands in is selected by the build target, so `main` can call it
+ * without knowing which robot it was compiled for. Call once at startup.
+ *
+ * @param[in] drivers This robot's drivers object.
+ */
 void initSubsystemCommands(Drivers *drivers);
 // #ifndef TARGET_TEST_BED
+/**
+ * @return This robot's IMU calibration command, which the startup sequence schedules before
+ *      handing control to the operator.
+ */
 src::control::imu::ImuCalibrateCommandBase *getImuCalibrateCommand();
 // #endif
 }  // namespace tbh whatever you want it to be

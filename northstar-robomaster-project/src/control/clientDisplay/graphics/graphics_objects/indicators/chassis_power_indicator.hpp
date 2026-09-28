@@ -7,8 +7,15 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Shows the chassis' power draw as a large number along the bottom of the screen.
+ *
+ * Exceeding the referee system's power limit drains a buffer and then costs health, so the operator
+ * needs to see draw as they drive. The reading is averaged over a short window, since the raw value
+ * is far too noisy to read, and turns red once it is over the limit.
+ */
 class ChassisPowerIndicator : public GraphicsContainer
 {
 public:
@@ -24,6 +31,8 @@ public:
         // addGraphicsObject(&chargeBar);
     }
 
+    /// Averages the recent power draw, recenters the number, and colors it red while the draw is
+    /// over the referee system's limit.
     void update()
     {
         float rawPower = chassis->getChassisPowerDraw();  // chassis->getWheelRpm();

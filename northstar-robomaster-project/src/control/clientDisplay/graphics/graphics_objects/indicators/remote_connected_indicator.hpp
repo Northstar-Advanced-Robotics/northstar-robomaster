@@ -6,8 +6,14 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Reports whether the remote is connected, as text down the left side of the screen.
+ *
+ * The text is flashed rather than held steady: a static "connected" message would look identical
+ * whether the HUD were live or frozen, so the blinking is what actually proves the link is up.
+ */
 class RemoteConnectedIndicator : public GraphicsContainer
 {
 public:
@@ -16,6 +22,7 @@ public:
         addGraphicsObject(&status);
     }
 
+    /// Updates the connection text and color, and toggles its visibility to produce the flash.
     void update()
     {
         if (cycles > 500)

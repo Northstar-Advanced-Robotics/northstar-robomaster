@@ -28,6 +28,8 @@
 namespace src::control::turret
 {
 /**
+ * @ingroup robots
+ *
  * Turret subsystem for the Standard.
  */
 class StandardTurretSubsystem final : public RobotTurretSubsystem

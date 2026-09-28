@@ -17,6 +17,15 @@
  * along with aruw-mcb.  If not, see <https://www.gnu.org/licenses/>.
  */
 
+/**
+ * Turret constants for the standard.
+ *
+ * Turret motor IDs, encoder offsets, pitch and yaw travel limits, and the gains for the
+ * chassis-frame and world-frame controllers.
+ *
+ * Include `turret_constants.hpp` rather than this file; it picks the right robot's constants for
+ * the build target, and this header refuses to compile on its own.
+ */
 #ifndef STANDARD_TURRET_CONSTANTS_HPP_
 #define STANDARD_TURRET_CONSTANTS_HPP_
 
@@ -95,7 +104,7 @@ static constexpr float STATIC_FRICTION_FF_VELOCITY_DEADZONE = 0.05f;  // rad/s
 static constexpr float STATIC_FRICTION_FF_ERROR_DEADZONE = 0.01f;     // rad
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
-    .kp = 20.0f,
+    .kp = 18.0f,
     .ki = 0.0f,
     .kd = 0.05f,
     .maxICumulative = 0.0f,
@@ -123,7 +132,7 @@ static constexpr tap::algorithms::SmoothPidConfig YAW_POS_PID_CONFIG = {
 // };
 
 static constexpr tap::algorithms::SmoothPidConfig YAW_VEL_PID_CONFIG = {
-    .kp = 1100.0f,
+    .kp = 950.0f,
     .ki = 0.0f,
     .kd = 0.0f,
     .maxICumulative = 1000.0f,

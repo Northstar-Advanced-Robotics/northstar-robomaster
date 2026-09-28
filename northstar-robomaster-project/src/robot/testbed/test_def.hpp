@@ -1,3 +1,15 @@
+/**
+ * Declares the test bed's subsystems, commands, and mappings, and selects which of them are built.
+ *
+ * The test bed is a bench fixture used to bring up hardware in isolation, so which peripherals are
+ * attached changes from day to day. The `USING_*` defines below say what is currently on the bench.
+ * `testbed_control.cpp` includes every `using_*.hpp` unconditionally, and each of those files
+ * guards its own contents on the matching switch -- so commenting a define out here drops that
+ * hardware from the build, and a motor that is not on the bench cannot stall bring-up of the rest.
+ *
+ * Everything is declared at file scope, which is why this header is included by
+ * `testbed_control.cpp` alone.
+ */
 #ifdef TARGET_TEST_BED
 
 #ifndef TEST_DEF_HPP_

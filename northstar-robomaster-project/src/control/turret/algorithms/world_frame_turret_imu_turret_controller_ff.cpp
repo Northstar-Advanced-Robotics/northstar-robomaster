@@ -108,7 +108,7 @@ static inline void initializeWorldFrameTurretImuController(
 }
 
 /**
- * A helper function for the `run*PidYawWorldFrameController` functions below. Updates the passed in
+ * A helper shared by the `runController` and `setSetpoint` methods below. Updates the passed in
  * `turretMotor`'s desired chassis frame setpoint and the passed in `worldFrameSetpoint`'.
  * Performs necessary limiting of the `worldFrameSetpoint` based on the `turretMotor`'s
  * min/max setpoints.
@@ -185,10 +185,11 @@ static inline float computeStaticFrictionFF(
 /**
  * Runs a world frame cascade (position -> velocity) PID controller.
  *
- * @param[in] worldFrameAngleSetpoint World frame angle setpoint, not required to be normalized, in
- * radians.
- * @param[in] worldFrameAngleMeasurement World frame angle measurement, not required to be
- * normalized, in radians.
+ * @param[in] worldFrameAngleError The world frame error (setpoint minus measurement), not
+ * required to be normalized, in radians.
+ * @param[in] chassisFrameAngleMeasurement The **chassis** frame angle measurement, in radians. The
+ * function reconstructs a pseudo-setpoint from this plus the error above, since the turret motor's
+ * limits are expressed in the chassis frame.
  * @param[in] worldFrameVelocityMeasured World frame angular velocity measurement, in
  * radians/second.
  * @param[in] dt Time change since this function was last called, in ms.

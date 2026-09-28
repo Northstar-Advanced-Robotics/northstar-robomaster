@@ -28,13 +28,18 @@
 namespace src::control::governor
 {
 /**
- * A governor that allows a Command to run based on an internal timer and information from the
- * vision processor that dictates fire rate.
+ * @ingroup governors
  *
- * Limits the frequency with which the underlying command is scheduled to be at most the last
- * "fire rate" suggestion provided by the Vision Coprocessor for this turret.
+ * Caps how often the governed command may be scheduled, enforcing a fire rate.
  *
- * If CV is disconnected, does not limit fire.
+ * Asks a `FireRateReselectionManagerInterface` for the current rate each iteration and blocks until
+ * that much time has passed since the last shot, which is how the fire-mode selection actually
+ * limits the agitator.
+ *
+ * @note This fork's only implementation of that interface is `ManualFireRateReselectionManager`,
+ *      i.e. the rate the operator selected. Upstream aruw-mcb sourced it from a vision
+ *      coprocessor; there is no such input here, and a `NOT_READY` state **blocks** rather than
+ *      firing freely.
  */
 class FireRateLimitGovernor : public tap::control::governor::CommandGovernorInterface
 {

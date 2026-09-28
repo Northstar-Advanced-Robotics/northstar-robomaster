@@ -9,8 +9,15 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Reports the state of computer vision, as text down the left side of the screen.
+ *
+ * Two things the operator cannot otherwise see: whether the vision computer is alive at all (the
+ * text's color), and whether it currently has a target. A separate "SHOOT" prompt appears when
+ * auto-aim considers the turret on target, which is when firing will actually connect.
+ */
 class CVIndicator : public GraphicsContainer
 {
 public:
@@ -26,6 +33,8 @@ public:
         addGraphicsObject(&onTarget);
     }
 
+    /// Updates the vision status text and color, and shows the "SHOOT" prompt when the turret is on
+    /// target.
     void update()
     {
         if (visionComms->isCvOnline())

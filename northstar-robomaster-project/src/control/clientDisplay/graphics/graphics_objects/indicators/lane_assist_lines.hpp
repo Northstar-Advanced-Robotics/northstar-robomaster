@@ -11,6 +11,15 @@
 namespace src::control::client_display::graphics
 {
 // looks like / \ at the bottom of the screen
+/**
+ * @ingroup client_display
+ *
+ * Draws two lines converging ahead of the robot, marking how wide it is.
+ *
+ * Judging whether the robot fits through a gap is hard from the turret's point of view, so the
+ * lines project the chassis' width onto the ground in front of it. They follow the turret's pitch,
+ * and are hidden entirely once pitch carries them off the bottom of the screen.
+ */
 class LaneAssistLines : public GraphicsContainer
 {
 public:
@@ -20,6 +29,8 @@ public:
         addGraphicsObject(&right);
     }
 
+    /// Projects the chassis' width onto the screen at the current turret pitch, hiding the lines
+    /// when they fall outside the display.
     void update()
     {
         float pitch = turret->pitchMotor.getChassisFrameMeasuredAngle().getUnwrappedValue();

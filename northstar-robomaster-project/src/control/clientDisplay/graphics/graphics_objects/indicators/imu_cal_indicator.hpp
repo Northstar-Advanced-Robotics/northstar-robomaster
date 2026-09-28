@@ -7,8 +7,15 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Reports what the IMU calibration is doing, as text down the left side of the screen.
+ *
+ * Calibration takes several seconds and passes through several stages, during which the robot must
+ * hold still; naming the current stage tells the operator that it is progressing rather than hung,
+ * and reminds them of the key combination when it is not running.
+ */
 class ImuCalIndicator : public GraphicsContainer
 {
 public:
@@ -19,6 +26,8 @@ public:
         addGraphicsObject(&stage);
     }
 
+    /// Sets the text to the calibration's current stage, or to the key combination that starts one
+    /// when no calibration is running.
     void update()
     {
         // if(drivers->remote.keyPressed(Remote::Key::R))

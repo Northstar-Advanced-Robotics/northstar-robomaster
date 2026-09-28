@@ -27,6 +27,7 @@
 namespace src::control::turret
 {
 /**
+ * @ingroup turret
  *
  * A turret subystem that is only capable of yawing.
  *

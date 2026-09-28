@@ -28,13 +28,15 @@ using namespace tap::algorithms;
 namespace src::control::agitator
 {
 /**
+ * @ingroup agitator
+ *
  * A command that aims to keep the agitator at a constant velocity. At the end of this command,
  * the agitator will move to a specified setpoint, as to give a consistent starting point for each
  * shot.
  *
- * Ends if the agitator is offline or jammed.
+ * Ends if the agitator is offline or jammed. In single-shot mode -- the default -- it also ends
+ * once the target integral is reached, which is the usual way it finishes.
  */
-
 class ConstantVelocityAgitatorCommand : public tap::control::setpoint::MoveIntegralCommand
 {
 public:

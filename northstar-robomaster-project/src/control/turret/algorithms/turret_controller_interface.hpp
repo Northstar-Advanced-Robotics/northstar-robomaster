@@ -32,6 +32,8 @@ class TurretMotor;
 namespace src::control::turret::algorithms
 {
 /**
+ * @ingroup turret
+ *
  * An interface describing the functionality of a turret controller. When implementing this class,
  * the user is responsible for designing a controller that will set the desired output of some
  * turret subsystem. Instances of this interface are designed to be used in a command. Using this
@@ -45,7 +47,8 @@ class TurretControllerInterface
 {
 public:
     /**
-     * @param[in] TurretMotor A `TurretMotor` object accessible for children objects to use.
+     * @param[in] turretMotor The axis this controller drives. Not owned; must outlive the
+     *      controller. Exposed to subclasses as the protected `turretMotor` member.
      */
     TurretControllerInterface(TurretMotor &turretMotor) : turretMotor(turretMotor) {}
 
@@ -58,25 +61,36 @@ public:
 
     /**
      * Main controller update loop. Expected that the controller is initialized and that this
-     * function is only called when `isOnline` is `false`. Call periodically.
+     * function is only called while `isOnline` returns `true`. Call periodically.
      *
-     * @param[in] dt The time difference in milliseconds between previous and current call of
-     * `runController`.
-     * @param[in] desiredSetpoint The controller's desired setpoint in whatever frame the controller
-     * is operating. Units radians.
+     * @param[in] dt The time difference in **milliseconds** between the previous and current call
+     * of `runController`. Note taproot's `SmoothPid` treats `dt` as unitless, so milliseconds is a
+     * convention this codebase maintains at every call site rather than something enforced.
+     *
+     * @param[in] desiredSetpoint The controller's desired setpoint in whatever frame the
+     * controller operates in, in radians.
      */
     virtual void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) = 0;
 
     /**
-     * Sets the controller setpoint, but doesn't run the controller.
+     * Updates the controller's target without stepping the control loop. Use when taking over from
+     * another controller, so the new one starts from the current aim rather than snapping.
+     *
+     * @param[in] desiredSetpoint The desired setpoint, in radians, in the controller's own frame.
      */
     virtual void setSetpoint(WrappedFloat desiredSetpoint) = 0;
 
+    /**
+     * Convenience overload wrapping a raw angle.
+     *
+     * @param[in] desiredSetpoint The desired setpoint, in radians, in the controller's own frame.
+     */
     inline void setSetpoint(float desiredSetpoint) { setSetpoint(Angle(desiredSetpoint)); }
 
     /**
-     * @return The controller's setpoint, units radians. **Does not** have to be in the same
-     * reference frame as the TurretSubsystem's `get<yaw|pitch>Setpoint` functions.
+     * @return The controller's setpoint, units radians, in whatever frame this controller operates
+     * in -- which is **not** necessarily the chassis frame the `TurretMotor` stores its setpoint
+     * in.
      */
     virtual WrappedFloat getSetpoint() const = 0;
 
@@ -87,9 +101,10 @@ public:
      */
     virtual WrappedFloat getMeasurement() const = 0;
 
-    /// @return World frame yaw angle measurement, refer to top level documentation for more
-    /// details.
-
+    /// @return The measurement taken from the motor encoder specifically, as opposed to
+    /// `getMeasurement`, which a world-frame controller sources from an IMU instead. Lets a caller
+    /// compare the two. The base implementation returns a constant zero; controllers that can
+    /// distinguish the two sources override it.
     virtual WrappedFloat getMeasurementMotor() const { return WrappedFloat(0, 0, M_TWOPI); };
 
     /**
@@ -124,9 +139,18 @@ public:
         WrappedFloat chassisFrameAngle) const = 0;
 
 protected:
+    /// The axis this controller drives. Subclasses read its measurement and write its output.
     TurretMotor &turretMotor;
 };
 
+/**
+ * @ingroup turret
+ *
+ * A `TurretControllerInterface` that drives a pitch axis.
+ *
+ * Exists so a command can hold "some pitch controller" without knowing which frame it works in, and
+ * so pitch and yaw controllers cannot be passed in the wrong order.
+ */
 class TurretPitchControllerInterface : public TurretControllerInterface
 {
 public:
@@ -136,6 +160,12 @@ public:
     }
 };
 
+/**
+ * @ingroup turret
+ *
+ * A `TurretControllerInterface` that drives a yaw axis. The yaw counterpart to
+ * `TurretPitchControllerInterface`.
+ */
 class TurretYawControllerInterface : public TurretControllerInterface
 {
 public:

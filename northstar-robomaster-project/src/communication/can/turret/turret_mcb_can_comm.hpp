@@ -41,13 +41,24 @@ class Drivers;
 namespace src::can
 {
 /**
+ * @ingroup communication
+ *
  * A CAN message handler that handles sending and receiving data from the turret mounted
  * microcontroller. Reads IMU data and sends instructions to the turret microcontroller. Follows the
  * protocol described in the wiki here:
  * https://gitlab.com/aruw/controls/aruw-mcb/-/wikis/Turret-MCB-Comm-Protocol.
  *
- * @note Since we use radians in this codebase, angle values that are sent from the turret MCB in
- * degrees are converted to radians by this object.
+ * @warning **Not built into any robot.** No robot's `Drivers` declares a member of this type, the
+ * `WorldFrame*TurretCanImu*` controllers that would consume it are never instantiated, and the
+ * `sendData` call in `main.cpp` is commented out. Live turret control uses the chassis board's
+ * BMI088 instead.
+ *
+ * @warning **The angle getters return degrees, not radians.** `ANGLE_FIXED_POINT_PRECISION` is
+ * `360 / UINT16_MAX`, i.e. degrees per count, and the receive handlers store that value directly --
+ * this fork dropped the `modm::toRadian` conversion that upstream aruw-mcb applies. The angular
+ * *velocity* getters are unaffected and really are rad/s. The `*Unwrapped` getters compound the
+ * problem by adding `2*PI` per revolution to a degree-valued angle. Fix this before wiring any of
+ * this class up.
  */
 class TurretMCBCanComm : public tap::communication::sensors::limit_switch::LimitSwitchInterface
 {
@@ -84,12 +95,13 @@ public:
     }
 
     /**
-     * @return turret yaw angle in radians, normalized between [-pi, pi]
+     * @return Turret **roll** angle, normalized to [-180, 180]. Nominally degrees despite this
+     *      class' rad-per-second velocity getters; see the class warning.
      */
     mockable inline float getRoll() const { return lastCompleteImuData.roll; }
 
     /**
-     * @return turret yaw angular velocity in rad/sec
+     * @return Turret roll angular velocity in rad/s. This one really is radians.
      */
     mockable inline float getRollVelocity() const
     {
@@ -98,9 +110,12 @@ public:
     }
 
     /**
-     * @return An unwrapped (not normalized) turret yaw angle, in rad. This object keeps track of
-     * the number of revolutions that the attached turret IMU has taken, and the number of
-     * revolutions is reset once the IMU is recalibrated or if the turret IMU comes disconnected.
+     * @return An unwrapped turret **roll** angle, accumulating `2*PI` per revolution on top of
+     *      `getRoll`.
+     *
+     * @warning Mixes units -- see the class warning -- and unlike the pitch and yaw counterparts,
+     *      `rollRevolutions` is never reset on recalibration or disconnect, and is not initialized
+     *      in the constructor.
      */
     mockable inline float getRollUnwrapped() const
     {
@@ -108,12 +123,13 @@ public:
     }
 
     /**
-     * @return turret pitch angle in rad, a value normalized between [-pi, pi]
+     * @return Turret pitch angle, normalized to [-180, 180]. Nominally degrees; see the class
+     *      warning.
      */
     mockable inline float getPitch() const { return lastCompleteImuData.pitch; }
 
     /**
-     * @return turret pitch angular velocity in rad/sec
+     * @return Turret pitch angular velocity in rad/s. This one really is radians.
      */
     mockable inline float getPitchVelocity() const
     {
@@ -122,9 +138,10 @@ public:
     }
 
     /**
-     * @return An unwrapped (not normalized) turret pitch angle, in rad. This object keeps track of
-     * the number of revolutions that the attached turret IMU has taken, and the number of
-     * revolutions is reset once the IMU is recalibrated or if the turret IMU comes disconnected.
+     * @return An unwrapped turret pitch angle, accumulating `2*PI` per revolution on top of
+     *      `getPitch`. The revolution count resets when the IMU is recalibrated or disconnects.
+     *
+     * @warning Mixes units; see the class warning.
      */
     mockable inline float getPitchUnwrapped() const
     {
@@ -132,12 +149,13 @@ public:
     }
 
     /**
-     * @return turret yaw angle in radians, normalized between [-pi, pi]
+     * @return Turret yaw angle, normalized to [-180, 180]. Nominally degrees; see the class
+     *      warning.
      */
     mockable inline float getYaw() const { return lastCompleteImuData.yaw; }
 
     /**
-     * @return turret yaw angular velocity in rad/sec
+     * @return Turret yaw angular velocity in rad/s. This one really is radians.
      */
     mockable inline float getYawVelocity() const
     {
@@ -146,9 +164,10 @@ public:
     }
 
     /**
-     * @return An unwrapped (not normalized) turret yaw angle, in rad. This object keeps track of
-     * the number of revolutions that the attached turret IMU has taken, and the number of
-     * revolutions is reset once the IMU is recalibrated or if the turret IMU comes disconnected.
+     * @return An unwrapped turret yaw angle, accumulating `2*PI` per revolution on top of
+     *      `getYaw`. The revolution count resets when the IMU is recalibrated or disconnects.
+     *
+     * @warning Mixes units; see the class warning.
      */
     mockable inline float getYawUnwrapped() const
     {

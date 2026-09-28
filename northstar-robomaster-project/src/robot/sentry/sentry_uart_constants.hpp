@@ -22,6 +22,9 @@ static constexpr uint16_t primeScaleFactor = 10;
 static constexpr uint32_t TIME_BTWN_SENDING_ODOMETRY_MSG = 2 * primeScaleFactor;
 static constexpr uint32_t TIME_BEFORE_SENDING_ODOMETRY_MSG =
     TIME_BTWN_SENDING_ODOMETRY_MSG + TIME_BEFORE_UART_START;
+/// @warning Hardcodes 4 ms rather than using `TIME_BTWN_SENDING_ODOMETRY_MSG` (20 ms), so
+/// the documented constant above is computed and then ignored, and the stated
+/// prime-multiple invariant does not hold for this message. Hero uses the constant.
 static tap::arch::PeriodicMilliTimer sendOdometryMsgTimeout{4};
 
 /** Time in ms between sending the Robot Health message. */
@@ -30,7 +33,7 @@ static constexpr uint32_t TIME_BEFORE_SENDING_HEALTH_MSG =
     TIME_BTWN_SENDING_HEALTH_MSG + TIME_BEFORE_UART_START;
 static tap::arch::PeriodicMilliTimer sendHealthMsgTimeout{TIME_BTWN_SENDING_HEALTH_MSG};
 
-/** Time in ms between sending the Robot Health message. */
+/** Time in ms between sending the referee-system turret data message. */
 static constexpr uint32_t TIME_BTWN_SENDING_REF_TURRET_DATA_MSG = 5 * primeScaleFactor;
 static constexpr uint32_t TIME_BEFORE_SENDING_REF_TURRET_DATA_MSG =
     TIME_BTWN_SENDING_REF_TURRET_DATA_MSG + TIME_BEFORE_UART_START;

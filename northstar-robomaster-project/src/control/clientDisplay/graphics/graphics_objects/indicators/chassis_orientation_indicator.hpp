@@ -17,6 +17,17 @@ namespace src::control::client_display::graphics
 //      __/
 // at the center of the screen, the arcs represent the left and right inner
 // panels if there are 2 arcs, if there are 4 then they are all four panels
+/**
+ * @ingroup client_display
+ *
+ * Draws arcs at the center of the screen showing which way the chassis is facing relative to the
+ * turret.
+ *
+ * With turret-relative driving the chassis can be pointed anywhere, and the operator, looking down
+ * the turret, has no other way to tell. The arcs stand for the chassis' armor panels, so their
+ * position says which panel is currently facing the enemy. Optionally accompanied by a prompt to
+ * start beyblading when the chassis is sitting still.
+ */
 class ChassisOrientationIndicator : public GraphicsContainer
 {
 public:
@@ -40,6 +51,7 @@ public:
         }
     }
 
+    /// Rotates the arcs to match the current angle between the chassis and the turret.
     void update()
     {
         uint16_t heading = static_cast<uint16_t>(

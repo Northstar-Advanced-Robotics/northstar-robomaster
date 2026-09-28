@@ -31,11 +31,9 @@ namespace src::control::turret::algorithms
  * Transforms the passed in turret yaw angle in the chassis frame to the world frame (units
  * radians).
  *
- * @param[in] initChassisFrameImuAngle The initial chassis IMU angle, in radians, measured from the
- *      chassis mounted IMU that is captured upon initialization of the chassis IMU world relative
- *      PID controller.
- * @param[in] currChassisFrameImuAngle The current chassis IMU angle, in radians, measured from the
- *      chassis mounted IMU.
+ * @param[in] initChassisFrameImuAngle The chassis IMU angle, in radians, captured when the
+ *      controller was initialized. This defines where the world frame's zero sits.
+ * @param[in] currChassisFrameImuAngle The current chassis IMU angle, in radians.
  * @param[in] angleToTransform The angle, in radians, to transform. Measured as a turret yaw angle
  *      in the chassis frame.
  * @return A turret yaw angle in radians. `angleToTransform` transformed into the world frame.
@@ -52,11 +50,9 @@ static inline WrappedFloat transformChassisFrameToWorldFrame(
  * Transforms the passed in turret yaw angle in the world frame to the chassis frame (units
  * radians).
  *
- * @param[in] initChassisFrameImuAngle The initial chassis IMU angle, in radians, measured from the
- *      chassis mounted IMU that is captured upon initialization of the chassis IMU world relative
- * PID controller.
- * @param[in] currChassisFrameImuAngle The current chassis IMU angle, in radians, measured from the
- *      chassis mounted IMU.
+ * @param[in] initChassisFrameImuAngle The chassis IMU angle, in radians, captured when the
+ *      controller was initialized. This defines where the world frame's zero sits.
+ * @param[in] currChassisFrameImuAngle The current chassis IMU angle, in radians.
  * @param[in] angleToTransform The angle, in radians to transform. Measured as a turret yaw angle in
  *      the world frame.
  * @return A turret yaw angle in radians. `angleToTransform` transformed into the chassis frame.
@@ -70,21 +66,21 @@ static inline WrappedFloat transformWorldFrameToChassisFrame(
 }
 
 /**
- * A helper function for the `run*PidYawWorldFrameController` functions below. Updates the passed in
+ * A helper shared by the `runController` and `setSetpoint` methods below. Updates the passed in
  * `yawMotor`'s desired chassis frame setpoint and the passed in `worldFrameYawSetpoint`'.
  * Performs necessary limiting of the `worldFrameYawSetpoint` based on the `yawMotor`'s
  * min/max yaw setpoints.
  *
  * @param[in] desiredSetpoint The new user-specified world frame turret yaw angle setpoint, in
  *      radians.
- * @param[in] initChassisFrameImuAngle The initial chassis IMU angle, in radians, measured from the
+ * @param[in] chassisFrameInitImuYawAngle The initial chassis IMU angle, in radians, measured from the
  *      chassis mounted IMU that is captured upon initialization of the chassis IMU world relative
  *      PID controller.
- * @param[in] currChassisFrameImuAngle The current chassis IMU angle, in radians, measured from the
+ * @param[in] chassisFrameImuYawAngle The current chassis IMU angle, in radians, measured from the
  *      chassis mounted IMU.
  * @param[out] worldFrameYawSetpoint The limited and wrapped world frame turret yaw setpoint, in
  *      radians. Set to `desiredSetpoint` and then wrapped/limited as necessary.
- * @param[out] yawMotor The turret subsystem whose chassis relative turret yaw angle is
+ * @param[out] yawMotor The turret motor whose chassis relative yaw angle is
  *      updated by this function.
  */
 static inline void updateWorldFrameSetpoint(

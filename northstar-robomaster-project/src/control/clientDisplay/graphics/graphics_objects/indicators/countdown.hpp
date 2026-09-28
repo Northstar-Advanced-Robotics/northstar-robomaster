@@ -6,8 +6,14 @@
 
 namespace src::control::client_display::graphics
 {
-// when trying to buy projectiles as soon as the match starts, you can't see the original
-// countdown this is drawn to the side so you can still know the countdown
+/**
+ * @ingroup client_display
+ *
+ * Shows the referee system's pre-match countdown as a large number off to the side of the screen.
+ *
+ * The client's own countdown is hidden behind the purchase menu, which is exactly where the
+ * operator is looking as the match starts, so this copy is drawn somewhere still visible.
+ */
 class Countdown : public GraphicsContainer
 {
 public:
@@ -19,6 +25,8 @@ public:
         number.height = LINE_HEIGHT;
     }
 
+    /// Reads the remaining stage time from the referee system and recenters the number, coloring it
+    /// by game stage and hiding it once the match is underway.
     void update()
     {
         // if(drivers->remote.keyPressed(Remote::Key::R))
