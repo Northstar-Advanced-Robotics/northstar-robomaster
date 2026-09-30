@@ -6,7 +6,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Build Tests - Debug",
-            "program": "${workspaceFolder}/northstar-robomaster-project/build/tests/scons-debug/northstar-robomaster-project-tests.elf",
+            "program": "${workspaceFolder}/northstar-robomaster-project/build/tests-rm-dev-board-c/scons-debug/TARGET_STANDARD/northstar-robomaster-project-tests.elf",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -26,7 +26,7 @@
             "type": "cppdbg",
             "request": "launch",
             "preLaunchTask": "Build Sim - Debug",
-            "program": "${workspaceFolder}/northstar-robomaster-project/build/sim/scons-debug/northstar-robomaster-project.elf",
+            "program": "${workspaceFolder}/northstar-robomaster-project/build/sim-rm-dev-board-c/scons-debug/TARGET_STANDARD/northstar-robomaster-project.elf",
             "args": [],
             "stopAtEntry": false,
             "cwd": "${workspaceFolder}",
@@ -48,7 +48,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (standard)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_STANDARD/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -61,7 +61,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (sentry)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_SENTRY/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -74,7 +74,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (hero)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_HERO/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -87,7 +87,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (testbed)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_TEST_BED/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -100,7 +100,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (standard fly_sky)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_STANDARD-FLY_SKY/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -113,7 +113,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (sentry fly_sky)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_SENTRY-FLY_SKY/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -126,7 +126,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (hero fly_sky)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_HERO-FLY_SKY/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"
@@ -139,7 +139,7 @@
             "servertype": "openocd",
             "cwd": "${workspaceRoot}",
             "preLaunchTask": "Program - Debug (testbed fly_sky)",
-            "executable": "./northstar-robomaster-project/build/hardware/scons-debug/northstar-robomaster-project.elf",
+            "executable": "./northstar-robomaster-project/build/hardware-rm-dev-board-c/scons-debug/TARGET_TEST_BED-FLY_SKY/northstar-robomaster-project.elf",
             "device": "STM32F427II",
             "configFiles": [
                 "./northstar-robomaster-project/openocd.cfg"

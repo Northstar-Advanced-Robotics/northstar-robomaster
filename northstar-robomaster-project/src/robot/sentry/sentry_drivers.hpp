@@ -29,7 +29,7 @@
 #else
 #include "tap/communication/sensors/imu/imu_terminal_serial_handler.hpp"
 
-#include "../../src/communication/can/turret/turret_mcb_can_comm.hpp"
+#include "communication/can/turret/turret_mcb_can_comm.hpp"
 #include "communication/sensors/encoder/pwm_encoder.hpp"
 #include "communication/serial/vision_comms.hpp"
 #include "robot/control_operator_interface.hpp"

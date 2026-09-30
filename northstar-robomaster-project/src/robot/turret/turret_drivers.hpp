@@ -26,7 +26,7 @@
 #include "tap/mock/imu_terminal_serial_handler_mock.hpp"
 #else
 #include "tap/communication/sensors/imu/imu_terminal_serial_handler.hpp"
-#include "../../src/communication/can/chassis/chassis_mcb_can_comm.hpp"
+#include "communication/can/chassis/chassis_mcb_can_comm.hpp"
 #endif
 
 namespace src::robot::turret

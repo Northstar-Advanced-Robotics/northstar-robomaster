@@ -106,22 +106,29 @@ in VSCode, type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, then type "C/C++:
 Configuration" and hit enter. A dropdown menu will appear where you may choose either the "Test",
 "Sim", or "Hardware" configuration.
 
-### Upgrading Taproot
+### Boards and Taproot
 
-The Taproot project recommends that user projects occasionally upgrade the version of
-Taproot that they depend on. The guide for doing so is
-[here](https://gitlab.com/aruw/controls/taproot/-/wikis/Upgrading-a-Taproot-project). 
+Each robot runs on one RoboMaster development board, set in `ROBOT_BOARD` in
+`northstar-robomaster-project/build_tools/extract_robot_type.py`. Each board has its own
+`project.xml` and its own generated copy of `taproot` and `modm` under
+`northstar-robomaster-project/boards/<board>/` (`rm-dev-board-a`, `rm-dev-board-c`), and SCons
+picks the right one from the robot you build.
+
+The generated trees come from the `taproot` submodule, which is our Taproot fork
+[LateralRoot](https://github.com/Northstar-Advanced-Robotics/LateralRoot) (branch `northstar-2026`).
+**Never edit a generated `taproot/` folder by hand**: change LateralRoot, update the submodule, and
+regenerate with `./scripts/regenerate_taproot.sh` (or the "lbuild build" VS Code tasks).
 
 ## Building and running via the terminal
 
 The below commands require that your working directory is `/northstar-robomaster-project` (where the
-`SConstruct` and `project.xml` files are).
+`SConstruct` file is).
 
-- `lbuild build`: Re-generates out copy of `taproot` and `modm`.
-- `scons build`: Builds the firmware image for the hardware target. Creates a "release" folder located in `build/hardware/` which contains the final `.elf` file as well as the intermediate object files (`.o`).
+- `./scripts/regenerate_taproot.sh` (from the repo root): Re-generates every board's copy of `taproot` and `modm`. To regenerate one board, run `pipenv run lbuild build` from inside `boards/<board>/`; lbuild must be run from the folder holding that board's `project.xml`.
+- `scons build`: Builds the firmware image for the hardware target. Output goes to `build/hardware-<board>/scons-<profile>/TARGET_<ROBOT>/`, which contains the final `.elf` file as well as the intermediate object files (`.o`).
 - `scons build-tests`: Builds a program which hosts our unit tests. This executable can be run on your host computer (only supported on Linux) and prints results for each unit test run.
 - `scons run`: Builds as with `scons build` and then programs the board.
-- `scons run-tests`: Builds and runs the unit test program.
+- `scons run-tests`: Builds and runs the unit test program (uses `robot=STANDARD` unless you pass another robot).
 - `scons size`: Prints statistics on program size and (statically-)allocated memory. Note that the reported available heap space is an upper bound, and this tool has no way of knowing about the real size of dynamic allocations.
 
 Below is the full usage statement from our scons build environment. Note that you can select the

@@ -18,13 +18,13 @@
 import os
 from os.path import abspath, join
 
-from build_tools import extract_remote_type, parse_args
+from build_tools import extract_remote_type, extract_robot_type, parse_args
 from SCons.Script import *
 
 # Define project settings and build paths
 PROJECT_NAME = "northstar-robomaster-project"
 BUILD_PATH = "build"
-TAPROOT_PATH = "taproot"
+TAPROOT_PATH = None  # set below from the robot type -> board mapping
 SRC_PATH = "src"
 TEST_PATH = "test"
 TAPROOT_SCRIPTS_TOOLPATH = abspath("../taproot-scripts/scons-tools")
@@ -36,15 +36,23 @@ args = parse_args.parse_args()
 # Define a new SCons environment and set up basic build variables
 env = DefaultEnvironment(ENV=os.environ)
 
+# Each robot runs on one RoboMaster dev board (see ROBOT_BOARD in build_tools/extract_robot_type.py),
+# and each board has its own generated taproot/modm tree under boards/<board>/.
+ROBOT_NAME = args["ROBOT_TYPE"][len("TARGET_"):]
+BOARD = extract_robot_type.ROBOT_BOARD[ROBOT_NAME]
+TAPROOT_PATH = join("boards", BOARD, "taproot")
+env.AppendUnique(CPPDEFINES=["BOARD_" + BOARD.upper().replace("-", "_")])
+print(f"Board: {BOARD} ({TAPROOT_PATH})")
+
 # Every argument that changes compile flags has to be part of the build path. If it isn't,
 # two different flag sets share one set of object files, and switching between them forces a
 # full rebuild each way instead of just switching directories.
 #
+# The board selects a different taproot/modm (different chip), so it splits the tree at the top.
 # "profiling" adds -DRUN_WITH_PROFILING to the *global* environment (see taproot/SConscript),
 # so it affects taproot and modm as well as src -- it has to split the tree at the very top,
-# above the shared libtaproot.a. The default (false) keeps the historical path so existing
-# launch configs and scripts are unaffected.
-build_env_dir = args["TARGET_ENV"]
+# above the shared libtaproot.a.
+build_env_dir = args["TARGET_ENV"] + "-" + BOARD
 if args["PROFILING"] == "true":
     build_env_dir += "-profiling"
 
@@ -86,7 +94,7 @@ File(None)
 
 # We include the tests as library to improve build times for CI.
 if args["TARGET_ENV"] == "tests":
-    source_files = env.FindSourceFiles("taproot/test")
+    source_files = env.FindSourceFiles(join(TAPROOT_PATH, "test"))
     files = [env.Object(file) for file in source_files]
 
     # Construct a static library

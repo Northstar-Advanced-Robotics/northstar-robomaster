@@ -84,7 +84,7 @@
     },
     "C_Cpp.errorSquiggles": "Enabled",
     "C_Cpp.default.includePath": [
-        "northstar-robomaster-project/taproot/src",
+        "northstar-robomaster-project/boards/rm-dev-board-c/taproot/src",
         "northstar-robomaster-project/src",
     ],
     "C_Cpp.default.cppStandard": "c++20",

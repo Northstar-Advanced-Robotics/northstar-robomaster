@@ -80,7 +80,9 @@ def parse_args():
         raise Exception("You specified an invalid profiling type.\n" + USAGE)
 
     # Extract the robot type from either the command line or robot_type.hpp
-    args["ROBOT_TYPE"] = extract_robot_type.get_robot_type()
+    args["ROBOT_TYPE"] = extract_robot_type.get_robot_type(
+        extract_robot_type.DEFAULT_TEST_ROBOT if args["TARGET_ENV"] == "tests" else None
+    )
     
     args["REMOTE_TYPE"] = extract_remote_type.get_remote_type()
 

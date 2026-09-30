@@ -81,8 +81,8 @@ jobs:
         run: |
           pipenv run scons build profile=debug profiling=true robot=TURRET
 
-  # Hosted (simulator) build. Needs gcc 11 (gcc 13 fails in modm's hosted protothread
-  # macros), which is the Ubuntu 22.04 default.
+  # Hosted (simulator) build and unit tests. Needs gcc 11 (gcc 13 fails in modm's hosted
+  # protothread macros), which is the Ubuntu 22.04 default.
   build-sim-linux:
     runs-on: ubuntu-22.04
 
@@ -98,6 +98,9 @@ jobs:
           python-version: '3.11'
           cache: 'pipenv'
 
+      - name: Install googletest
+        run: sudo apt-get update && sudo apt-get install -y libgtest-dev libgmock-dev
+
       - name: Install Pipenv and project dependencies
         working-directory: ./northstar-robomaster-project
         run: |
@@ -109,3 +112,8 @@ jobs:
         working-directory: ./northstar-robomaster-project
         run: |
           pipenv run scons build-sim robot=STANDARD
+
+      - name: Run unit tests
+        working-directory: ./northstar-robomaster-project
+        run: |
+          pipenv run scons run-tests

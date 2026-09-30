@@ -60,7 +60,7 @@ clang-format:
 
     - python3 ./taproot-scripts/check_license_headers.py
         -p NorthStarControls
-        -i './**/__init__.py' 'taproot/**/*' 'taproot-scripts/**/*' 'northstar-robomaster-project/taproot/**/*' 'docs/**/*' 'northstar-robomaster-project/robot-type/robot_type.hpp'
+        -i './**/__init__.py' 'taproot/**/*' 'taproot-scripts/**/*' 'northstar-robomaster-project/boards/*/taproot/**/*' 'docs/**/*' 'northstar-robomaster-project/robot-type/robot_type.hpp'
         -o 'Advanced Robotics at the University of Washington'
 
     - python3 ./taproot-scripts/check_header_guard.py northstar-robomaster-project/src northstar-robomaster-project/test/

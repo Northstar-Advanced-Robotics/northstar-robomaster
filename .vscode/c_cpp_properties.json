@@ -10,8 +10,8 @@
             ],
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/sim-modm/hosted-linux/modm/src",
-                "northstar-robomaster-project/taproot/test",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/sim-modm/hosted-linux/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/test",
                 "northstar-robomaster-project/test"
             ],
             "compilerPath": "g++",
@@ -29,7 +29,7 @@
             ],
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/sim-modm/hosted-linux/modm/src"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/sim-modm/hosted-linux/modm/src"
             ],
             "compilerPath": "g++",
             "intelliSenseMode": "gcc-x64",
@@ -41,10 +41,10 @@
             "name": "standard",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -59,10 +59,10 @@
             "name": "sentry",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -77,10 +77,10 @@
             "name": "hero",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -95,10 +95,10 @@
             "name": "test-bed",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -113,10 +113,10 @@
             "name": "standard fly_sky",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -132,10 +132,10 @@
             "name": "sentry fly_sky",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -151,10 +151,10 @@
             "name": "hero fly_sky",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp"
             ],
             "compilerPath": "arm-none-eabi-g++",
             "intelliSenseMode": "gcc-arm",
@@ -170,10 +170,10 @@
             "name": "test-bed fly_sky",
             "includePath": [
                 "${default}",
-                "northstar-robomaster-project/taproot/modm/src",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
-                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/src",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/boards/rm-dev-board-c/taproot/modm/ext/cmsis/dsp",
                 "${workspaceFolder}"
             ],
             "compilerPath": "arm-none-eabi-g++",

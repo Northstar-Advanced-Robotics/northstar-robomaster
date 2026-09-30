@@ -41,6 +41,21 @@ ROBOT_CLASS = {
 # Make sure that all robots have a class
 assert all([robot in ROBOT_CLASS.keys() for robot in VALID_ROBOT_TYPES])
 
+# Which RoboMaster development board each target runs on. Selects boards/<board>/taproot at build time.
+ROBOT_BOARD = {
+    "STANDARD": "rm-dev-board-c",
+    "HERO": "rm-dev-board-c",
+    "SENTRY": "rm-dev-board-c",
+    "ENGINEER": "rm-dev-board-c",
+    "DRONE": "rm-dev-board-c",
+    "TEST_BED": "rm-dev-board-c",
+    "TURRET": "rm-dev-board-c",
+}
+assert all([robot in ROBOT_BOARD.keys() for robot in VALID_ROBOT_TYPES])
+
+# Robot used for the unit-test targets when no robot= is given, so `scons run-tests` works on its own.
+DEFAULT_TEST_ROBOT = "STANDARD"
+
 
 def search_for_robot_type(query):
     return (
@@ -50,8 +65,11 @@ def search_for_robot_type(query):
     )
 
 
-def get_robot_type():
+def get_robot_type(default=None):
     robot_query = ARGUMENTS.get("robot")
+    if not robot_query and default:
+        print(f"No robot= given, defaulting to {default}")
+        robot_query = default
     robot_type_matches = search_for_robot_type(robot_query)
 
     if len(robot_type_matches) != 1:

@@ -74,7 +74,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build-sim profile=debug",
+            "command": "pipenv run scons build-sim profile=debug robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -87,7 +87,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run-sim profile=debug",
+            "command": "pipenv run scons run-sim profile=debug robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -100,7 +100,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons build-tests profile=debug",
+            "command": "pipenv run scons build-tests profile=debug robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -113,7 +113,7 @@
             "presentation": {
                 "panel": "new"
             },
-            "command": "pipenv run scons run-tests profile=debug",
+            "command": "pipenv run scons run-tests profile=debug robot=STANDARD",
             "group": "build",
             "problemMatcher": [],
             "options": {
@@ -371,7 +371,20 @@
             }
         },
         {
-            "label": "lbuild build",
+            "label": "lbuild build (all boards)",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "./scripts/regenerate_taproot.sh",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        },
+        {
+            "label": "lbuild build (Type A)",
             "type": "shell",
             "presentation": {
                 "panel": "new"
@@ -380,7 +393,20 @@
             "group": "none",
             "problemMatcher": [],
             "options": {
-                "cwd": "${workspaceRoot}/northstar-robomaster-project"
+                "cwd": "${workspaceRoot}/northstar-robomaster-project/boards/rm-dev-board-a"
+            }
+        },
+        {
+            "label": "lbuild build (Type C)",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "pipenv run lbuild build",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}/northstar-robomaster-project/boards/rm-dev-board-c"
             }
         },
         {
