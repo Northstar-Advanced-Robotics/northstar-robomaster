@@ -73,3 +73,39 @@ jobs:
         working-directory: ./northstar-robomaster-project
         run: |
           pipenv run scons build profile=debug profiling=true robot=TEST_BED
+
+      # 10. Run SCons Build
+      # Runs specifically in the northstar-robomaster-project folder
+      - name: Build with SCons Turret
+        working-directory: ./northstar-robomaster-project
+        run: |
+          pipenv run scons build profile=debug profiling=true robot=TURRET
+
+  # Hosted (simulator) build. Needs gcc 11 (gcc 13 fails in modm's hosted protothread
+  # macros), which is the Ubuntu 22.04 default.
+  build-sim-linux:
+    runs-on: ubuntu-22.04
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+        with:
+          submodules: recursive
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pipenv'
+
+      - name: Install Pipenv and project dependencies
+        working-directory: ./northstar-robomaster-project
+        run: |
+          python -m pip install --upgrade pip
+          pip install pipenv
+          pipenv install --python 3.11
+
+      - name: Build sim with SCons Standard
+        working-directory: ./northstar-robomaster-project
+        run: |
+          pipenv run scons build-sim robot=STANDARD
