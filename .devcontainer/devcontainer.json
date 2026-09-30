@@ -21,6 +21,6 @@
     }
   },
   "postCreateCommand": "bash scripts/postcreate.sh",
-  "postAttachCommand": "bash .devcontainer/install-personal-extensions.sh; bash scripts/install-extension.sh --quiet",
+  "postAttachCommand": "bash scripts/install-extension.sh --quiet",
   "remoteUser": "vscode"
 }
