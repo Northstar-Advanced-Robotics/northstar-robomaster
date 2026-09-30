@@ -16,8 +16,7 @@
 #
 # devcontainer.json runs this from both "postCreateCommand" (via
 # scripts/postcreate.sh) and "postAttachCommand". Both, because a rebuild wipes
-# ~/.vscode-server/extensions -- the same reason
-# .devcontainer/install-personal-extensions.sh re-syncs on attach.
+# ~/.vscode-server/extensions.
 #
 # Deliberately no -e: a failure here must never block the attach.
 set -uo pipefail

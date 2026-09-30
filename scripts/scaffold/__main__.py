@@ -1,13 +1,8 @@
 #!/usr/bin/env python3
 """Scaffold a new Taproot subsystem or command.
 
-Creates the .hpp/.cpp under northstar-robomaster-project/src/control/<dir>/,
-formats them with clang-format, then prints an exact checklist for wiring them
-into each robot's control file.
-
-This tool NEVER modifies an existing file. The wiring step is read-only
-inspection; you paste the snippets yourself. Undo is always `rm -r` on the
-generated directory.
+Creates the .hpp/.cpp under northstar-robomaster-project/src/control/<dir>/
+and formats them with clang-format. It never modifies an existing file.
 
     python3 scripts/scaffold subsystem Flywheel
     python3 scripts/scaffold command SpinUp --requires FlywheelSubsystem
@@ -15,12 +10,12 @@ generated directory.
 
 import argparse
 import json
+import re
 import sys
 from pathlib import Path
 
 import names as names_mod
 import render
-import wiring
 
 REPO_ROOT = Path(__file__).resolve().parents[2]
 PROJECT_ROOT = REPO_ROOT / "northstar-robomaster-project"
@@ -39,16 +34,10 @@ def _add_shared_args(p):
         default=None,
         help="feature directory under src/control/ (default: derived from the name)",
     )
-    p.add_argument(
-        "--robots",
-        default="standard",
-        help="comma-separated: %s -- or 'all', or 'none' to skip the wiring "
-        "checklist" % ",".join(wiring.ROBOTS),
-    )
     p.add_argument("--class", dest="class_override", default=None,
                    help="override the derived class name (e.g. for acronyms)")
     p.add_argument("--instance", dest="instance_override", default=None,
-                   help="override the object name used in the wiring snippets")
+                   help="override the derived instance name")
     p.add_argument("--namespace", default=None,
                    help="override the namespace (default: match the directory, "
                         "else src::control::<dir>)")
@@ -73,7 +62,7 @@ def parse_args(argv):
     cmd.add_argument(
         "--requires",
         required=True,
-        help="the subsystem class this command requires, e.g. FlywheelSubsystem",
+        help="the subsystem this command requires, by file name: chassis_subsystem or chassis",
     )
     cmd.add_argument(
         "--requires-include",
@@ -83,54 +72,63 @@ def parse_args(argv):
     return parser.parse_args(argv)
 
 
-def resolve_robots(spec):
-    """Parse --robots into a de-duplicated list in canonical order.
+_CLASS_DEF = re.compile(r"^[ \t]*class\s+(\w+)\s*(?::|\{)", re.M)
 
-    Accepts a comma-separated list, the keyword `all`, or `none`. Whitespace
-    around names is tolerated so `--robots "standard, hero"` works from a shell
-    or a VS Code promptString.
+
+def _subsystem_stems(directory):
+    """File stems of the subsystem headers under `directory`, e.g. chassis_subsystem."""
+    return sorted(p.stem for p in Path(directory).rglob("*_subsystem.hpp"))
+
+
+def find_subsystem(value, directory=None):
+    """Find the subsystem named by `value` and describe it like render.find_class.
+
+    `value` is normally the header's file name -- `chassis_subsystem`,
+    `chassis_subsystem.hpp` or just `chassis` -- which is unambiguous because no two
+    subsystem headers share a name. An exact class name (`PoopSubsystem`) also
+    works, for acronyms or the odd subsystem whose file is named differently.
     """
-    spec = (spec or "").strip().lower()
-    if spec in ("", "none"):
-        return []
-    if spec == "all":
-        return list(wiring.ROBOTS)
+    if value.endswith(".hpp"):
+        value = value[: -len(".hpp")]
+    tokens = names_mod.tokenize(value)
+    if tokens and tokens[-1] == "subsystem":
+        tokens = tokens[:-1]
+    if tokens:
+        stem = "_".join(tokens + ["subsystem"])
+        headers = sorted(SRC_ROOT.rglob(stem + ".hpp"))
+        if len(headers) == 1:
+            match = _CLASS_DEF.search(headers[0].read_text(errors="replace"))
+            if match:
+                found = render.find_class(SRC_ROOT, match.group(1))
+                return dict(found, class_name=match.group(1))
 
-    picked = [r.strip() for r in spec.split(",") if r.strip()]
-    if "all" in picked:
-        return list(wiring.ROBOTS)
+    found = render.find_class(SRC_ROOT, value)
+    if found and found["definition"]:
+        return dict(found, class_name=value)
 
-    unknown = [r for r in picked if r not in wiring.ROBOTS]
-    if unknown:
-        raise ScaffoldError(
-            "unknown robot(s) %s -- choose from %s, or use 'all' / 'none'"
-            % (", ".join(unknown), ", ".join(wiring.ROBOTS))
-        )
-    # Canonical order, de-duplicated, so `hero,standard,hero` behaves sanely.
-    return [r for r in wiring.ROBOTS if r in set(picked)]
+    where = SRC_ROOT / "control" / directory if directory else None
+    if where is None or not _subsystem_stems(where):
+        where = SRC_ROOT / "control"
+    raise ScaffoldError(
+        'no subsystem "%s". Subsystems in src/%s/: %s'
+        % (value, where.relative_to(SRC_ROOT).as_posix(),
+           ", ".join(_subsystem_stems(where)) or "(none)")
+    )
 
 
-def resolve_requires(args, target_dir, command_namespace):
+def resolve_requires(args, subsystem, target_dir, command_namespace):
     """Work out how the command should refer to the subsystem it requires."""
-    cls = args.requires
-    found = render.find_class(SRC_ROOT, cls)
+    found = subsystem
+    cls = found["class_name"]
 
-    if args.requires_include:
-        include = args.requires_include
-    elif found:
-        include = found["include"]
-    else:
-        raise ScaffoldError(
-            "could not find `class %s` under src/. Pass --requires-include "
-            "<path relative to src/> to say where it lives." % cls
-        )
+    include = args.requires_include or found["include"]
 
     # Same directory -> plain filename, matching play_song_command.hpp.
-    if found and found["path"].parent == target_dir:
+    if found["path"].parent == target_dir:
         include = found["path"].name
 
     qualified = cls
-    if found and found["namespace"] and found["namespace"] != command_namespace:
+    if found["namespace"] and found["namespace"] != command_namespace:
         qualified = "%s::%s" % (found["namespace"], cls)
 
     tokens = names_mod.tokenize(cls)
@@ -142,7 +140,6 @@ def resolve_requires(args, target_dir, command_namespace):
         "requires_class": qualified,
         "requires_include": include,
         "requires_instance": instance,
-        "found": bool(found),
     }
 
 
@@ -151,18 +148,20 @@ def build(args):
 
     directory = args.directory.strip("/") if args.directory else None
 
-    if directory is None and kind == "command":
+    subsystem = None
+    if kind == "command":
+        subsystem = find_subsystem(args.requires, directory)
+
+    if directory is None and subsystem:
         # A command belongs beside the subsystem it drives, not in a directory
-        # named after itself: `command SpinUp --requires FlywheelSubsystem`
-        # lands in src/control/flywheel/.
-        owner = render.find_class(SRC_ROOT, args.requires)
-        if owner and owner["definition"]:
-            try:
-                directory = owner["path"].parent.relative_to(
-                    SRC_ROOT / "control"
-                ).as_posix()
-            except ValueError:
-                directory = None  # subsystem lives outside src/control/
+        # named after itself: `command SpinUp --requires flywheel` lands in
+        # src/control/flywheel/.
+        try:
+            directory = subsystem["path"].parent.relative_to(
+                SRC_ROOT / "control"
+            ).as_posix()
+        except ValueError:
+            directory = None  # subsystem lives outside src/control/
 
     if directory is None:
         # Fall back to the name with any trailing "subsystem"/"command" token
@@ -201,7 +200,7 @@ def build(args):
     requires = None
 
     if kind == "command":
-        requires = resolve_requires(args, target_dir, nm["namespace"])
+        requires = resolve_requires(args, subsystem, target_dir, nm["namespace"])
         values.update(requires)
 
     files = []
@@ -219,7 +218,6 @@ def build(args):
 
 def main(argv):
     args = parse_args(argv)
-    robots = resolve_robots(args.robots)
     nm, requires, files = build(args)
 
     written = render.write_files(files, dry_run=args.dry_run, force=args.force)
@@ -229,10 +227,6 @@ def main(argv):
         else render.clang_format([p for p, _ in files], REPO_ROOT)
     )
 
-    subsystem_instance = requires["requires_instance"] if requires else None
-    plans = [wiring.plan(PROJECT_ROOT, r, nm, subsystem_instance) for r in robots]
-
-    undo = "rm -r %s" % (files[0][0].parent.relative_to(REPO_ROOT))
     result = {
         "ok": True,
         "dry_run": args.dry_run,
@@ -241,8 +235,6 @@ def main(argv):
         "requires": requires,
         "files": written,
         "format": fmt,
-        "wiring": plans,
-        "undo": undo,
     }
 
     if args.as_json:
@@ -266,36 +258,7 @@ def print_report(result, dry_run):
     elif fmt["clean"]:
         out("  clang-format: clean\n")
 
-    if result["requires"] and not result["requires"]["found"]:
-        out("\n  note: `%s` was not found under src/; using the include you gave.\n"
-            % result["requires"]["requires_class"])
-
-    if len(result["wiring"]) > 1:
-        out("\nWiring checklist for %d robots: %s\n"
-            % (len(result["wiring"]), ", ".join(p["robot"] for p in result["wiring"])))
-        out("  The generated files are shared by every robot, but each robot's\n"
-            "  control file needs its own registration.\n")
-
-    for plan in result["wiring"]:
-        rel = Path(plan["control_file"]).relative_to(REPO_ROOT)
-        out("\nTODO -- wire into %s\n" % rel)
-        if plan["tag"]:
-            out("  (registration functions on this robot use the tag `%s`)\n" % plan["tag"])
-        for step in plan["steps"]:
-            where = "line %s" % step["line"] if step["line"] else "location not found"
-            mark = " [already present]" if step["already_present"] else ""
-            out("\n  %d. %-12s %s%s\n" % (step["n"], where, step["where"], mark))
-            for line in step["snippet"].splitlines():
-                out("       %s\n" % line)
-            if step["note"]:
-                out("       ^ %s\n" % step["note"])
-        for warning in plan["warnings"]:
-            out("\n  ! %s\n" % warning)
-
-    if not result["wiring"]:
-        out("\n(no robots selected -- nothing to wire)\n")
-
-    out("\nUndo: %s\n\n" % result["undo"])
+    out("\n")
 
 
 if __name__ == "__main__":
