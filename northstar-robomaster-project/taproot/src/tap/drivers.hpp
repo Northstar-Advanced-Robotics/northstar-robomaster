@@ -27,7 +27,6 @@
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 #include "tap/architecture/profiler.hpp"
 #include "tap/mock/analog_mock.hpp"
-#include "tap/mock/bmi088_mock.hpp"
 #include "tap/mock/can_mock.hpp"
 #include "tap/mock/can_rx_handler_mock.hpp"
 #include "tap/mock/command_mapper_mock.hpp"
@@ -37,6 +36,7 @@
 #include "tap/mock/dji_motor_tx_handler_mock.hpp"
 #include "tap/mock/error_controller_mock.hpp"
 #include "tap/mock/leds_mock.hpp"
+#include "tap/mock/mpu6500_mock.hpp"
 #include "tap/mock/pwm_mock.hpp"
 #include "tap/mock/ref_serial_mock.hpp"
 #include "tap/mock/remote_mock.hpp"
@@ -52,7 +52,7 @@
 #include "tap/communication/gpio/digital.hpp"
 #include "tap/communication/gpio/leds.hpp"
 #include "tap/communication/gpio/pwm.hpp"
-#include "tap/communication/sensors/imu/bmi088/bmi088.hpp"
+#include "tap/communication/sensors/imu/mpu6500/mpu6500.hpp"
 #include "tap/communication/serial/ref_serial.hpp"
 #include "tap/communication/serial/remote.hpp"
 #include "tap/communication/serial/terminal_serial.hpp"
@@ -85,6 +85,7 @@ protected:
           digital(),
           leds(),
           pwm(),
+          mpu6500(this),
           refSerial(this),
           remote(this),
           uart(),
@@ -94,7 +95,6 @@ protected:
           errorController(this),
           djiMotorTerminalSerialHandler(this),
           djiMotorTxHandler(this),
-          bmi088(this),
 #ifdef ENV_UNIT_TESTS
           commandScheduler(this)
 #else
@@ -111,6 +111,7 @@ protected:
     testing::NiceMock<mock::DigitalMock> digital;
     testing::NiceMock<mock::LedsMock> leds;
     testing::NiceMock<mock::PwmMock> pwm;
+    testing::NiceMock<mock::Mpu6500Mock> mpu6500;
     testing::NiceMock<mock::RefSerialMock> refSerial;
     testing::NiceMock<mock::RemoteMock> remote;
     testing::NiceMock<mock::UartMock> uart;
@@ -120,7 +121,6 @@ protected:
     testing::StrictMock<mock::ErrorControllerMock> errorController;
     testing::NiceMock<mock::DjiMotorTerminalSerialHandlerMock> djiMotorTerminalSerialHandler;
     testing::NiceMock<mock::DjiMotorTxHandlerMock> djiMotorTxHandler;
-    testing::NiceMock<mock::Bmi088Mock> bmi088;
     testing::NiceMock<mock::CommandSchedulerMock> commandScheduler;
 #else
 public:
@@ -131,6 +131,7 @@ public:
     gpio::Digital digital;
     gpio::Leds leds;
     gpio::Pwm pwm;
+    communication::sensors::imu::mpu6500::Mpu6500 mpu6500;
     communication::serial::RefSerial refSerial;
     communication::serial::Remote remote;
     communication::serial::Uart uart;
@@ -140,7 +141,6 @@ public:
     errors::ErrorController errorController;
     motor::DjiMotorTerminalSerialHandler djiMotorTerminalSerialHandler;
     motor::DjiMotorTxHandler djiMotorTxHandler;
-    communication::sensors::imu::bmi088::Bmi088 bmi088;
     control::CommandScheduler commandScheduler;
 #endif
     static constexpr uint8_t DT = 1000 / 500;  // ms, main loop period

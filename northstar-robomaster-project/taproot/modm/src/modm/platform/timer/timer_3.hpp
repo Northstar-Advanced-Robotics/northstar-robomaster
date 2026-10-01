@@ -14,8 +14,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_TIMER_4_HPP
-#define MODM_STM32_TIMER_4_HPP
+#ifndef MODM_STM32_TIMER_3_HPP
+#define MODM_STM32_TIMER_3_HPP
 
 #include "general_purpose_base.hpp"
 #include <modm/platform/gpio/connector.hpp>
@@ -25,13 +25,13 @@ namespace modm
 namespace platform
 {
 /**
- * General Purpose Timer 4
+ * General Purpose Timer 3
  *
  * Interrupt handler:
  * @code
- * MODM_ISR(TIM4)
+ * MODM_ISR(TIM3)
  * {
- *     Timer4::resetInterruptFlags(Timer4::...);
+ *     Timer3::resetInterruptFlags(Timer3::...);
  *
  *     ...
  * }
@@ -44,7 +44,7 @@ namespace platform
  * @author		Fabian Greif
  * @ingroup		modm_platform_timer
  */
-class Timer4 : public GeneralPurposeTimer
+class Timer3 : public GeneralPurposeTimer
 {
 public:
 	enum class MasterMode : uint32_t
@@ -98,7 +98,7 @@ public:
 	static void
 	connect()
 	{
-		using Connector = GpioConnector<Peripheral::Tim4, Signals...>;
+		using Connector = GpioConnector<Peripheral::Tim3, Signals...>;
 		Connector::connect();
 	}
 
@@ -116,13 +116,13 @@ public:
 	static inline void
 	pause()
 	{
-		TIM4->CR1 &= ~TIM_CR1_CEN;
+		TIM3->CR1 &= ~TIM_CR1_CEN;
 	}
 
 	static inline void
 	start()
 	{
-		TIM4->CR1 |= TIM_CR1_CEN;
+		TIM3->CR1 |= TIM_CR1_CEN;
 	}
 
 	static void
@@ -139,19 +139,19 @@ public:
 	{
 		// Because a prescaler of zero is not possible the actual
 		// prescaler value is \p prescaler - 1 (see Datasheet)
-		TIM4->PSC = prescaler - 1;
+		TIM3->PSC = prescaler - 1;
 	}
 
 	static uint16_t
 	getPrescaler()
 	{
-		return (TIM4->PSC + 1);
+		return (TIM3->PSC + 1);
 	}
 
 	static inline void
 	setOverflow(Value overflow)
 	{
-		TIM4->ARR = overflow;
+		TIM3->ARR = overflow;
 	}
 
 	template<class SystemClock>
@@ -160,7 +160,7 @@ public:
 	{
 		// This will be inaccurate for non-smooth frequencies (last six digits
 		// unequal to zero)
-		uint32_t cycles = microseconds * (SystemClock::Timer4 / 1'000'000UL);
+		uint32_t cycles = microseconds * (SystemClock::Timer3 / 1'000'000UL);
 		uint16_t prescaler = (cycles + 65'535) / 65'536;	// always round up
 		Value overflow = cycles / prescaler;
 
@@ -171,7 +171,7 @@ public:
 
 		if (autoApply) {
 			// Generate Update Event to apply the new settings for ARR
-			TIM4->EGR |= TIM_EGR_UG;
+			TIM3->EGR |= TIM_EGR_UG;
 		}
 
 		return overflow;
@@ -182,39 +182,39 @@ public:
 	static uint32_t
 	getTickFrequency()
 	{
-		return SystemClock::Timer4 / (TIM4->PSC + 1);
+		return SystemClock::Timer3 / (TIM3->PSC + 1);
 	}
 
 	static inline void
 	applyAndReset()
 	{
 		// Generate Update Event to apply the new settings for ARR
-		TIM4->EGR |= TIM_EGR_UG;
+		TIM3->EGR |= TIM_EGR_UG;
 	}
 
 	static inline Value
 	getValue()
 	{
-		return TIM4->CNT;
+		return TIM3->CNT;
 	}
 
 	static inline void
 	setValue(Value value)
 	{
-		TIM4->CNT = value;
+		TIM3->CNT = value;
 	}
 
 
 	static inline void
 	enableOutput()
 	{
-		TIM4->BDTR |= TIM_BDTR_MOE;
+		TIM3->BDTR |= TIM_BDTR_MOE;
 	}
 
 	static inline void
 	disableOutput()
 	{
-		TIM4->BDTR &= ~(TIM_BDTR_MOE);
+		TIM3->BDTR &= ~(TIM_BDTR_MOE);
 	}
 
 	/*
@@ -224,19 +224,19 @@ public:
 	setAutomaticUpdate(bool enable)
 	{
 		if(enable)
-			TIM4->BDTR |= TIM_BDTR_AOE;
+			TIM3->BDTR |= TIM_BDTR_AOE;
 		else
-			TIM4->BDTR &= ~TIM_BDTR_AOE;
+			TIM3->BDTR &= ~TIM_BDTR_AOE;
 	}
 
 	static inline void
 	setOffState(OffStateForRunMode runMode, OffStateForIdleMode idleMode)
 	{
-		uint32_t flags = TIM4->BDTR;
+		uint32_t flags = TIM3->BDTR;
 		flags &= ~(TIM_BDTR_OSSR | TIM_BDTR_OSSI);
 		flags |= static_cast<uint32_t>(runMode);
 		flags |= static_cast<uint32_t>(idleMode);
-		TIM4->BDTR = flags;
+		TIM3->BDTR = flags;
 	}
 
 	/*
@@ -251,10 +251,10 @@ public:
 	static inline void
 	setDeadTime(uint8_t deadTime)
 	{
-		uint32_t flags = TIM4->BDTR;
+		uint32_t flags = TIM3->BDTR;
 		flags &= ~TIM_BDTR_DTG;
 		flags |= deadTime;
-		TIM4->BDTR = flags;
+		TIM3->BDTR = flags;
 	}
 
 	/*
@@ -285,10 +285,10 @@ public:
 				bitmask = 0x00;
 				break;
 		}
-		uint32_t flags = TIM4->BDTR;
+		uint32_t flags = TIM3->BDTR;
 		flags &= ~TIM_BDTR_DTG;
 		flags |= (deadTime & bitmask) | static_cast<uint32_t>(resolution);
-		TIM4->BDTR = flags;
+		TIM3->BDTR = flags;
 	}
 public:
 	static void
@@ -320,16 +320,16 @@ public:
 				uint32_t offset = 8 * channel;
 
 				flags <<= offset;
-				flags |= TIM4->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
-				TIM4->CCMR1 = flags;
+				flags |= TIM3->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM3->CCMR1 = flags;
 			}
 			else {
 				uint32_t offset = 8 * (channel - 2);
 
 				flags <<= offset;
-				flags |= TIM4->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+				flags |= TIM3->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
 
-				TIM4->CCMR2 = flags;
+				TIM3->CCMR2 = flags;
 			}
 		}
 	}
@@ -352,16 +352,16 @@ public:
 				uint32_t offset = 8 * channel;
 
 				flags <<= offset;
-				flags |= TIM4->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
-				TIM4->CCMR1 = flags;
+				flags |= TIM3->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM3->CCMR1 = flags;
 			}
 			else {
 				uint32_t offset = 8 * (channel - 2);
 
 				flags <<= offset;
-				flags |= TIM4->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+				flags |= TIM3->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
 
-				TIM4->CCMR2 = flags;
+				TIM3->CCMR2 = flags;
 			}
 		}
 	}
@@ -383,16 +383,16 @@ public:
 				uint32_t offset = 8 * channel;
 
 				flags <<= offset;
-				flags |= TIM4->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
-				TIM4->CCMR1 = flags;
+				flags |= TIM3->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM3->CCMR1 = flags;
 			}
 			else {
 				uint32_t offset = 8 * (channel - 2);
 
 				flags <<= offset;
-				flags |= TIM4->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+				flags |= TIM3->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
 
-				TIM4->CCMR2 = flags;
+				TIM3->CCMR2 = flags;
 			}
 		}
 	}
@@ -414,16 +414,16 @@ public:
 				uint32_t offset = 8 * channel;
 
 				flags <<= offset;
-				flags |= TIM4->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
-				TIM4->CCMR1 = flags;
+				flags |= TIM3->CCMR1 & ~(TIM_CCMR1_OC1M << offset);
+				TIM3->CCMR1 = flags;
 			}
 			else {
 				uint32_t offset = 8 * (channel - 2);
 
 				flags <<= offset;
-				flags |= TIM4->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
+				flags |= TIM3->CCMR2 & ~(TIM_CCMR1_OC1M << offset);
 
-				TIM4->CCMR2 = flags;
+				TIM3->CCMR2 = flags;
 			}
 		}
 	}
@@ -438,13 +438,13 @@ public:
 	static inline void
 	setCompareValue(uint32_t channel, Value value)
 	{
-		*(&TIM4->CCR1 + (channel - 1)) = value;
+		*(&TIM3->CCR1 + (channel - 1)) = value;
 	}
 
 	static inline Value
 	getCompareValue(uint32_t channel)
 	{
-		return *(&TIM4->CCR1 + (channel - 1));
+		return *(&TIM3->CCR1 + (channel - 1));
 	}
 
 public:
@@ -454,37 +454,37 @@ public:
 	static inline void
 	enableInterrupt(Interrupt_t interrupt)
 	{
-		TIM4->DIER |= interrupt.value;
+		TIM3->DIER |= interrupt.value;
 	}
 
 	static inline void
 	disableInterrupt(Interrupt_t interrupt)
 	{
-		TIM4->DIER &= ~interrupt.value;
+		TIM3->DIER &= ~interrupt.value;
 	}
 
 	static inline InterruptFlag_t
 	getEnabledInterrupts()
 	{
-		return InterruptFlag_t(TIM4->DIER);
+		return InterruptFlag_t(TIM3->DIER);
 	}
 
 	static inline void
 	enableDmaRequest(DmaRequestEnable dmaRequests)
 	{
-		TIM4->DIER |= static_cast<uint32_t>(dmaRequests);
+		TIM3->DIER |= static_cast<uint32_t>(dmaRequests);
 	}
 
 	static inline void
 	disableDmaRequest(DmaRequestEnable dmaRequests)
 	{
-		TIM4->DIER &= ~static_cast<uint32_t>(dmaRequests);
+		TIM3->DIER &= ~static_cast<uint32_t>(dmaRequests);
 	}
 
 	static inline InterruptFlag_t
 	getInterruptFlags()
 	{
-		return InterruptFlag_t(TIM4->SR);
+		return InterruptFlag_t(TIM3->SR);
 	}
 
 	static inline void
@@ -492,7 +492,7 @@ public:
 	{
 		// Flags are cleared by writing a zero to the flag position.
 		// Writing a one is ignored.
-		TIM4->SR = ~flags.value;
+		TIM3->SR = ~flags.value;
 	}
 };
 
@@ -500,4 +500,4 @@ public:
 
 }	// namespace modm
 
-#endif // MODM_STM32_TIMER_4_HPP
+#endif // MODM_STM32_TIMER_3_HPP

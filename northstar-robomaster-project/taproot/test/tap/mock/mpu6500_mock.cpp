@@ -3,7 +3,7 @@
 /*****************************************************************************/
 
 /*
- * Copyright (c) 2020-2022 Advanced Robotics at the University of Washington <robomstr@uw.edu>
+ * Copyright (c) 2020-2021 Advanced Robotics at the University of Washington <robomstr@uw.edu>
  *
  * This file is part of Taproot.
  *
@@ -21,11 +21,13 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#include "bmi088_hal.hpp"
+#include "mpu6500_mock.hpp"
 
-#if defined(ENV_UNIT_TESTS)
-namespace tap::communication::sensors::imu::bmi088
+namespace tap::mock
 {
-std::deque<uint8_t> Bmi088Hal::rxData;
-}  // namespace tap::communication::sensors::imu::bmi088
-#endif
+Mpu6500Mock::Mpu6500Mock(tap::Drivers *drivers)
+    : communication::sensors::imu::mpu6500::Mpu6500(drivers)
+{
+}
+Mpu6500Mock::~Mpu6500Mock() {}
+}  // namespace tap::mock

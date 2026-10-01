@@ -167,8 +167,14 @@ public:
 	using Ch1 = GpioSignal;
 	/// Connect to Adc3
 	using In4 = GpioSignal;
-	/// Connect to Fsmc
+	/// Connect to Fmc
 	using Niord = GpioSignal;
+	/// Connect to Spi5
+	using Nss = GpioSignal;
+	/// Connect to Uart7
+	using Rx = GpioSignal;
+	/// Connect to Sai1
+	using Sdb = GpioSignal;
 	/// @}
 #endif
 	/// @cond
@@ -193,8 +199,26 @@ public:
 	template< Peripheral peripheral >
 	struct Niord { static void connect();
 		static_assert(
-			(peripheral == Peripheral::Fsmc),
-			"GpioF6::Niord only connects to Fsmc!");
+			(peripheral == Peripheral::Fmc),
+			"GpioF6::Niord only connects to Fmc!");
+	};
+	template< Peripheral peripheral >
+	struct Nss { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Spi5),
+			"GpioF6::Nss only connects to Spi5!");
+	};
+	template< Peripheral peripheral >
+	struct Rx { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Uart7),
+			"GpioF6::Rx only connects to Uart7!");
+	};
+	template< Peripheral peripheral >
+	struct Sdb { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Sai1),
+			"GpioF6::Sdb only connects to Sai1!");
 	};
 	/// @endcond
 private:
@@ -242,7 +266,7 @@ template<>
 constexpr int8_t
 GpioF6::AdcChannel<Peripheral::Adc3> = 4;
 template<>
-struct GpioF6::Niord<Peripheral::Fsmc>
+struct GpioF6::Niord<Peripheral::Fmc>
 {
 	using Gpio = GpioF6;
 	static constexpr Gpio::Signal Signal = Gpio::Signal::Niord;
@@ -251,6 +275,42 @@ struct GpioF6::Niord<Peripheral::Fsmc>
 	connect()
 	{
 		setAlternateFunction(12);
+	}
+};
+template<>
+struct GpioF6::Nss<Peripheral::Spi5>
+{
+	using Gpio = GpioF6;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Nss;
+	static constexpr int af = 5;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(5);
+	}
+};
+template<>
+struct GpioF6::Rx<Peripheral::Uart7>
+{
+	using Gpio = GpioF6;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Rx;
+	static constexpr int af = 8;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(8);
+	}
+};
+template<>
+struct GpioF6::Sdb<Peripheral::Sai1>
+{
+	using Gpio = GpioF6;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Sdb;
+	static constexpr int af = 6;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(6);
 	}
 };
 /// @endcond

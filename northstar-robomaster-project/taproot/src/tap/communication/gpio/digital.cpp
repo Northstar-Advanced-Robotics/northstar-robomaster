@@ -51,14 +51,17 @@ void Digital::configureInputPullMode(Digital::InputPin pin, Digital::InputPullMo
 #else
     switch (pin)
     {
-        case Digital::InputPin::PF1:
-            DigitalInPinPF1::configure(mode);
+        case Digital::InputPin::A:
+            DigitalInPinA::configure(mode);
             break;
-        case Digital::InputPin::PF0:
-            DigitalInPinPF0::configure(mode);
+        case Digital::InputPin::B:
+            DigitalInPinB::configure(mode);
             break;
-        case Digital::InputPin::B12:
-            DigitalInPinB12::configure(mode);
+        case Digital::InputPin::C:
+            DigitalInPinC::configure(mode);
+            break;
+        case Digital::InputPin::D:
+            DigitalInPinD::configure(mode);
             break;
     }
 #endif
@@ -72,14 +75,17 @@ void Digital::set(Digital::OutputPin pin, bool isSet)
 #else
     switch (pin)
     {
-        case Digital::OutputPin::B13:
-            DigitalOutPinB13::set(isSet);
+        case Digital::OutputPin::E:
+            DigitalOutPinE::set(isSet);
             break;
-        case Digital::OutputPin::B14:
-            DigitalOutPinB14::set(isSet);
+        case Digital::OutputPin::F:
+            DigitalOutPinF::set(isSet);
             break;
-        case Digital::OutputPin::B15:
-            DigitalOutPinB15::set(isSet);
+        case Digital::OutputPin::G:
+            DigitalOutPinG::set(isSet);
+            break;
+        case Digital::OutputPin::H:
+            DigitalOutPinH::set(isSet);
             break;
         case Digital::OutputPin::Laser:
             DigitalOutPinLaser::set(isSet);
@@ -96,12 +102,14 @@ bool Digital::read(Digital::InputPin pin) const
 #else
     switch (pin)
     {
-        case Digital::InputPin::PF1:
-            return DigitalInPinPF1::read();
-        case Digital::InputPin::PF0:
-            return DigitalInPinPF0::read();
-        case Digital::InputPin::B12:
-            return DigitalInPinB12::read();
+        case Digital::InputPin::A:
+            return DigitalInPinA::read();
+        case Digital::InputPin::B:
+            return DigitalInPinB::read();
+        case Digital::InputPin::C:
+            return DigitalInPinC::read();
+        case Digital::InputPin::D:
+            return DigitalInPinD::read();
         default:
             return false;
     }

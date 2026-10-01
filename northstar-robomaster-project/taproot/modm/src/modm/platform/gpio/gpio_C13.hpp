@@ -202,11 +202,10 @@ struct GpioC13::Af1<Peripheral::Rtc>
 {
 	using Gpio = GpioC13;
 	static constexpr Gpio::Signal Signal = Gpio::Signal::Af1;
-	static constexpr int af = 0;
+	static constexpr int af = -1;
 	inline static void
 	connect()
 	{
-		setAlternateFunction(0);
 	}
 };
 /// @endcond

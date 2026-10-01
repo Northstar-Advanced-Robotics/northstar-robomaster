@@ -51,7 +51,7 @@ void tap::can::Can::initialize()
         CanFilter::FIFO0,
         CanFilter::StandardIdentifier(0),
         CanFilter::StandardFilterMask(0));
-    Can2::connect<GpioB5::Rx, GpioB6::Tx>(Gpio::InputType::PullUp);
+    Can2::connect<GpioB12::Rx, GpioB13::Tx>(Gpio::InputType::PullUp);
     modm_assert((Can2::initialize<Board::SystemClock, 1000_kbps>(12)), "Can2", "initialize-failed");
     // receive every message for CAN 2
     CanFilter::setFilter(

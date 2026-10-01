@@ -14,25 +14,25 @@
  */
 // ----------------------------------------------------------------------------
 
-#include "spi_master_2.hpp"
+#include "spi_master_5.hpp"
 
 // Bit0: single transfer state
 // Bit1: block transfer state
 uint8_t
-modm::platform::SpiMaster2::state(0);
+modm::platform::SpiMaster5::state(0);
 
 uint8_t
-modm::platform::SpiMaster2::count(0);
+modm::platform::SpiMaster5::count(0);
 
 void *
-modm::platform::SpiMaster2::context(nullptr);
+modm::platform::SpiMaster5::context(nullptr);
 
 modm::Spi::ConfigurationHandler
-modm::platform::SpiMaster2::configuration(nullptr);
+modm::platform::SpiMaster5::configuration(nullptr);
 // ----------------------------------------------------------------------------
 
 uint8_t
-modm::platform::SpiMaster2::acquire(void *ctx, ConfigurationHandler handler)
+modm::platform::SpiMaster5::acquire(void *ctx, ConfigurationHandler handler)
 {
 	if (context == nullptr)
 	{
@@ -53,7 +53,7 @@ modm::platform::SpiMaster2::acquire(void *ctx, ConfigurationHandler handler)
 }
 
 uint8_t
-modm::platform::SpiMaster2::release(void *ctx)
+modm::platform::SpiMaster5::release(void *ctx)
 {
 	if (ctx == context)
 	{
@@ -65,7 +65,7 @@ modm::platform::SpiMaster2::release(void *ctx)
 // ----------------------------------------------------------------------------
 
 modm::ResumableResult<uint8_t>
-modm::platform::SpiMaster2::transfer(uint8_t data)
+modm::platform::SpiMaster5::transfer(uint8_t data)
 {
 	// this is a manually implemented "fast resumable function"
 	// there is no context or nesting protection, since we don't need it.
@@ -77,20 +77,20 @@ modm::platform::SpiMaster2::transfer(uint8_t data)
 	if ( !(state & Bit0) )
 	{
 		// wait for previous transfer to finish
-		if (!SpiHal2::isTransmitRegisterEmpty())
+		if (!SpiHal5::isTransmitRegisterEmpty())
 			return {modm::rf::Running};
 
 		// start transfer by copying data into register
-		SpiHal2::write(data);
+		SpiHal5::write(data);
 
 		// set LSB = Bit0
 		state |= Bit0;
 	}
 
-	if (!SpiHal2::isReceiveRegisterNotEmpty())
+	if (!SpiHal5::isReceiveRegisterNotEmpty())
 		return {modm::rf::Running};
 
-	SpiHal2::read(data);
+	SpiHal5::read(data);
 
 	// transfer finished
 	state &= ~Bit0;
@@ -98,7 +98,7 @@ modm::platform::SpiMaster2::transfer(uint8_t data)
 }
 
 modm::ResumableResult<void>
-modm::platform::SpiMaster2::transfer(
+modm::platform::SpiMaster5::transfer(
 		const uint8_t * tx, uint8_t * rx, std::size_t length)
 {
 	// this is a manually implemented "fast resumable function"

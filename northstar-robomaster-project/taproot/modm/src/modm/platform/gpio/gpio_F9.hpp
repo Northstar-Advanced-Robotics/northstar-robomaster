@@ -163,12 +163,16 @@ public:
 	/// @{
 	/// Connect to any software peripheral
 	using BitBang = GpioSignal;
-	/// Connect to Fsmc
+	/// Connect to Fmc
 	using Cd = GpioSignal;
 	/// Connect to Tim14
 	using Ch1 = GpioSignal;
+	/// Connect to Sai1
+	using Fsb = GpioSignal;
 	/// Connect to Adc3
 	using In7 = GpioSignal;
+	/// Connect to Spi5
+	using Mosi = GpioSignal;
 	/// @}
 #endif
 	/// @cond
@@ -181,8 +185,8 @@ public:
 	template< Peripheral peripheral >
 	struct Cd { static void connect();
 		static_assert(
-			(peripheral == Peripheral::Fsmc),
-			"GpioF9::Cd only connects to Fsmc!");
+			(peripheral == Peripheral::Fmc),
+			"GpioF9::Cd only connects to Fmc!");
 	};
 	template< Peripheral peripheral >
 	struct Ch1 { static void connect();
@@ -191,10 +195,22 @@ public:
 			"GpioF9::Ch1 only connects to Tim14!");
 	};
 	template< Peripheral peripheral >
+	struct Fsb { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Sai1),
+			"GpioF9::Fsb only connects to Sai1!");
+	};
+	template< Peripheral peripheral >
 	struct In7 { static void connect();
 		static_assert(
 			(peripheral == Peripheral::Adc3),
 			"GpioF9::In7 only connects to Adc3!");
+	};
+	template< Peripheral peripheral >
+	struct Mosi { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Spi5),
+			"GpioF9::Mosi only connects to Spi5!");
 	};
 	/// @endcond
 private:
@@ -214,7 +230,7 @@ struct GpioF9::BitBang<Peripheral::BitBang>
 	inline static void connect() {}
 };
 template<>
-struct GpioF9::Cd<Peripheral::Fsmc>
+struct GpioF9::Cd<Peripheral::Fmc>
 {
 	using Gpio = GpioF9;
 	static constexpr Gpio::Signal Signal = Gpio::Signal::Cd;
@@ -238,6 +254,18 @@ struct GpioF9::Ch1<Peripheral::Tim14>
 	}
 };
 template<>
+struct GpioF9::Fsb<Peripheral::Sai1>
+{
+	using Gpio = GpioF9;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Fsb;
+	static constexpr int af = 6;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(6);
+	}
+};
+template<>
 struct GpioF9::In7<Peripheral::Adc3>
 {
 	using Gpio = GpioF9;
@@ -253,6 +281,18 @@ struct GpioF9::In7<Peripheral::Adc3>
 template<>
 constexpr int8_t
 GpioF9::AdcChannel<Peripheral::Adc3> = 7;
+template<>
+struct GpioF9::Mosi<Peripheral::Spi5>
+{
+	using Gpio = GpioF9;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Mosi;
+	static constexpr int af = 5;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(5);
+	}
+};
 /// @endcond
 
 } // namespace modm::platform

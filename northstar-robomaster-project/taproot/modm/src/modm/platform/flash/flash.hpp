@@ -22,7 +22,7 @@ class Flash
 {
 public:
 	static constexpr uintptr_t OriginAddr{ 0x8000000 };
-	static constexpr size_t Size{ 0x100000 };
+	static constexpr size_t Size{ 0x200000 };
 	static inline uint8_t *const Origin{(uint8_t*)OriginAddr};
 	using MaxWordType = uint32_t;
 

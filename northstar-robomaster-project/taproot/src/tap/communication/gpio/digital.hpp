@@ -56,9 +56,10 @@ public:
      */
     enum InputPin
     {
-        PF1,
-        PF0,
-        B12,
+        A,
+        B,
+        C,
+        D,
     };
 
     /**
@@ -66,9 +67,10 @@ public:
      */
     enum OutputPin
     {
-        B13,
-        B14,
-        B15,
+        E,
+        F,
+        G,
+        H,
         Laser,
     };
 

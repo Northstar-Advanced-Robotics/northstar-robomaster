@@ -167,6 +167,8 @@ public:
 	using Bkin = GpioSignal;
 	/// Connect to Dcmi
 	using D5 = GpioSignal;
+	/// Connect to Fmc
+	using Nbl2 = GpioSignal;
 	/// @}
 #endif
 	/// @cond
@@ -187,6 +189,12 @@ public:
 		static_assert(
 			(peripheral == Peripheral::Dcmi),
 			"GpioI4::D5 only connects to Dcmi!");
+	};
+	template< Peripheral peripheral >
+	struct Nbl2 { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Fmc),
+			"GpioI4::Nbl2 only connects to Fmc!");
 	};
 	/// @endcond
 private:
@@ -227,6 +235,18 @@ struct GpioI4::D5<Peripheral::Dcmi>
 	connect()
 	{
 		setAlternateFunction(13);
+	}
+};
+template<>
+struct GpioI4::Nbl2<Peripheral::Fmc>
+{
+	using Gpio = GpioI4;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Nbl2;
+	static constexpr int af = 12;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(12);
 	}
 };
 /// @endcond

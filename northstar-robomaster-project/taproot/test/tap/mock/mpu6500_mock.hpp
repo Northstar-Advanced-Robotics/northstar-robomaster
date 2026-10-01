@@ -21,37 +21,39 @@
  * along with Taproot.  If not, see <https://www.gnu.org/licenses/>.
  */
 
-#ifndef TAPROOT_BMI088_MOCK_HPP_
-#define TAPROOT_BMI088_MOCK_HPP_
+#ifndef TAPROOT_MPU6500_MOCK_HPP_
+#define TAPROOT_MPU6500_MOCK_HPP_
 
 #include <gmock/gmock.h>
 
-#include "tap/communication/sensors/imu/bmi088/bmi088.hpp"
+#include "tap/communication/sensors/imu/mpu6500/mpu6500.hpp"
 
-namespace tap::mock
+namespace tap
 {
-class Bmi088Mock : public tap::communication::sensors::imu::bmi088::Bmi088
+namespace mock
+{
+class Mpu6500Mock : public tap::communication::sensors::imu::mpu6500::Mpu6500
 {
 public:
-    Bmi088Mock(tap::Drivers *drivers);
-    virtual ~Bmi088Mock();
+    Mpu6500Mock(tap::Drivers *drivers);
+    virtual ~Mpu6500Mock();
 
-    MOCK_METHOD(void, initialize, (float, float, float), (override));
+    MOCK_METHOD(void, init, (float, float, float), (override));
     MOCK_METHOD(void, periodicIMUUpdate, (), (override));
     MOCK_METHOD(bool, read, (), (override));
-    MOCK_METHOD(ImuState, getImuState, (), (const final override));
-    MOCK_METHOD(float, getYaw, (), (const override));
-    MOCK_METHOD(float, getPitch, (), (const override));
-    MOCK_METHOD(float, getRoll, (), (const override));
-    MOCK_METHOD(float, getGx, (), (const override));
-    MOCK_METHOD(float, getGy, (), (const override));
-    MOCK_METHOD(float, getGz, (), (const override));
     MOCK_METHOD(float, getAx, (), (const override));
     MOCK_METHOD(float, getAy, (), (const override));
     MOCK_METHOD(float, getAz, (), (const override));
+    MOCK_METHOD(float, getGx, (), (const override));
+    MOCK_METHOD(float, getGy, (), (const override));
+    MOCK_METHOD(float, getGz, (), (const override));
     MOCK_METHOD(float, getTemp, (), (const override));
-    MOCK_METHOD(uint32_t, getPrevIMUDataReceivedTime, (), (const override));
-};
-}  // namespace tap::mock
+    MOCK_METHOD(float, getYaw, (), (const override));
+    MOCK_METHOD(float, getPitch, (), (const override));
+    MOCK_METHOD(float, getRoll, (), (const override));
+    MOCK_METHOD(ImuState, getImuState, (), (const final override));
+};  // Mpu6500Mock
+}  // namespace mock
+}  // namespace tap
 
-#endif  // TAPROOT_BMI088_MOCK_HPP_
+#endif  //  TAPROOT_MPU6500_MOCK_HPP_

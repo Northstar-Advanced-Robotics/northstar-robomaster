@@ -163,8 +163,10 @@ public:
 	/// @{
 	/// Connect to any software peripheral
 	using BitBang = GpioSignal;
-	/// Connect to Fsmc
+	/// Connect to Fmc
 	using A14 = GpioSignal;
+	/// Connect to Fmc
+	using Ba0 = GpioSignal;
 	/// @}
 #endif
 	/// @cond
@@ -177,8 +179,14 @@ public:
 	template< Peripheral peripheral >
 	struct A14 { static void connect();
 		static_assert(
-			(peripheral == Peripheral::Fsmc),
-			"GpioG4::A14 only connects to Fsmc!");
+			(peripheral == Peripheral::Fmc),
+			"GpioG4::A14 only connects to Fmc!");
+	};
+	template< Peripheral peripheral >
+	struct Ba0 { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Fmc),
+			"GpioG4::Ba0 only connects to Fmc!");
 	};
 	/// @endcond
 private:
@@ -198,10 +206,22 @@ struct GpioG4::BitBang<Peripheral::BitBang>
 	inline static void connect() {}
 };
 template<>
-struct GpioG4::A14<Peripheral::Fsmc>
+struct GpioG4::A14<Peripheral::Fmc>
 {
 	using Gpio = GpioG4;
 	static constexpr Gpio::Signal Signal = Gpio::Signal::A14;
+	static constexpr int af = 12;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(12);
+	}
+};
+template<>
+struct GpioG4::Ba0<Peripheral::Fmc>
+{
+	using Gpio = GpioG4;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Ba0;
 	static constexpr int af = 12;
 	inline static void
 	connect()

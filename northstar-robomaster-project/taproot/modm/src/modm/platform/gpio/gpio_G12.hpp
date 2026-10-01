@@ -163,7 +163,9 @@ public:
 	/// @{
 	/// Connect to any software peripheral
 	using BitBang = GpioSignal;
-	/// Connect to Fsmc
+	/// Connect to Spi6
+	using Miso = GpioSignal;
+	/// Connect to Fmc
 	using Ne4 = GpioSignal;
 	/// Connect to Usart6
 	using Rts = GpioSignal;
@@ -177,10 +179,16 @@ public:
 			"GpioG12::BitBang only connects to software drivers!");
 	};
 	template< Peripheral peripheral >
+	struct Miso { static void connect();
+		static_assert(
+			(peripheral == Peripheral::Spi6),
+			"GpioG12::Miso only connects to Spi6!");
+	};
+	template< Peripheral peripheral >
 	struct Ne4 { static void connect();
 		static_assert(
-			(peripheral == Peripheral::Fsmc),
-			"GpioG12::Ne4 only connects to Fsmc!");
+			(peripheral == Peripheral::Fmc),
+			"GpioG12::Ne4 only connects to Fmc!");
 	};
 	template< Peripheral peripheral >
 	struct Rts { static void connect();
@@ -206,7 +214,19 @@ struct GpioG12::BitBang<Peripheral::BitBang>
 	inline static void connect() {}
 };
 template<>
-struct GpioG12::Ne4<Peripheral::Fsmc>
+struct GpioG12::Miso<Peripheral::Spi6>
+{
+	using Gpio = GpioG12;
+	static constexpr Gpio::Signal Signal = Gpio::Signal::Miso;
+	static constexpr int af = 5;
+	inline static void
+	connect()
+	{
+		setAlternateFunction(5);
+	}
+};
+template<>
+struct GpioG12::Ne4<Peripheral::Fmc>
 {
 	using Gpio = GpioG12;
 	static constexpr Gpio::Signal Signal = Gpio::Signal::Ne4;

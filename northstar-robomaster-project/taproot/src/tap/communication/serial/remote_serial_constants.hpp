@@ -31,7 +31,7 @@
 namespace tap::communication::serial::bound_ports
 {
 #ifdef DT7
-static constexpr Uart::UartPort REMOTE_SERIAL_UART_PORT = Uart::UartPort::Uart3;
+static constexpr Uart::UartPort REMOTE_SERIAL_UART_PORT = Uart::UartPort::Uart1;
 static constexpr uint32_t REMOTE_BAUD_RATE = 100'000;
 static constexpr Uart::Parity REMOTE_PARITY = Uart::Parity::Even;
 #endif

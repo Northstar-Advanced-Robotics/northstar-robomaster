@@ -12,8 +12,8 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_SPI_HAL2_HPP
-#define MODM_STM32_SPI_HAL2_HPP
+#ifndef MODM_STM32_SPI_HAL5_HPP
+#define MODM_STM32_SPI_HAL5_HPP
 
 #include "spi_base.hpp"
 
@@ -24,15 +24,15 @@ namespace platform
 {
 
 /**
- * Serial peripheral interface (SPI2)
+ * Serial peripheral interface (SPI5)
  *
  * Very basic implementation that exposes more hardware features than
  * the regular Spi classes.
  *
  * @author		Kevin Laeufer
- * @ingroup		modm_platform_spi modm_platform_spi_2
+ * @ingroup		modm_platform_spi modm_platform_spi_5
  */
-class SpiHal2 : public SpiBase
+class SpiHal5 : public SpiBase
 {
 public:
 	/// Enables the clock, resets the hardware and sets the SPE bit
@@ -141,6 +141,6 @@ public:
 
 } // namespace modm
 
-#include "spi_hal_2_impl.hpp"
+#include "spi_hal_5_impl.hpp"
 
-#endif // MODM_STM32_SPI_HAL2_HPP
+#endif // MODM_STM32_SPI_HAL5_HPP

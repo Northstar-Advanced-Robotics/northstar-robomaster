@@ -14,13 +14,13 @@
  */
 // ----------------------------------------------------------------------------
 
-#ifndef MODM_STM32_SPI_MASTER2_HPP
-#define MODM_STM32_SPI_MASTER2_HPP
+#ifndef MODM_STM32_SPI_MASTER5_HPP
+#define MODM_STM32_SPI_MASTER5_HPP
 
 #include <modm/architecture/interface/spi_master.hpp>
 #include <modm/platform/gpio/connector.hpp>
 #include <modm/math/algorithm/prescaler.hpp>
-#include "spi_hal_2.hpp"
+#include "spi_hal_5.hpp"
 
 namespace modm
 {
@@ -29,21 +29,21 @@ namespace platform
 {
 
 /**
- * Serial peripheral interface (SPI2).
+ * Serial peripheral interface (SPI5).
  *
  * Simple unbuffered implementation.
  *
  * @author	Niklas Hauser
- * @ingroup	modm_platform_spi modm_platform_spi_2
+ * @ingroup	modm_platform_spi modm_platform_spi_5
  */
-class SpiMaster2 : public modm::SpiMaster
+class SpiMaster5 : public modm::SpiMaster
 {
 	static uint8_t state;
 	static uint8_t count;
 	static void *context;
 	static ConfigurationHandler configuration;
 public:
-	using Hal = SpiHal2;
+	using Hal = SpiHal5;
 
 	/// Spi Data Mode, Mode0 is the most common mode
 	enum class
@@ -71,7 +71,7 @@ public:
 	static void
 	connect()
 	{
-		using Connector = GpioConnector<Peripheral::Spi2, Signals...>;
+		using Connector = GpioConnector<Peripheral::Spi5, Signals...>;
 		using Sck = typename Connector::template GetSignal<Gpio::Signal::Sck>;
 		using Mosi = typename Connector::template GetSignal<Gpio::Signal::Mosi>;
 		using Miso = typename Connector::template GetSignal<Gpio::Signal::Miso>;
@@ -88,32 +88,32 @@ public:
 	static void
 	initialize()
 	{
-		constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi2, baudrate, 2, 256);
+		constexpr auto result = modm::Prescaler::from_power(SystemClock::Spi5, baudrate, 2, 256);
 		assertBaudrateInTolerance< result.frequency, baudrate, tolerance >();
 
 		// translate the prescaler into the bitmapping
-		constexpr SpiHal2::Prescaler prescaler{result.index << SPI_CR1_BR_Pos};
+		constexpr SpiHal5::Prescaler prescaler{result.index << SPI_CR1_BR_Pos};
 
 		// initialize the Spi
-		SpiHal2::initialize(prescaler);
+		SpiHal5::initialize(prescaler);
 		state = 0;
 	}
 
 	static modm_always_inline void
 	setDataMode(DataMode mode)
 	{
-		SpiHal2::setDataMode(static_cast<SpiHal2::DataMode>(mode));
+		SpiHal5::setDataMode(static_cast<SpiHal5::DataMode>(mode));
 	}
 
 	static modm_always_inline void
 	setDataOrder(DataOrder order)
 	{
-		SpiHal2::setDataOrder(static_cast<SpiHal2::DataOrder>(order));
+		SpiHal5::setDataOrder(static_cast<SpiHal5::DataOrder>(order));
 	}
 	static modm_always_inline void
 	setDataSize(DataSize size)
 	{
-		SpiHal2::setDataSize(static_cast<SpiHal2::DataSize>(size));
+		SpiHal5::setDataSize(static_cast<SpiHal5::DataSize>(size));
 	}
 
 
@@ -149,4 +149,4 @@ public:
 
 } // namespace modm
 
-#endif // MODM_STM32_SPI_MASTER2_HPP
+#endif // MODM_STM32_SPI_MASTER5_HPP

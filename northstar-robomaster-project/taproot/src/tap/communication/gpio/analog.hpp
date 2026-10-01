@@ -50,6 +50,11 @@ public:
     // Analog pins
     enum Pin
     {
+        S,
+        T,
+        U,
+        V,
+        OledJoystick,
     };
 
     /**
