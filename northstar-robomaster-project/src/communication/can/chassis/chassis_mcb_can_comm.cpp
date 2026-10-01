@@ -19,6 +19,8 @@
 
 #include "chassis_mcb_can_comm.hpp"
 
+#include "communication/can/imu_can_constants.hpp"
+
 #include "tap/algorithms/wrapped_float.hpp"
 #include "tap/architecture/endianness_wrappers.hpp"
 #include "tap/drivers.hpp"
@@ -127,7 +129,7 @@ void ChassisMcbCanComm::sendAxisData(
         ANGLE_FIXED_POINT_PRECISION;
     axisData->angleAngularVelocityRaw =
         angularVelocity /
-        tap::communication::sensors::imu::bmi088::Bmi088::GYRO_RAD_PER_S_PER_GYRO_COUNT;
+        CAN_GYRO_RAD_PER_S_PER_COUNT;
     axisData->linearAcceleration = linearAcceleration * MPS2_TO_CMPS2;
     axisData->seq = imuDataSeq;
 
@@ -136,21 +138,21 @@ void ChassisMcbCanComm::sendAxisData(
 
 void ChassisMcbCanComm::sendIMUData()
 {
-    using tap::communication::sensors::imu::bmi088::Bmi088;
-    const Bmi088::ImuState imuState = drivers->bmi088.getImuState();
+    using tap::communication::sensors::imu::ImuInterface;
+    const ImuInterface::ImuState imuState = drivers->mpu6500.getImuState();
 
     if (getImuRecalibrationRequested())
     {
-        drivers->bmi088.requestCalibration();
+        drivers->mpu6500.requestCalibration();
     }
 
-    if (imuState == Bmi088::ImuState::IMU_CALIBRATING)
+    if (imuState == ImuInterface::ImuState::IMU_CALIBRATING)
     {
         clearImuRecalibration();
     }
 
-    if ((imuState == Bmi088::ImuState::IMU_CALIBRATED ||
-         imuState == Bmi088::ImuState::IMU_NOT_CALIBRATED) &&
+    if ((imuState == ImuInterface::ImuState::IMU_CALIBRATED ||
+         imuState == ImuInterface::ImuState::IMU_NOT_CALIBRATED) &&
         drivers->can.isReadyToSend(CHASSIS_IMU_CAN_BUS))
     {
         drivers->leds.set(tap::gpio::Leds::Green, blinkCounter < 50);
@@ -158,19 +160,19 @@ void ChassisMcbCanComm::sendIMUData()
 
         sendAxisData(
             X_AXIS_TX_CAN_ID,
-            drivers->bmi088.getRoll(),
-            drivers->bmi088.getGx(),
-            drivers->bmi088.getAx());
+            drivers->mpu6500.getRoll(),
+            drivers->mpu6500.getGx(),
+            drivers->mpu6500.getAx());
         sendAxisData(
             Y_AXIS_TX_CAN_ID,
-            drivers->bmi088.getPitch(),
-            drivers->bmi088.getGy(),
-            drivers->bmi088.getAy());
+            drivers->mpu6500.getPitch(),
+            drivers->mpu6500.getGy(),
+            drivers->mpu6500.getAy());
         sendAxisData(
             Z_AXIS_TX_CAN_ID,
-            drivers->bmi088.getYaw(),
-            drivers->bmi088.getGz(),
-            drivers->bmi088.getAz());
+            drivers->mpu6500.getYaw(),
+            drivers->mpu6500.getGz(),
+            drivers->mpu6500.getAz());
 
         imuDataSeq++;
     }

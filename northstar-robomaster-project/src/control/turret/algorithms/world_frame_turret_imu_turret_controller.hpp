@@ -35,7 +35,7 @@ class TurretMotor;
 /**
  * @ingroup turret
  *
- * World frame turret yaw controller, driven by the onboard BMI088 IMU.
+ * World frame turret yaw controller, driven by the onboard MPU6500 IMU.
  *
  * Because the IMU measures orientation against the world rather than against the chassis, the
  * turret holds its aim while the chassis moves underneath it -- which is what makes this preferable
@@ -46,7 +46,7 @@ class TurretMotor;
  * loop's output is the motor command.
  *
  * @note Despite what earlier revisions of this comment claimed, this controller does **not** use a
- *      turret-mounted board over `TurretMCBCanComm`. It reads `drivers.bmi088` directly. The
+ *      turret-mounted board over `TurretMCBCanComm`. It reads `drivers.mpu6500` directly. The
  *      `TurretMCBCanComm` variant is `WorldFrameYawTurretCanImuCascadePidTurretController`, which
  *      no robot currently builds.
  *
@@ -111,24 +111,24 @@ private:
     float worldFrameMeasurementIMU;
     int32_t IMUrevolutions;
 
-    inline tap::algorithms::WrappedFloat getBmi088Yaw(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getImuYaw(bool negitive = false) const
     {
-        return negitive ? tap::algorithms::Angle(drivers.bmi088.getYaw() * -1)
-                        : tap::algorithms::Angle(drivers.bmi088.getYaw());
+        return negitive ? tap::algorithms::Angle(drivers.mpu6500.getYaw() * -1)
+                        : tap::algorithms::Angle(drivers.mpu6500.getYaw());
     }
 
-    inline float getBmi088YawVelocity() const { return drivers.bmi088.getGz(); }
+    inline float getImuYawVelocity() const { return drivers.mpu6500.getGz(); }
 };
 
 /**
  * @ingroup turret
  *
- * World frame turret pitch controller, driven by the onboard BMI088 IMU.
+ * World frame turret pitch controller, driven by the onboard MPU6500 IMU.
  *
  * The pitch counterpart to `WorldFrameYawTurretImuCascadePidTurretController`; see that class for
  * why a world-frame measurement beats a chassis-relative one. Runs the same cascade PID.
  *
- * @note Reads `drivers.bmi088` directly, not a turret-mounted board over `TurretMCBCanComm`.
+ * @note Reads `drivers.mpu6500` directly, not a turret-mounted board over `TurretMCBCanComm`.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  */
@@ -184,13 +184,13 @@ private:
 
     tap::algorithms::WrappedFloat worldFrameSetpoint;
 
-    inline tap::algorithms::WrappedFloat getBmi088Pitch(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getImuPitch(bool negitive = false) const
     {
-        return negitive ? tap::algorithms::Angle(drivers.bmi088.getPitch() * -1)
-                        : tap::algorithms::Angle(drivers.bmi088.getPitch());
+        return negitive ? tap::algorithms::Angle(drivers.mpu6500.getPitch() * -1)
+                        : tap::algorithms::Angle(drivers.mpu6500.getPitch());
     }
 
-    inline float getBmi088PitchVelocity() const { return drivers.bmi088.getGy(); }
+    inline float getImuPitchVelocity() const { return drivers.mpu6500.getGy(); }
 };
 }  // namespace src::control::turret
 

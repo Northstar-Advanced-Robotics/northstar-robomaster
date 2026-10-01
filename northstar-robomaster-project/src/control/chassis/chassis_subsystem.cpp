@@ -27,7 +27,7 @@ float ChassisSubsystem::chassisSpeedRotationPID(float angleOffset)
 
     // D
     // Gz is CCW positive (right-hand rule), so -Gz damps.
-    float currentRotationPidD = -drivers->bmi088.getGz() * CHASSIS_ROTATION_D;  // D
+    float currentRotationPidD = -drivers->mpu6500.getGz() * CHASSIS_ROTATION_D;  // D
 
     float chassisRotationSpeed = limitVal<float>(
         currRotationPidP + currentRotationPidD,

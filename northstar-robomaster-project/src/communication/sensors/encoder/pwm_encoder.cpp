@@ -3,6 +3,8 @@
 #ifndef PLATFORM_HOSTED
 // We need device.hpp to ensure definitions are visible
 #include <modm/platform/device.hpp>
+
+#include "tap/board/board.hpp"
 #endif
 
 namespace src::communication::sensors
@@ -15,6 +17,11 @@ PwmEncoder::PwmEncoder(bool isInverted, float gearRatio)
 void PwmEncoder::initialize()
 {
 #ifndef PLATFORM_HOSTED
+    // TODO(northstar): Timer12 conflict on Type A, decision pending. Taproot drives the buzzer on
+    // Timer12 (PH6) on the Type A board, so this encoder and BuzzerSubsystem / the startup beep
+    // fight over the timer. PB14 may also not be brought out on a Type A header. Candidate fix:
+    // move to header pin H (PD12, Timer4 CH1) and drop H from the digital outputs in project.xml.
+
     // 1. Configure Pin PB14 -> Connect to Timer 12 Channel 1
     // (This remains the same)
     modm::platform::GpioB14::Ch1<modm::platform::Peripheral::Tim12>::connect();
@@ -23,8 +30,11 @@ void PwmEncoder::initialize()
     modm::platform::Timer12::enable();
 
     // 3. Configure Timer for PWM Input
-    // Set Prescaler to 84 so we get 1MHz counting frequency (1us resolution)
-    modm::platform::Timer12::setPrescaler(84);
+    // Prescale the timer clock to 1MHz counting frequency (1us resolution). Derived from the
+    // board's clock tree: 90 on the F427 (Type A), 84 on the F407.
+    static constexpr uint32_t TIMER12_COUNT_FREQUENCY = 1'000'000;
+    static_assert(Board::SystemClock::Timer12 % TIMER12_COUNT_FREQUENCY == 0);
+    modm::platform::Timer12::setPrescaler(Board::SystemClock::Timer12 / TIMER12_COUNT_FREQUENCY);
 
     // --- Channel 1 Setup (Period / Rising Edge) ---
     // Use InputOwn (was Direct)

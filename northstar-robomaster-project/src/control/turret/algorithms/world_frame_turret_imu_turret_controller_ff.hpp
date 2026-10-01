@@ -36,7 +36,7 @@ class TurretMotor;
  * @ingroup turret
  *
  * World frame turret yaw controller with a static-friction feedforward term, driven by the onboard
- * BMI088 IMU.
+ * MPU6500 IMU.
  *
  * Identical to `WorldFrameYawTurretImuCascadePidTurretController` except that it also computes a
  * feedforward intended to break stiction when the turret is stalled just off target -- the regime
@@ -47,7 +47,7 @@ class TurretMotor;
  *      behaves exactly like the non-FF controller, and the `STATIC_FRICTION_FF_*` constants it
  *      passes to that helper have no effect.
  *
- * @note Reads `drivers.bmi088` directly, not a turret-mounted board over `TurretMCBCanComm`.
+ * @note Reads `drivers.mpu6500` directly, not a turret-mounted board over `TurretMCBCanComm`.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  */
@@ -110,26 +110,26 @@ private:
     float worldFrameMeasurementIMU;
     int32_t IMUrevolutions;
 
-    inline tap::algorithms::WrappedFloat getBmi088Yaw(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getImuYaw(bool negitive = false) const
     {
-        return negitive ? tap::algorithms::Angle(drivers.bmi088.getYaw() * -1)
-                        : tap::algorithms::Angle(drivers.bmi088.getYaw());
+        return negitive ? tap::algorithms::Angle(drivers.mpu6500.getYaw() * -1)
+                        : tap::algorithms::Angle(drivers.mpu6500.getYaw());
     }
 
-    inline float getBmi088YawVelocity() const { return drivers.bmi088.getGz(); }
+    inline float getImuYawVelocity() const { return drivers.mpu6500.getGz(); }
 };
 
 /**
  * @ingroup turret
  *
  * World frame turret pitch controller with a static-friction feedforward term, driven by the
- * onboard BMI088 IMU. Also applies gravity compensation, as the non-FF pitch controller does.
+ * onboard MPU6500 IMU. Also applies gravity compensation, as the non-FF pitch controller does.
  *
  * @warning Shares the same helper as the yaw class above, so the feedforward is likewise computed
  *      and then discarded. Until that is restored this behaves exactly like
  *      `WorldFramePitchTurretImuCascadePidTurretController`.
  *
- * @note Reads `drivers.bmi088` directly, not a turret-mounted board over `TurretMCBCanComm`.
+ * @note Reads `drivers.mpu6500` directly, not a turret-mounted board over `TurretMCBCanComm`.
  *
  * Implements TurretControllerInterface interface, see parent class comment for details.
  */
@@ -185,13 +185,13 @@ private:
 
     tap::algorithms::WrappedFloat worldFrameSetpoint;
 
-    inline tap::algorithms::WrappedFloat getBmi088Pitch(bool negitive = false) const
+    inline tap::algorithms::WrappedFloat getImuPitch(bool negitive = false) const
     {
-        return negitive ? tap::algorithms::Angle(drivers.bmi088.getPitch() * -1)
-                        : tap::algorithms::Angle(drivers.bmi088.getPitch());
+        return negitive ? tap::algorithms::Angle(drivers.mpu6500.getPitch() * -1)
+                        : tap::algorithms::Angle(drivers.mpu6500.getPitch());
     }
 
-    inline float getBmi088PitchVelocity() const { return drivers.bmi088.getGy(); }
+    inline float getImuPitchVelocity() const { return drivers.mpu6500.getGy(); }
 };
 }  // namespace src::control::turret
 

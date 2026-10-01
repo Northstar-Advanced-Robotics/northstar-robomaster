@@ -39,7 +39,7 @@ class TurretMotor;
  *
  * World frame turret yaw controller for robots without a turret-mounted IMU.
  *
- * The board's BMI088 is bolted to the chassis, so it measures chassis rotation rather than turret
+ * The board's MPU6500 is bolted to the chassis, so it measures chassis rotation rather than turret
  * rotation. The turret's world-frame angle is reconstructed by adding the yaw encoder's
  * chassis-relative angle to the IMU heading -- which means any encoder or IMU error shows up
  * directly as aim drift. Prefer `WorldFrameYawTurretImuCascadePidTurretController` where available.
@@ -110,9 +110,9 @@ private:
     tap::algorithms::WrappedFloat chassisFrameInitImuYawAngle;
 
     /// @return The chassis IMU's yaw, negated to match this controller's sign convention.
-    inline tap::algorithms::WrappedFloat getBmi088Yaw() const
+    inline tap::algorithms::WrappedFloat getImuYaw() const
     {
-        return tap::algorithms::Angle(-drivers.bmi088.getYaw());
+        return tap::algorithms::Angle(-drivers.mpu6500.getYaw());
     }
 };
 
@@ -180,9 +180,9 @@ private:
 
     tap::algorithms::WrappedFloat chassisFrameInitImuPitchAngle;
 
-    inline tap::algorithms::WrappedFloat getBmi088Pitch() const
+    inline tap::algorithms::WrappedFloat getImuPitch() const
     {
-        return tap::algorithms::Angle(drivers.bmi088.getPitch());
+        return tap::algorithms::Angle(drivers.mpu6500.getPitch());
     }
 };
 

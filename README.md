@@ -106,11 +106,23 @@ in VSCode, type <kbd>Ctrl</kbd>+<kbd>Shift</kbd>+<kbd>P</kbd>, then type "C/C++:
 Configuration" and hit enter. A dropdown menu will appear where you may choose either the "Test",
 "Sim", or "Hardware" configuration.
 
-### Upgrading Taproot
+### Taproot, LateralRoot and the generated `taproot/` tree
 
-The Taproot project recommends that user projects occasionally upgrade the version of
-Taproot that they depend on. The guide for doing so is
-[here](https://gitlab.com/aruw/controls/taproot/-/wikis/Upgrading-a-Taproot-project). 
+This project targets the **RoboMaster Development Board Type A** (STM32F427IIH6, MPU6500 IMU). The board,
+pins and UARTs are set in `northstar-robomaster-project/project.xml`.
+
+The `taproot` submodule is [LateralRoot](https://github.com/Northstar-Advanced-Robotics/LateralRoot),
+our fork of Taproot, on its `northstar-2026` branch. `northstar-robomaster-project/taproot/` is generated
+from it and committed. To regenerate it after changing `project.xml` or the submodule:
+
+```
+cd northstar-robomaster-project
+pipenv run lbuild build
+```
+
+Never hand-edit the generated `taproot/` folder: change LateralRoot (or `project.xml`) and regenerate.
+LateralRoot's branches, our changes to Taproot and how to pull in upstream Taproot updates are described in
+[`NORTHSTAR.md` on LateralRoot](https://github.com/Northstar-Advanced-Robotics/LateralRoot/blob/northstar-dev/NORTHSTAR.md).
 
 ## Building and running via the terminal
 

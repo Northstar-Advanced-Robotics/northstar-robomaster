@@ -153,7 +153,7 @@ public:
      */
     float getChassisYaw()
     {
-        return modm::Angle::normalize(drivers->bmi088.getYaw() - getTurretYaw());
+        return modm::Angle::normalize(drivers->mpu6500.getYaw() - getTurretYaw());
     }
 
     /**

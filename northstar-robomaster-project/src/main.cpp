@@ -107,7 +107,7 @@ int main()
             deltaTime = currentTTime - lastTime;
             lastTime = currentTTime;
 
-            PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
+            PROFILE(drivers->profiler, drivers->mpu6500.periodicIMUUpdate, ());
 
 #ifndef TARGET_TURRET
             PROFILE(drivers->profiler, drivers->encoder.update, ());
@@ -163,7 +163,7 @@ static void initializeIo(Drivers *drivers)
         {
             i = 0;
             drivers->pwm.write(0.5f, tap::gpio::Pwm::Buzzer);
-            drivers->pwm.setTimerFrequency(tap::gpio::Pwm::TIMER4, 1500);
+            drivers->pwm.setTimerFrequency(tap::gpio::Pwm::TIMER12, 1500);  // buzzer timer on Type A
         }
         else
         {
@@ -174,7 +174,7 @@ static void initializeIo(Drivers *drivers)
         modm::delay_us(10);
     }
 
-    drivers->leds.set(tap::gpio::Leds::Blue, true);
+    drivers->leds.set(tap::gpio::Leds::Green, true);  // Type A has no blue LED
 
     drivers->can.initialize();
     drivers->errorController.init();
@@ -187,13 +187,13 @@ static void initializeIo(Drivers *drivers)
     drivers->refSerial.initialize();
 
 #ifdef TARGET_HERO
-    drivers->bmi088.initialize(500, 0.1f, 0.000f);
-    drivers->bmi088.setTargetTemperature(35.0f);
-    drivers->bmi088.setCalibrationSamples(2000);
+    drivers->mpu6500.initialize(500, 0.1f, 0.000f);
+    drivers->mpu6500.setTargetTemperature(35.0f);
+    drivers->mpu6500.setCalibrationSamples(2000);
 #else
-    drivers->bmi088.initialize(500, 0.05f, 0.000f);
-    drivers->bmi088.setTargetTemperature(35.0f);
-    drivers->bmi088.setCalibrationSamples(2000);
+    drivers->mpu6500.initialize(500, 0.05f, 0.000f);
+    drivers->mpu6500.setTargetTemperature(35.0f);
+    drivers->mpu6500.setCalibrationSamples(2000);
 #endif
 
 #ifndef TARGET_TURRET
@@ -229,7 +229,7 @@ static void updateIo(Drivers *drivers)
     }
 // #endif
     drivers->canRxHandler.pollCanData();
-    drivers->bmi088.read();
+    drivers->mpu6500.read();
 
 #ifndef TARGET_TURRET
     drivers->refSerial.updateSerial();
@@ -242,17 +242,17 @@ static void updateIo(Drivers *drivers)
     if (cal)
     {
         cal = false;
-        drivers->bmi088.requestCalibration();
+        drivers->mpu6500.requestCalibration();
     }
-    debugXAccel = drivers->bmi088.getAx();
-    debugYAccel = drivers->bmi088.getAy();
-    debugZAccel = drivers->bmi088.getAz();
-    debugYawV = drivers->bmi088.getGz();
-    debugYaw = modm::toDegree(drivers->bmi088.getYaw());
-    debugPitchV = drivers->bmi088.getGy();
-    debugPitch = modm::toDegree(drivers->bmi088.getPitch());
-    debugRollV = drivers->bmi088.getGx();
-    debugRoll = modm::toDegree(drivers->bmi088.getRoll());
+    debugXAccel = drivers->mpu6500.getAx();
+    debugYAccel = drivers->mpu6500.getAy();
+    debugZAccel = drivers->mpu6500.getAz();
+    debugYawV = drivers->mpu6500.getGz();
+    debugYaw = modm::toDegree(drivers->mpu6500.getYaw());
+    debugPitchV = drivers->mpu6500.getGy();
+    debugPitch = modm::toDegree(drivers->mpu6500.getPitch());
+    debugRollV = drivers->mpu6500.getGx();
+    debugRoll = modm::toDegree(drivers->mpu6500.getRoll());
     conneccc = drivers->remote.isConnected();
     dddddgfregr = drivers->encoder.getPosition().getUnwrappedValue();
     uartOnline = drivers->refSerial.getRefSerialReceivingData();

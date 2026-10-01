@@ -372,7 +372,7 @@ Trigger rightSwitchUpCvControl =
 
 src::control::chassis::ChassisOdometry *chassisOdometry =
     new src::control::chassis::ChassisOdometry(
-        &drivers()->bmi088,
+        &drivers()->mpu6500,
         &turret.yawMotor,
         src::control::chassis::DIST_TO_CENTER,
         src::control::chassis::WHEEL_DIAMETER_M);
@@ -516,7 +516,7 @@ void startHeroCommands(Drivers *drivers)
     drivers->visionComms.attachOdometry(chassisOdometry);
     drivers->visionComms.attachRemote(&drivers->remote);
 
-    drivers->bmi088.setMountingTransform(
+    drivers->mpu6500.setMountingTransform(
         tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
     // pitch up needs to be negitive up is on motor side
     // right neg

@@ -32,9 +32,9 @@ public:
     static constexpr size_t VISION_COMMS_BAUD_RATE = 115'200;
 
     static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_TX_UART_PORT =
-        tap::communication::serial::Uart::UartPort::Uart1;
+        VISION_COMMS_UART_PORT;
     static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_RX_UART_PORT =
-        tap::communication::serial::Uart::UartPort::Uart1;
+        VISION_COMMS_UART_PORT;
 
     /**
      * Message type IDs carried in the `DJISerial` header. Both sides of the link must agree on

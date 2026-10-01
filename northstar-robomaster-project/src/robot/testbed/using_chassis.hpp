@@ -71,7 +71,7 @@ PlateHitGovernor plateHitGovernor(drivers(), 5000);
 //     &chassisSubsystem);
 
 src::control::chassis::ChassisOdometry* chassisOdometry = new src::control::chassis::ChassisOdometry(
-    &drivers()->bmi088,
+    &drivers()->mpu6500,
     yawMotor,
     src::control::chassis::DIST_TO_CENTER,
     src::control::chassis::WHEEL_DIAMETER_M);

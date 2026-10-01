@@ -4,6 +4,7 @@
 #include <cstdint>
 
 #include "tap/architecture/periodic_timer.hpp"
+#include "tap/communication/serial/uart.hpp"
 
 #ifndef UART_CONSTANTS_HPP_
 #error "Do not include this file directly! Use uart_constants.hpp instead."
@@ -11,6 +12,14 @@
 
 namespace src::communication::serial
 {
+/**
+ * UART the vision coprocessor is wired to.
+ * TODO(northstar): confirm vision UART on Type A. Uart7 is a placeholder; never Uart1 (the DR16
+ * remote / DBUS port).
+ */
+static constexpr tap::communication::serial::Uart::UartPort VISION_COMMS_UART_PORT =
+    tap::communication::serial::Uart::UartPort::Uart7;
+
 static constexpr uint32_t TIME_BEFORE_UART_START =
     1000;  // initial delay of 1 second to allow time for things to start up
 static tap::arch::MilliTimeout messageOffsetInitializationTimeout{TIME_BEFORE_UART_START};

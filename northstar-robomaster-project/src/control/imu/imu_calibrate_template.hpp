@@ -31,7 +31,7 @@ public:
            online. */
         WAITING_FOR_SYSTEMS_ONLINE,
         /** The command holds the turret at its configured `startAngle` and waits for it to settle
-           before requesting calibration of the onboard BMI088. */
+           before requesting calibration of the onboard MPU6500. */
         LOCKING_TURRET,
         /** While in this state, the command waits until calibration of the IMUs are complete. */
         CALIBRATING_IMU,

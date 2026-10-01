@@ -24,7 +24,7 @@
 #include "control/turret/constants/turret_constants.hpp"
 
 using tap::algorithms::Angle;
-using tap::communication::sensors::imu::bmi088::Bmi088;
+using tap::communication::sensors::imu::ImuInterface;
 
 namespace src::control::imu
 {
@@ -92,8 +92,8 @@ void ImuCalibrateCommand::execute()
         case CalibrationState::WAITING_FOR_SYSTEMS_ONLINE:
         {
             // Only start calibrating if the turret is online and if there is an IMU online to be
-            // calibrated. The onboard Bmi088 will never be in the `IMU_NOT_CONNECTED` state unless
-            // the Bmi088 is shorted (which has never happened). The turret MCB will only be
+            // calibrated. The onboard MPU6500 will never be in the `IMU_NOT_CONNECTED` state unless
+            // the MPU6500 is shorted (which has never happened). The turret MCB will only be
             // offline if the turret MCB is unplugged.
             bool turretsOnline = true;
 
@@ -103,7 +103,7 @@ void ImuCalibrateCommand::execute()
             }
 
             if (turretsOnline &&
-                ((drivers->bmi088.getImuState() != Bmi088::ImuState::IMU_NOT_CONNECTED)))
+                ((drivers->mpu6500.getImuState() != ImuInterface::ImuState::IMU_NOT_CONNECTED)))
             {
                 calibrationLongTimeout.restart(MAX_CALIBRATION_WAITTIME_MS);
                 calibrationTimer.restart(WAIT_TIME_TURRET_RESPONSE_MS);
@@ -133,14 +133,14 @@ void ImuCalibrateCommand::execute()
                  *}
                  */
 
-                drivers->bmi088.requestCalibration();
+                drivers->mpu6500.requestCalibration();
                 calibrationState = CalibrationState::CALIBRATING_IMU;
             }
 
             break;
         }
         case CalibrationState::CALIBRATING_IMU:
-            if (drivers->bmi088.getImuState() == Bmi088::ImuState::IMU_CALIBRATED)
+            if (drivers->mpu6500.getImuState() == ImuInterface::ImuState::IMU_CALIBRATED)
             {
                 // assume turret MCB takes approximately as long as the onboard IMU to calibrate,
                 // plus 1 second extra to handle sending the request and processing it

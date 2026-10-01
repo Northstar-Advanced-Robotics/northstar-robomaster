@@ -256,7 +256,7 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::initialize()
 {
     initializeWorldFrameTurretImuController(
         this,
-        getBmi088Yaw(),
+        getImuYaw(),
         turretMotor,
         positionPid,
         velocityPid,
@@ -266,15 +266,15 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::runController(
     const uint32_t dt,
     const WrappedFloat desiredSetpoint)
 {
-    if (abs(worldFrameMeasurementIMU - getBmi088Yaw(false).getWrappedValue()) > M_TWOPI * .7f)
+    if (abs(worldFrameMeasurementIMU - getImuYaw(false).getWrappedValue()) > M_TWOPI * .7f)
     {
         IMUrevolutions += tap::algorithms::getSign(
-            worldFrameMeasurementIMU - getBmi088Yaw(false).getWrappedValue());
+            worldFrameMeasurementIMU - getImuYaw(false).getWrappedValue());
     }
-    worldFrameMeasurementIMU = getBmi088Yaw(false).getWrappedValue();
+    worldFrameMeasurementIMU = getImuYaw(false).getWrappedValue();
     const WrappedFloat chassisFrameYaw = turretMotor.getChassisFrameMeasuredAngle();
-    const WrappedFloat worldFrameYawAngle = getBmi088Yaw(false);  // negitive
-    const float worldFrameYawVelocity = getBmi088YawVelocity();
+    const WrappedFloat worldFrameYawAngle = getImuYaw(false);  // negitive
+    const float worldFrameYawVelocity = getImuYawVelocity();
 
     updateWorldFrameSetpoint(
         desiredSetpoint,
@@ -304,7 +304,7 @@ void WorldFrameYawTurretImuCascadePidTurretControllerFF::runController(
 void WorldFrameYawTurretImuCascadePidTurretControllerFF::setSetpoint(WrappedFloat desiredSetpoint)
 {
     const WrappedFloat chassisFrameYaw = turretMotor.getChassisFrameMeasuredAngle();
-    const WrappedFloat worldFrameYawAngle = getBmi088Yaw();
+    const WrappedFloat worldFrameYawAngle = getImuYaw();
 
     updateWorldFrameSetpoint(
         desiredSetpoint,
@@ -327,9 +327,9 @@ WrappedFloat WorldFrameYawTurretImuCascadePidTurretControllerFF::getMeasurementM
 bool WorldFrameYawTurretImuCascadePidTurretControllerFF::isOnline() const
 {
     return turretMotor.isOnline() &&
-           (drivers.bmi088.getImuState() ==
+           (drivers.mpu6500.getImuState() ==
                 tap::communication::sensors::imu::ImuInterface::ImuState::IMU_CALIBRATED ||
-            drivers.bmi088.getImuState() ==
+            drivers.mpu6500.getImuState() ==
                 tap::communication::sensors::imu::ImuInterface::ImuState::
                     IMU_NOT_CALIBRATED);  // TODO not shure if this is valid, was
                                           // drivers.mpu6500.isRunning();;
@@ -338,7 +338,7 @@ bool WorldFrameYawTurretImuCascadePidTurretControllerFF::isOnline() const
 WrappedFloat WorldFrameYawTurretImuCascadePidTurretControllerFF::
     convertControllerAngleToChassisFrame(WrappedFloat controllerFrameAngle) const
 {
-    const WrappedFloat worldFrameYawAngle = getBmi088Yaw();
+    const WrappedFloat worldFrameYawAngle = getImuYaw();
 
     return transformWorldFrameValueToChassisFrame(
         turretMotor.getChassisFrameMeasuredAngle(),
@@ -349,7 +349,7 @@ WrappedFloat WorldFrameYawTurretImuCascadePidTurretControllerFF::
 WrappedFloat WorldFrameYawTurretImuCascadePidTurretControllerFF::
     convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const
 {
-    const WrappedFloat worldFrameYawAngle = getBmi088Yaw();
+    const WrappedFloat worldFrameYawAngle = getImuYaw();
 
     return transformChassisFrameToWorldFrame(
         turretMotor.getChassisFrameMeasuredAngle(),
@@ -375,7 +375,7 @@ void WorldFramePitchTurretImuCascadePidTurretControllerFF::initialize()
 {
     initializeWorldFrameTurretImuController(
         this,
-        getBmi088Pitch(),
+        getImuPitch(),
         turretMotor,
         positionPid,
         velocityPid,
@@ -387,8 +387,8 @@ void WorldFramePitchTurretImuCascadePidTurretControllerFF::runController(  // TO
     const WrappedFloat desiredSetpoint)
 {
     const WrappedFloat chassisFramePitch = turretMotor.getChassisFrameMeasuredAngle();
-    const WrappedFloat worldFramePitchAngle = getBmi088Pitch(false);  // negitive
-    const float worldFramePitchVelocity = getBmi088PitchVelocity();
+    const WrappedFloat worldFramePitchAngle = getImuPitch(false);  // negitive
+    const float worldFramePitchVelocity = getImuPitchVelocity();
 
     updateWorldFrameSetpoint(
         desiredSetpoint,
@@ -419,7 +419,7 @@ void WorldFramePitchTurretImuCascadePidTurretControllerFF::runController(  // TO
 void WorldFramePitchTurretImuCascadePidTurretControllerFF::setSetpoint(WrappedFloat desiredSetpoint)
 {
     const WrappedFloat chassisFramePitch = turretMotor.getChassisFrameMeasuredAngle();
-    const WrappedFloat worldFramePitchAngle = getBmi088Pitch();
+    const WrappedFloat worldFramePitchAngle = getImuPitch();
 
     updateWorldFrameSetpoint(
         desiredSetpoint,
@@ -431,15 +431,15 @@ void WorldFramePitchTurretImuCascadePidTurretControllerFF::setSetpoint(WrappedFl
 
 WrappedFloat WorldFramePitchTurretImuCascadePidTurretControllerFF::getMeasurement() const
 {
-    return getBmi088Pitch();
+    return getImuPitch();
 }
 
 bool WorldFramePitchTurretImuCascadePidTurretControllerFF::isOnline() const
 {
     return turretMotor.isOnline() &&
-           (drivers.bmi088.getImuState() ==
+           (drivers.mpu6500.getImuState() ==
                 tap::communication::sensors::imu::ImuInterface::ImuState::IMU_CALIBRATED ||
-            drivers.bmi088.getImuState() ==
+            drivers.mpu6500.getImuState() ==
                 tap::communication::sensors::imu::ImuInterface::ImuState::
                     IMU_NOT_CALIBRATED);  // TODO not shure if this is valid, was
                                           // drivers.mpu6500.isRunning();;
@@ -448,7 +448,7 @@ bool WorldFramePitchTurretImuCascadePidTurretControllerFF::isOnline() const
 WrappedFloat WorldFramePitchTurretImuCascadePidTurretControllerFF::
     convertControllerAngleToChassisFrame(WrappedFloat controllerFrameAngle) const
 {
-    const WrappedFloat worldFramePitchAngle = getBmi088Pitch();
+    const WrappedFloat worldFramePitchAngle = getImuPitch();
 
     return transformWorldFrameValueToChassisFrame(
         turretMotor.getChassisFrameMeasuredAngle(),
@@ -459,7 +459,7 @@ WrappedFloat WorldFramePitchTurretImuCascadePidTurretControllerFF::
 WrappedFloat WorldFramePitchTurretImuCascadePidTurretControllerFF::
     convertChassisAngleToControllerFrame(WrappedFloat chassisFrameAngle) const
 {
-    const WrappedFloat worldFramePitchAngle = getBmi088Pitch();
+    const WrappedFloat worldFramePitchAngle = getImuPitch();
 
     return transformChassisFrameToWorldFrame(
         turretMotor.getChassisFrameMeasuredAngle(),

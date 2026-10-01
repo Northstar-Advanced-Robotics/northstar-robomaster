@@ -41,7 +41,7 @@ namespace src::control::imu
 /**
  * @ingroup util
  *
- * Calibrates the onboard BMI088 IMU, holding the robot still while it happens.
+ * Calibrates the onboard MPU6500 IMU, holding the robot still while it happens.
  *
  * A gyroscope can only measure its own bias while stationary, so the command takes the turret and
  * chassis away from the operator, parks them, waits for motion to settle, and only then asks the
@@ -72,7 +72,7 @@ public:
         /** The command holds the turret at its configured `startAngle` and waits for it to settle
            before requesting calibration. */
         LOCKING_TURRET,
-        /** The command waits for the BMI088 to report that calibration has finished. */
+        /** The command waits for the MPU6500 to report that calibration has finished. */
         CALIBRATING_IMU,
         /** @warning Never entered. Nothing assigns this state; the completion tone is scheduled
            from `WAITING_CALIBRATION_COMPLETE` instead. */
@@ -181,7 +181,7 @@ protected:
      * Timeout that we set after initially starting the turret PID controller to allow any residual
      * movement from starting the new PID controller to be resolved.
      *
-     * Also the delay that we set after the onboard BMI088 is calibrated to ensure that turret IMU
+     * Also the delay that we set after the onboard MPU6500 is calibrated to ensure that turret IMU
      * has enough time to successfully calibrate.
      */
     tap::arch::MilliTimeout calibrationTimer;

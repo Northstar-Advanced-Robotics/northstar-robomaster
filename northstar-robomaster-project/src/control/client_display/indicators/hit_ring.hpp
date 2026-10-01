@@ -51,7 +51,7 @@ public:
     {
         float encoder =
             turret->yawMotor.getChassisFrameMeasuredAngle().getWrappedValue() * 180 / PI;
-        float imu = drivers->bmi088.getYaw();
+        float imu = drivers->mpu6500.getYaw();
         // if the turret compared to the drivetrain (from the encoder) is facing forward,
         // heading would be 360, if facing right, heading would be 90
 

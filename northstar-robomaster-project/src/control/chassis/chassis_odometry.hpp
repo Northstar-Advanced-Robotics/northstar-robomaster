@@ -3,6 +3,7 @@
 
 #include "tap/algorithms/wrapped_float.hpp"
 #include "tap/architecture/clock.hpp"
+#include "tap/communication/sensors/imu/abstract_imu.hpp"
 
 #include "control/turret/turret_motor.hpp"
 #include "modm/math/geometry/angle.hpp"
@@ -55,7 +56,7 @@ class ChassisOdometry
         0.98f;  // 0-1, 1 = no smoothing, 0 = max smoothing
 
     /// The chassis IMU, the source of absolute orientation.
-    tap::communication::sensors::imu::bmi088::Bmi088* imu;
+    tap::communication::sensors::imu::AbstractIMU* imu;
     /// The turret yaw motor, used to convert the IMU's turret-frame yaw into a chassis heading.
     src::control::turret::TurretMotor* turretYaw;
 
@@ -143,7 +144,7 @@ public:
      * @param[in] wheelDiameter Wheel diameter in meters.
      */
     ChassisOdometry(
-        tap::communication::sensors::imu::bmi088::Bmi088* imu,
+        tap::communication::sensors::imu::AbstractIMU* imu,
         src::control::turret::TurretMotor* turretYaw,
         float distanceToCenter,
         float wheelDiameter)

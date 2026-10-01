@@ -105,7 +105,7 @@ void setDefaultTestCommands(src::robot::testbed::Drivers *drivers)
 
 void startTestCommands(src::robot::testbed::Drivers *drivers)
 {
-    drivers->bmi088.setMountingTransform(
+    drivers->mpu6500.setMountingTransform(
         tap::algorithms::transforms::Transform(0, 0, 0, 0, modm::toRadian(0), modm::toRadian(180)));
 }
 

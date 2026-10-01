@@ -22,9 +22,9 @@
 
 #include "tap/architecture/periodic_timer.hpp"
 #include "tap/communication/can/can_rx_listener.hpp"
-#include "tap/communication/sensors/imu/bmi088/bmi088.hpp"
 #include "tap/communication/sensors/limit_switch/limit_switch_interface.hpp"
 
+#include "communication/can/imu_can_constants.hpp"
 #include "modm/architecture/interface/register.hpp"
 #include "modm/math/geometry/angle.hpp"
 
@@ -51,7 +51,7 @@ namespace src::communication::can
  * @warning **Not built into any robot.** No robot's `Drivers` declares a member of this type, the
  * `WorldFrame*TurretCanImu*` controllers that would consume it are never instantiated, and the
  * `sendData` call in `main.cpp` is commented out. Live turret control uses the chassis board's
- * BMI088 instead.
+ * onboard IMU instead.
  *
  * @warning **The angle getters return degrees, not radians.** `ANGLE_FIXED_POINT_PRECISION` is
  * `360 / UINT16_MAX`, i.e. degrees per count, and the receive handlers store that value directly --
@@ -106,7 +106,7 @@ public:
     mockable inline float getRollVelocity() const
     {
         return static_cast<float>(lastCompleteImuData.rawRollVelocity) *
-               tap::communication::sensors::imu::bmi088::Bmi088::GYRO_RAD_PER_S_PER_GYRO_COUNT;
+               CAN_GYRO_RAD_PER_S_PER_COUNT;
     }
 
     /**
@@ -134,7 +134,7 @@ public:
     mockable inline float getPitchVelocity() const
     {
         return static_cast<float>(lastCompleteImuData.rawPitchVelocity) *
-               tap::communication::sensors::imu::bmi088::Bmi088::GYRO_RAD_PER_S_PER_GYRO_COUNT;
+               CAN_GYRO_RAD_PER_S_PER_COUNT;
     }
 
     /**
@@ -160,7 +160,7 @@ public:
     mockable inline float getYawVelocity() const
     {
         return static_cast<float>(lastCompleteImuData.rawYawVelocity) *
-               tap::communication::sensors::imu::bmi088::Bmi088::GYRO_RAD_PER_S_PER_GYRO_COUNT;
+               CAN_GYRO_RAD_PER_S_PER_COUNT;
     }
 
     /**
