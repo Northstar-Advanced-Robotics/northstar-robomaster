@@ -22,9 +22,6 @@
 #ifdef PLATFORM_HOSTED
 /* hosted environment (simulator) includes --------------------------------- */
 #include <iostream>
-
-#include "tap/communication/tcp-server/tcp_server.hpp"
-#include "tap/motor/motorsim/sim_handler.hpp"
 #endif
 
 #include "tap/board/board.hpp"
@@ -60,7 +57,7 @@ using namespace src::robot::standard;
 using namespace src::robot::sentry;
 #elif TARGET_HERO
 using namespace src::robot::hero;
-#elif TURRET
+#elif TARGET_TURRET
 #include "communication/can/chassis/chassis_mcb_can_comm.hpp"
 using namespace src::robot::turret;
 src::communication::can::ChassisMcbCanComm chassisMcbCanComm(DoNotUse_getDrivers());
@@ -98,11 +95,6 @@ int main()
     Board::initialize();
     initializeIo(drivers);
     initSubsystemCommands(drivers);
-#ifdef PLATFORM_HOSTED
-    tap::motorsim::SimHandler::resetMotorSims();
-    // Blocking call, waits until Windows Simulator connects.
-    tap::communication::TCPServer::MainServer()->getConnection();
-#endif
 
     while (1)
     {
@@ -117,11 +109,13 @@ int main()
 
             PROFILE(drivers->profiler, drivers->bmi088.periodicIMUUpdate, ());
 
+#ifndef TARGET_TURRET
             PROFILE(drivers->profiler, drivers->encoder.update, ());
+#endif
 
             // PROFILE(drivers->profiler, drivers->terminalSerial.update, ());
             PROFILE(drivers->profiler, drivers->commandScheduler.run, ());
-#ifdef TURRET
+#ifdef TARGET_TURRET
             PROFILE(drivers->profiler, chassisMcbCanComm.sendIMUData, ());
             PROFILE(drivers->profiler, chassisMcbCanComm.sendSynchronizationRequest, ());
 #else
@@ -139,7 +133,9 @@ int main()
         //         {
         //             PROFILE(drivers->profiler, drivers->revMotorTxHandler.heartBeat, ());
         //         }
+#ifndef TARGET_TURRET
         PROFILE(drivers->profiler, drivers->visionComms.sendMessage, ());
+#endif
 
         // #endif
         modm::delay_us(10);
@@ -183,8 +179,10 @@ static void initializeIo(Drivers *drivers)
     drivers->can.initialize();
     drivers->errorController.init();
 
+#ifndef TARGET_TURRET
     drivers->encoder.initialize();
     drivers->visionComms.initializeUartDelays();
+#endif
 
     drivers->refSerial.initialize();
 
@@ -198,7 +196,9 @@ static void initializeIo(Drivers *drivers)
     drivers->bmi088.setCalibrationSamples(2000);
 #endif
 
+#ifndef TARGET_TURRET
     drivers->visionComms.initializeCV();
+#endif
 }
 float debugXAccel = 0.0f;
 float debugYAccel = 0.0f;
@@ -228,14 +228,10 @@ static void updateIo(Drivers *drivers)
         calibrated = true;
     }
 // #endif
-#ifdef PLATFORM_HOSTED
-    tap::motorsim::SimHandler::updateSims();
-#endif
-
     drivers->canRxHandler.pollCanData();
     drivers->bmi088.read();
 
-#ifndef TURRET
+#ifndef TARGET_TURRET
     drivers->refSerial.updateSerial();
 #ifndef FLYSKY
     drivers->visionComms.updateSerial();

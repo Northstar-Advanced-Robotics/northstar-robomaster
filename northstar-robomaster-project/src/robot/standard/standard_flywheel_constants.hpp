@@ -9,6 +9,8 @@
  */
 #ifndef STANDARD_FLYWHEEL_CONSTANTS_HPP_
 #define STANDARD_FLYWHEEL_CONSTANTS_HPP_
+#include <optional>
+
 #include <modm/container/pair.hpp>
 
 #include "tap/motor/dji_motor.hpp"

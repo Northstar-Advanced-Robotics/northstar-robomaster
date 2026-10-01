@@ -17,7 +17,7 @@
 #include "robot/sentry/sentry_agitator_constants.hpp"
 #elif TARGET_HERO
 #include "robot/hero/hero_agitator_constants.hpp"
-#elif TURRET
+#elif TARGET_TURRET
 #include "robot/standard/standard_agitator_constants.hpp"
 #elif TARGET_TEST_BED
 #ifdef USING_HERO_AGITATOR
