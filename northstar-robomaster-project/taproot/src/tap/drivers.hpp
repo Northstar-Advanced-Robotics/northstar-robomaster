@@ -44,8 +44,6 @@
 #include "tap/mock/terminal_serial_mock.hpp"
 #include "tap/mock/uart_mock.hpp"
 
-#include ""
-
 #else
 #include "tap/architecture/profiler.hpp"
 #include "tap/communication/can/can.hpp"
