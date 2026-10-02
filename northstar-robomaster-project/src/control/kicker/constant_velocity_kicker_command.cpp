@@ -5,7 +5,7 @@
 namespace src::control::kicker
 {
 ConstantVelocityKickerCommand::ConstantVelocityKickerCommand(
-    src::kicker::KickerSubsystem* kicker,
+    src::control::kicker::KickerSubsystem* kicker,
     float velocitySetpoint)
     : tap::control::Command(),
       kicker(kicker),

@@ -9,14 +9,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -44,7 +44,7 @@ public:
      */
     ChassisDriveToPointCommand(
         ChassisSubsystem *chassis,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float xPosition,
         float yPosition,
         float maxError);
@@ -77,13 +77,13 @@ private:
     static constexpr float MINIMUM_MPS = 0.38f;
 
     /// The chassis being driven.
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
     /// The odometry supplying the robot's position.
-    src::chassis::ChassisOdometry *chassisOdometry;
+    src::control::chassis::ChassisOdometry *chassisOdometry;
 
     /// The field-frame position being driven to, in meters.
     modm::Vector<float, 2> targetPosition;
     /// How close to `targetPosition` counts as arrived, in meters.
     float maxError;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

@@ -23,8 +23,7 @@
 
 #include "tap/algorithms/math_user_utils.hpp"
 
-using namespace tap::algorithms;
-using namespace tap::control::setpoint;
+using tap::control::setpoint::IntegrableSetpointSubsystem;
 
 namespace src::control::agitator
 {

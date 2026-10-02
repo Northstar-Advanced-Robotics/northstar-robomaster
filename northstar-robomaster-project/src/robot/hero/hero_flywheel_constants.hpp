@@ -80,6 +80,6 @@ inline std::optional<Spin> toSpinPreset(int value)
     }
 }
 
-};  // namespace src::control::flywheel
+}  // namespace src::control::flywheel
 
 #endif  // HERO_FLYWHEEL_CONSTANTS_HPP_

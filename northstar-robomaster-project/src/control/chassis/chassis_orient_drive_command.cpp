@@ -6,13 +6,11 @@
 
 #include "chassis_subsystem.hpp"
 
-using tap::algorithms::limitVal;
-
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisOrientDriveCommand::ChassisOrientDriveCommand(
     ChassisSubsystem* chassis,
-    src::control::ControlOperatorInterface* operatorInterface)
+    src::robot::ControlOperatorInterface* operatorInterface)
     : chassis(chassis),
       operatorInterface(operatorInterface)
 {
@@ -38,7 +36,7 @@ void ChassisOrientDriveCommand::execute()
     rotationalValue =
         tap::algorithms::lowPassFilter(rotationalValue, rotationFromPID, rotationalAlpha);
 
-    modm::Pair<float, float> normInput = src::chassis::getNormalizedInput(
+    modm::Pair<float, float> normInput = src::control::chassis::getNormalizedInput(
         operatorInterface->getDrivetrainVerticalTranslation(),
         operatorInterface->getDrivetrainHorizontalTranslation());
     chassis->setVelocityTurretDrive(normInput.first, normInput.second, rotationalValue);
@@ -48,4 +46,4 @@ void ChassisOrientDriveCommand::end([[maybe_unused]] bool interrupted)
 {
     chassis->setVelocityTurretDrive(0, 0, 0);
 }
-};  // namespace src::chassis
+}  // namespace src::control::chassis

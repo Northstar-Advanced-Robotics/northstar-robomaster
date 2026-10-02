@@ -7,13 +7,13 @@
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
 #include "tap/mock/dji_motor_mock.hpp"
-#else 
+#else
 #include "tap/motor/dji_motor.hpp"
 #endif
 
 // class Drivers;
 
-namespace HardwareTesting
+namespace src::control::test_subsystem
 {
 /// @ingroup util
 ///
@@ -66,4 +66,4 @@ private:
     Motor debugPitchMotor;
 
 };  // class TestSubsystem
-}  // namespace HardwareTesting
+}  // namespace src::control::test_subsystem

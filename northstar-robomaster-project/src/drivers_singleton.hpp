@@ -26,19 +26,19 @@
 
 #ifdef TARGET_STANDARD
 #include "robot/standard/standard_drivers.hpp"
-namespace src::standard
+namespace src::robot::standard
 #elif TARGET_SENTRY
 #include "robot/sentry/sentry_drivers.hpp"
-namespace src::sentry
+namespace src::robot::sentry
 #elif TARGET_HERO
 #include "robot/hero/hero_drivers.hpp"
-namespace src::hero
+namespace src::robot::hero
 #elif TURRET
 #include "robot/turret/turret_drivers.hpp"
-namespace src::gyro
+namespace src::robot::turret
 #elif TARGET_TEST_BED
 #include "robot/testbed/testbed_drivers.hpp"
-namespace src::testbed
+namespace src::robot::testbed
 #endif
 {
 /**
@@ -50,7 +50,7 @@ namespace src::testbed
  */
 Drivers *DoNotUse_getDrivers();
 using driversFunc = Drivers *(*)();
-}  // namespace src
+}  // namespace src::robot::<robot>
 
 #endif  // DRIVERS_SINGLETON_HPP_
 

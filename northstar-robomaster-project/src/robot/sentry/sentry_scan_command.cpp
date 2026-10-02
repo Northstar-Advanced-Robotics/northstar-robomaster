@@ -1,13 +1,16 @@
 #include "sentry_scan_command.hpp"
 
-namespace src::control::turret::cv
+using tap::algorithms::Angle;
+using tap::algorithms::WrappedFloat;
+
+namespace src::robot::sentry
 {
 SentryScanCommand::SentryScanCommand(
     tap::Drivers *drivers,
-    TurretSubsystem *turretSubsystem,
-    algorithms::TurretYawControllerInterface *yawController,
-    algorithms::TurretPitchControllerInterface *pitchController,
-    src::chassis::ChassisOdometry *chassisOdometry,
+    src::control::turret::TurretSubsystem *turretSubsystem,
+    src::control::turret::TurretYawControllerInterface *yawController,
+    src::control::turret::TurretPitchControllerInterface *pitchController,
+    src::control::chassis::ChassisOdometry *chassisOdometry,
     float MIN_PITCH_ANGLE,
     float MAX_PITCH_ANGLE,
     float PITCH_SPEED,
@@ -68,4 +71,4 @@ void SentryScanCommand::end(bool)
     turretSubsystem->pitchMotor.setMotorOutput(0);
 }
 
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry

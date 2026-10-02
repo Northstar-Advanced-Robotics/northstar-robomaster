@@ -55,17 +55,17 @@ tap::arch::PeriodicMilliTimer sendMotorTimeout(tap::Drivers::DT);
 // tap::arch::PeriodicMilliTimer revHeartBeatTimeout(100);
 
 #ifdef TARGET_STANDARD
-using namespace src::standard;
+using namespace src::robot::standard;
 #elif TARGET_SENTRY
-using namespace src::sentry;
+using namespace src::robot::sentry;
 #elif TARGET_HERO
-using namespace src::hero;
+using namespace src::robot::hero;
 #elif TURRET
 #include "communication/can/chassis/chassis_mcb_can_comm.hpp"
-using namespace src::gyro;
-ChassisMcbCanComm chassisMcbCanComm(DoNotUse_getDrivers());
+using namespace src::robot::turret;
+src::communication::can::ChassisMcbCanComm chassisMcbCanComm(DoNotUse_getDrivers());
 #elif TARGET_TEST_BED
-using namespace src::testbed;
+using namespace src::robot::testbed;
 #endif
 
 // using namespace std::chrono_literals;

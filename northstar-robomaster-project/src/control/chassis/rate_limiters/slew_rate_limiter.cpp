@@ -2,7 +2,7 @@
 
 #include "tap/algorithms/math_user_utils.hpp"
 
-namespace src::chassis::algorithms
+namespace src::control::chassis
 {
 float SlewRateLimiter::runLimiter(float desiredVelocity, float currentVelocity)
 {
@@ -19,4 +19,4 @@ float SlewRateLimiter::runLimiter(float desiredVelocity, float currentVelocity)
     return currentVelocity + step;
 }
 
-}  // namespace src::chassis::algorithms
+}  // namespace src::control::chassis

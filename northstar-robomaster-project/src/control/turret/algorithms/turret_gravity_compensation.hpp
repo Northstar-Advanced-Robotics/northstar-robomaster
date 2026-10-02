@@ -25,7 +25,7 @@
 
 #include "modm/math/geometry/angle.hpp"
 
-namespace src::control::turret::algorithms
+namespace src::control::turret
 {
 /**
  * Computes the motor output needed to hold the turret's pitch against gravity.
@@ -52,6 +52,6 @@ float computeGravitationalForceOffset(
     const float cgZ,
     const float pitchAngleFromCenter,
     const float gravityCompensatorMax);
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // GRAVITY_COMPENSATION_HPP_

@@ -20,9 +20,9 @@
 namespace src
 {
 class Drivers;
-}
+}  // namespace src
 
-namespace src::kicker
+namespace src::control::kicker
 {
 /**
  * @ingroup hopper_kicker
@@ -90,6 +90,6 @@ private:
 #endif
 };
 
-}  // namespace src::kicker
+}  // namespace src::control::kicker
 
 #endif  // KICKER_SUBSYSTEM_HPP_

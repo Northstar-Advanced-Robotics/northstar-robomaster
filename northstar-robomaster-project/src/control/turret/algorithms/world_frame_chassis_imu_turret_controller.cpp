@@ -25,7 +25,10 @@
 
 #include "turret_gravity_compensation.hpp"
 
-namespace src::control::turret::algorithms
+using tap::algorithms::Angle;
+using tap::algorithms::WrappedFloat;
+
+namespace src::control::turret
 {
 /**
  * Transforms the passed in turret yaw angle in the chassis frame to the world frame (units
@@ -326,4 +329,4 @@ WrappedFloat WorldFramePitchChassisImuTurretController::convertChassisAngleToCon
         chassisFrameAngle);
 }
 
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

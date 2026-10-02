@@ -33,22 +33,20 @@
 #define USING_AGITATOR
 // #define USING_HERO_AGITATOR
 // #define USING_FLYWHEEL
-// #define USING_REV
-// #define USING_HUD
 
 #include "control/dummy_subsystem.hpp"
 
 #include "drivers_singleton.hpp"
 
-src::testbed::driversFunc drivers = src::testbed::DoNotUse_getDrivers;
-DummySubsystem dummySubsystem(drivers());
+src::robot::testbed::driversFunc drivers = src::robot::testbed::DoNotUse_getDrivers;
+src::control::DummySubsystem dummySubsystem(drivers());
 
 #ifdef USING_CHASSIS
 
 #include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_drive_command.hpp"
 #include "control/chassis/chassis_orient_drive_command.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
+#include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/chassis/chassis_wiggle_command.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 #include "control/turret/constants/turret_constants.hpp"
@@ -61,24 +59,9 @@ DummySubsystem dummySubsystem(drivers());
 #include "control/turret/algorithms/world_frame_chassis_imu_turret_controller.hpp"
 #include "control/turret/algorithms/world_frame_turret_imu_turret_controller.hpp"
 #include "control/turret/constants/turret_constants.hpp"
-#include "control/turret/user/turret_user_world_relative_command.hpp"
-// turret
 #include "control/turret/cv/turret_cv_control_command.hpp"
-#include "control/turret/algorithms/world_frame_turret_can_imu_turret_controller.hpp"
 #include "control/turret/turret_subsystem.hpp"
-#include "control/turret/user/turret_quick_turn_command.hpp"
 #include "control/turret/user/turret_user_control_command.hpp"
-#include "robot/standard/standard_turret_subsystem.hpp"
-
-// testbed turret
-#include "control/turret/test/turret_test_command.hpp"
-
-#endif
-
-#if defined(USING_TURRET) && defined(USING_REV)
-
-#include "control/turret/rev_turret_subsystem.hpp"
-#include "control/turret/user/neo_turret_user_control_command.hpp"
 
 #endif
 
@@ -126,24 +109,6 @@ DummySubsystem dummySubsystem(drivers());
 #include "control/flywheel/flywheel_constants.hpp"
 #include "control/flywheel/flywheel_run_command.hpp"
 #include "control/flywheel/flywheel_subsystem.hpp"
-
-#endif
-
-#ifdef USING_HUD
-
-#include "tap/communication/serial/ref_serial_transmitter.hpp"
-
-#include "control/clientDisplay/client_display_command.hpp"
-#include "control/clientDisplay/client_display_subsystem.hpp"
-#include "control/clientDisplay/indicators/ammo_indicator.hpp"
-#include "control/clientDisplay/indicators/chassis_power_indicator.hpp"
-#include "control/clientDisplay/indicators/circle_crosshair.hpp"
-#include "control/clientDisplay/indicators/cv_aiming_indicator.hpp"
-#include "control/clientDisplay/indicators/flywheel_indicator.hpp"
-#include "control/clientDisplay/indicators/hud_indicator.hpp"
-#include "control/clientDisplay/indicators/shooting_mode_indicator.hpp"
-#include "control/clientDisplay/indicators/text_hud_indicators.hpp"
-#include "control/clientDisplay/indicators/vision_indicator.hpp"
 
 #endif
 

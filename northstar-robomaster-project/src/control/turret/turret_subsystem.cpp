@@ -28,8 +28,7 @@
 #include "tap/control/command_mapper.hpp"
 #include "tap/errors/create_errors.hpp"
 
-using namespace tap::motor;
-using namespace tap::algorithms;
+using tap::motor::MotorInterface;
 
 namespace src::control::turret
 {
@@ -38,10 +37,11 @@ TurretSubsystem::TurretSubsystem(
     MotorInterface *pitchMotor,
     MotorInterface *yawMotor,
     const TurretMotorConfig &pitchMotorConfig,
-    const TurretMotorConfig &yawMotorConfig)
+    const TurretMotorConfig &yawMotorConfig,
+    const tap::encoder::EncoderInterface *yawVelocityEncoder)
     : tap::control::Subsystem(drivers),
       pitchMotor(pitchMotor, pitchMotorConfig),
-      yawMotor(yawMotor, yawMotorConfig)
+      yawMotor(yawMotor, yawMotorConfig, yawVelocityEncoder)
 {
     assert(drivers != nullptr);
     assert(pitchMotor != nullptr);

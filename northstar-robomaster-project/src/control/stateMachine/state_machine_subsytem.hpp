@@ -9,7 +9,7 @@
 #include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_subsystem.hpp"
 
-namespace src::stateMachine
+namespace src::control::state_machine
 {
 /**
  * @ingroup util
@@ -35,9 +35,9 @@ public:
      */
     StateMachineSubsystem(
         tap::Drivers* drivers,
-        src::chassis::ChassisSubsystem* chassisSubsystem,
-        src::chassis::ChassisAutoDrive* chassisAutoDrive,
-        src::chassis::ChassisBeybladeCommand* beybladeCommand,
+        src::control::chassis::ChassisSubsystem* chassisSubsystem,
+        src::control::chassis::ChassisAutoDrive* chassisAutoDrive,
+        src::control::chassis::ChassisBeybladeCommand* beybladeCommand,
         src::control::governor::MatchRunningGovernor* matchRunningGovernor);
 
     /// Does nothing; this subsystem holds no hardware of its own.
@@ -55,11 +55,11 @@ public:
 
 private:
     /// The chassis being driven.
-    src::chassis::ChassisSubsystem* chassisSubsystem;
+    src::control::chassis::ChassisSubsystem* chassisSubsystem;
     /// The path follower supplying velocity and rotation setpoints.
-    src::chassis::ChassisAutoDrive* chassisAutoDrive;
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive;
     /// Supplies the beyblade spin rate. `nullptr` if this robot drives without spinning.
-    src::chassis::ChassisBeybladeCommand* beybladeCommand;
+    src::control::chassis::ChassisBeybladeCommand* beybladeCommand;
     /// Reports whether the referee system says a match is in progress.
     src::control::governor::MatchRunningGovernor* matchRunningGovernor;
 
@@ -69,6 +69,6 @@ private:
     uint32_t prevTime = 0;
 };
 
-}  // namespace src::stateMachine
+}  // namespace src::control::state_machine
 
 #endif

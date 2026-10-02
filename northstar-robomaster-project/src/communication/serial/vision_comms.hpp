@@ -7,12 +7,11 @@
 
 #include "control/chassis/chassis_auto_drive.hpp"
 #include "control/chassis/chassis_odometry.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
 #include "control/turret/constants/turret_constants.hpp"
 
 #include "uart_constants.hpp"
 
-namespace src::serial
+namespace src::communication::serial
 {
 /**
  * @ingroup communication
@@ -181,10 +180,10 @@ public:
     } modm_packed;
 
     /// Odometry to correct when a localization message arrives. `nullptr` until `attachOdometry`.
-    src::chassis::ChassisOdometry* chassisOdometry;
+    src::control::chassis::ChassisOdometry* chassisOdometry;
 
     /// Auto drive to feed paths to. `nullptr` until `attachAutoDrive`.
-    src::chassis::ChassisAutoDrive* chassisAutoDrive;
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive;
 
     /// Remote to inject forwarded FlySky/VT13 input into. `nullptr` until `attachRemote`.
     tap::communication::serial::Remote* remote;
@@ -303,7 +302,7 @@ public:
      * @param[in] chassisOdometry The odometry to update. Localization messages are ignored while
      *      this is unset.
      */
-    mockable inline void attachOdometry(src::chassis::ChassisOdometry* chassisOdometry)
+    mockable inline void attachOdometry(src::control::chassis::ChassisOdometry* chassisOdometry)
     {
         this->chassisOdometry = chassisOdometry;
     }
@@ -314,7 +313,7 @@ public:
      * @param[in] chassisAutoDrive The auto drive to update. Path messages are ignored while this
      *      is unset.
      */
-    mockable inline void attachAutoDrive(src::chassis::ChassisAutoDrive* chassisAutoDrive)
+    mockable inline void attachAutoDrive(src::control::chassis::ChassisAutoDrive* chassisAutoDrive)
     {
         this->chassisAutoDrive = chassisAutoDrive;
     }
@@ -430,6 +429,6 @@ private:
      */
     bool decodeToVT13Remote(const ReceivedSerialMessage& message);
 };
-}  // namespace src::serial
+}  // namespace src::communication::serial
 
 #endif  // VISION_COMMS_HPP

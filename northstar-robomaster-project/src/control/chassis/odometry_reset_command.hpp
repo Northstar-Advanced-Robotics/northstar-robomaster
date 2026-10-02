@@ -7,7 +7,7 @@
 
 #include "chassis_subsystem.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -27,7 +27,9 @@ public:
      *      be updating the pose while it is being reset.
      * @param[in] odometry The odometry to zero.
      */
-    OdometryResetCommand(ChassisSubsystem *chassis, src::chassis::ChassisOdometry *odometry)
+    OdometryResetCommand(
+        ChassisSubsystem *chassis,
+        src::control::chassis::ChassisOdometry *odometry)
         : chassis(chassis),
           odometry(odometry)
     {
@@ -55,10 +57,10 @@ public:
 
 private:
     /// The chassis held as a requirement for the duration of the reset.
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
     /// The odometry being zeroed.
-    src::chassis::ChassisOdometry *odometry;
+    src::control::chassis::ChassisOdometry *odometry;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

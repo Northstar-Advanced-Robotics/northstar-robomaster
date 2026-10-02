@@ -1,0 +1,61 @@
+#pragma once
+
+#include "control/client_display/graphics_objects/atomic_graphics_objects.hpp"
+#include "control/client_display/graphics_objects/graphics_container.hpp"
+#include "control/client_display/ui_subsystem.hpp"
+#include "control/governor/flywheel_on_governor.hpp"
+
+namespace src::control::client_display
+{
+/**
+ * @ingroup client_display
+ *
+ * A large ring around the center of the screen that turns green once the flywheels are spun up.
+ *
+ * Firing before the flywheels are at speed wastes projectiles, so the ring is drawn in black
+ * (effectively invisible against the feed) until they are ready.
+ */
+class FlywheelReadyIndicator : public GraphicsContainer
+{
+public:
+    FlywheelReadyIndicator(
+        tap::Drivers* drivers,
+        control::governor::FlywheelOnGovernor* flywheelGovernor)
+        : drivers(drivers),
+          flywheelGovernor(flywheelGovernor)
+    {
+        addGraphicsObject(&readyCircle);
+    }
+
+    /// Colors the ring green when the flywheels are up to speed, black otherwise.
+    void update()
+    {
+        // if(drivers->remote.keyPressed(Remote::Key::R))
+        //     drivers->recal.requestRecalibration();
+
+        if (flywheelGovernor->isReady())
+        {
+            readyCircle.color = UISubsystem::Color::GREEN;
+        }
+        else
+        {
+            readyCircle.color = UISubsystem::Color::BLACK;
+        }
+    }
+
+private:
+    tap::Drivers* drivers;
+
+    control::governor::FlywheelOnGovernor* flywheelGovernor;
+
+    static constexpr uint16_t X_POSITION =
+        UISubsystem::HALF_SCREEN_WIDTH;  // pixels, all numbers at the same y level on screen
+    static constexpr uint16_t Y_POSITION =
+        UISubsystem::HALF_SCREEN_HEIGHT;          // pixels, all numbers at the same y level on
+                                                  // screen
+    static constexpr uint16_t LINE_HEIGHT = 200;  // pixels, this is a large number
+
+    UnfilledCircle readyCircle{UISubsystem::Color::BLACK, X_POSITION, Y_POSITION, 200, 10};
+};
+
+}  // namespace src::control::client_display

@@ -1,4 +1,4 @@
-namespace src::chassis::algorithms
+namespace src::control::chassis
 {
 /**
  * @ingroup chassis
@@ -40,4 +40,4 @@ private:
     float maxError;  // Rotations per minute
 };
 
-}  // namespace src::chassis::algorithms
+}  // namespace src::control::chassis

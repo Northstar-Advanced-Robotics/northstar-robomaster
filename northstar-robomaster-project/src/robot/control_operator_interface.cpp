@@ -27,16 +27,14 @@
 #include "tap/architecture/clock.hpp"
 #include "tap/drivers.hpp"
 
-#include "control/chassis/chassis_subsystem.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
 
-using namespace tap::algorithms;
-using namespace tap::communication::serial;
-using namespace src::chassis;
+using src::control::chassis::CHASSIS_WALK_SPEED_MPS;
+using src::control::chassis::MAX_CHASSIS_SPEED_MPS;
+using tap::algorithms::compareFloatClose;
+using tap::algorithms::limitVal;
 
-namespace src
-{
-namespace control
+namespace src::robot
 {
 float ControlOperatorInterface::getTurretYawInput()
 {
@@ -73,27 +71,26 @@ float ControlOperatorInterface::getTurretPitchInput()
 }
 
 /** 
- * Returns a MPS scaled by max chassis speed per the power limit
+ * Returns a speed in m/s, up to `MAX_CHASSIS_SPEED_MPS`
  */
 float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
 
-    float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
-                                 drivers->refSerial.getRefSerialReceivingData(),
-                                 ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
-
     if (prevUpdateCounterY != updateCounter)
     {
         chassisYInput.update(
-            -drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * maxWheelSpeedMPS,
+            -drivers->remote.getChannel(Remote::Channel::LEFT_HORIZONTAL) * MAX_CHASSIS_SPEED_MPS,
             currTime);
         prevUpdateCounterY = updateCounter;
     }
 
     float output = 0.0f;
+
+    // SUPERCAP: sprint (Shift) at MAX_CHASSIS_SPEED_MPS only while
+    // capacitorBank->canSprint(SPRINT_THRESHOLD_PERCENT); otherwise fall back to
+    // CHASSIS_WALK_SPEED_MPS so the operator isn't promised speed an empty cap can't supply.
 
     if (drivers->remote.keyPressed(Remote::Key::A) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -104,7 +101,7 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
         drivers->remote.keyPressed(Remote::Key::A) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output = maxWheelSpeedMPS;
+        output = MAX_CHASSIS_SPEED_MPS;
     }
     if (drivers->remote.keyPressed(Remote::Key::D) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -115,39 +112,38 @@ float ControlOperatorInterface::getDrivetrainHorizontalTranslation()
         drivers->remote.keyPressed(Remote::Key::D) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output -= maxWheelSpeedMPS;
+        output -= MAX_CHASSIS_SPEED_MPS;
     }
 
     output = limitVal<float>(
         chassisYInput.getInterpolatedValue(currTime) + output,
-        -maxWheelSpeedMPS,
-        maxWheelSpeedMPS);
+        -MAX_CHASSIS_SPEED_MPS,
+        MAX_CHASSIS_SPEED_MPS);
 
     return output;
 }
 
 /** 
- * Returns a MPS scaled by max chassis speed per the power limit
+ * Returns a speed in m/s, up to `MAX_CHASSIS_SPEED_MPS`
  */
 float ControlOperatorInterface::getDrivetrainVerticalTranslation()
 {
     uint32_t updateCounter = drivers->remote.getUpdateCounter();
     uint32_t currTime = tap::arch::clock::getTimeMilliseconds();
 
-    float maxWheelSpeedMPS = ChassisSubsystem::getMaxWheelSpeed(
-                                 drivers->refSerial.getRefSerialReceivingData(),
-                                 ChassisSubsystem::getChassisPowerLimit(drivers)) *
-                             (WHEEL_DIAMETER_M * M_PI / 60.0f * CHASSIS_GEAR_RATIO) * 1.4142f;
-
     if (prevUpdateCounterX != updateCounter)
     {
         chassisXInput.update(
-            drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) * maxWheelSpeedMPS,
+            drivers->remote.getChannel(Remote::Channel::LEFT_VERTICAL) * MAX_CHASSIS_SPEED_MPS,
             currTime);
         prevUpdateCounterX = updateCounter;
     }
 
     float output = 0.0f;
+
+    // SUPERCAP: sprint (Shift) at MAX_CHASSIS_SPEED_MPS only while
+    // capacitorBank->canSprint(SPRINT_THRESHOLD_PERCENT); otherwise fall back to
+    // CHASSIS_WALK_SPEED_MPS so the operator isn't promised speed an empty cap can't supply.
 
     if (drivers->remote.keyPressed(Remote::Key::S) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -158,7 +154,7 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
         drivers->remote.keyPressed(Remote::Key::S) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output = -maxWheelSpeedMPS;
+        output = -MAX_CHASSIS_SPEED_MPS;
     }
     if (drivers->remote.keyPressed(Remote::Key::W) &&
         !drivers->remote.keyPressed(Remote::Key::SHIFT))
@@ -169,13 +165,13 @@ float ControlOperatorInterface::getDrivetrainVerticalTranslation()
         drivers->remote.keyPressed(Remote::Key::W) &&
         drivers->remote.keyPressed(Remote::Key::SHIFT))
     {
-        output += maxWheelSpeedMPS;
+        output += MAX_CHASSIS_SPEED_MPS;
     }
 
     output = limitVal<float>(
         chassisXInput.getInterpolatedValue(currTime) + output,
-        -maxWheelSpeedMPS,
-        maxWheelSpeedMPS);
+        -MAX_CHASSIS_SPEED_MPS,
+        MAX_CHASSIS_SPEED_MPS);
 
     return output;
 }
@@ -210,6 +206,4 @@ float ControlOperatorInterface::getDrivetrainRotationalTranslation()
     return 0;
 }
 
-}  // namespace control
-
-}  // namespace src
+}  // namespace src::robot

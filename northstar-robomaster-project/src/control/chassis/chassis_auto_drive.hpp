@@ -11,7 +11,7 @@
 #include "chassis_odometry.hpp"
 #include "chassis_subsystem.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 /**
  * @ingroup chassis
@@ -60,12 +60,12 @@ class ChassisAutoDrive
     static constexpr float DEGEN_CURVE_LENGTH = 0.1f;
 
     /// The chassis, used for its rotation PID controller.
-    src::chassis::ChassisSubsystem* chassis;
+    src::control::chassis::ChassisSubsystem* chassis;
     /// The odometry supplying the robot's position and velocity.
-    src::chassis::ChassisOdometry* chassisOdometry;
+    src::control::chassis::ChassisOdometry* chassisOdometry;
 
     /// The path being followed, or `NULL` when there is none.
-    CubicBezier* currentCurve;
+    src::control::algorithms::CubicBezier* currentCurve;
     /// Position of the target point along `currentCurve`, from 0 at the start to 1 at the end.
     float currentT = 0;
 
@@ -94,7 +94,7 @@ public:
      *
      * @param[in] newCurve The path to follow. Not owned; must outlive the follower's use of it.
      */
-    void setCurve(CubicBezier* newCurve);
+    void setCurve(src::control::algorithms::CubicBezier* newCurve);
     /// Recomputes the desired velocity and rotation for this iteration, advancing the target point
     /// if the robot has reached it. Call once per control loop iteration.
     void updateAutoDrive();
@@ -245,13 +245,12 @@ private:
      * Runs the chassis' auto drive rotation PID to turn the robot toward a point, storing the
      * result in `desiredRotation`.
      *
-     * @warning Likely sign-inverted, and untested since the coordinate frame refactor.
-     *      `getDifferenceToTargetAngle` yields a **counterclockwise** error and
-     *      `chassisSpeedRotationAutoDrivePID` returns a counterclockwise-positive output, but
-     *      `desiredRotation` is eventually passed to the chassis as `rotational`, which is
-     *      **clockwise** positive. As written the robot should turn away from the lookahead point.
-     *      The fix is to negate the PID's whole output here (negating only the input would flip P
-     *      but not D). Verify with a path-follow on the robot before relying on this.
+     * @warning Likely sign-inverted, and untested since the coordinate frame refactor. The PID
+     *      output is counterclockwise positive, matching `rotational`, but it is negated below to
+     *      preserve the behavior from before `rotational` became counterclockwise positive (when
+     *      it was clockwise). As written the robot should turn away from the lookahead point. The
+     *      fix is to drop that negation; verify with a path-follow on the robot before relying on
+     *      this.
      *
      * @param[in] localPoint The direction to face, as a **field-frame** vector from the robot to
      *      the point (despite the name, not chassis-local).
@@ -266,10 +265,10 @@ private:
             tap::algorithms::WrappedFloat(differenceInDesiredFacingRadians, -M_PI_4, M_PI_4)
                 .getWrappedValue());
 
-        desiredRotation = rotationFromPID;
+        desiredRotation = -rotationFromPID;
     }
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

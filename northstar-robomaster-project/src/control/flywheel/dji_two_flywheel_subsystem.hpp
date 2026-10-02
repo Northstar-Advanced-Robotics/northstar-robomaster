@@ -145,7 +145,7 @@ private:
      *      `MPS_TO_RPM` table.
      */
     float launchSpeedToFlywheelRpm(float launchSpeed) const override;
-};  // namespace src::control::flywheel
+};
 
 }  // namespace src::control::flywheel
 

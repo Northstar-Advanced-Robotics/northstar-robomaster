@@ -2,11 +2,11 @@
 
 #include "tap/algorithms/wrapped_float.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisAutoDrive::ChassisAutoDrive(
     ChassisSubsystem* chassis,
-    src::chassis::ChassisOdometry* chassisOdometry)
+    src::control::chassis::ChassisOdometry* chassisOdometry)
     : chassis(chassis),
       chassisOdometry(chassisOdometry),
       currentCurve(NULL)
@@ -19,7 +19,7 @@ void ChassisAutoDrive::resetPath()
     currentT = 0;
 }
 
-void ChassisAutoDrive::setCurve(CubicBezier* newPoint)
+void ChassisAutoDrive::setCurve(src::control::algorithms::CubicBezier* newPoint)
 {
     currentCurve = newPoint;
     currentT = approximateTClosestToPoint(chassisOdometry->getPositionGlobal());
@@ -81,4 +81,4 @@ void ChassisAutoDrive::updateAutoDrive()
     calculateRotationToFacePoint(lookaheadDirection);
 }
 
-};  // namespace src::chassis
+}  // namespace src::control::chassis

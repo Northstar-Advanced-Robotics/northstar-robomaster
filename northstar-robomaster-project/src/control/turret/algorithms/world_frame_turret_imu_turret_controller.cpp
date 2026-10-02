@@ -27,7 +27,11 @@
 
 #include "turret_gravity_compensation.hpp"
 
-namespace src::control::turret::algorithms
+using tap::algorithms::Angle;
+using tap::algorithms::compareFloatClose;
+using tap::algorithms::WrappedFloat;
+
+namespace src::control::turret
 {
 /**
  * Transforms the specified `angleToTransform`, a yaw/pitch angle (in radians) from the chassis
@@ -254,15 +258,9 @@ void WorldFrameYawTurretImuCascadePidTurretController::runController(
         velocityPid);
 
     lastpidOut = pidOut;
+    const float yawRateDifference = turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
     const float chassisYawRate =
-        compareFloatClose(
-            static_cast<src::control::turret::TurretMotorDJI &>(turretMotor)
-                    .getChassisFrameVelocitySUS() -
-                worldFrameYawVelocity,
-            0,
-            1)
-            ? 0
-            : turretMotor.getChassisFrameVelocity() - worldFrameYawVelocity;
+        compareFloatClose(yawRateDifference, 0, 1) ? 0 : yawRateDifference;
     turretMotor.setMotorOutput(pidOut + chassisYawRate * world_rel_turret_imu::BEYBLADE_FF_GAIN);
 }
 
@@ -428,4 +426,4 @@ WrappedFloat WorldFramePitchTurretImuCascadePidTurretController::
         worldFramePitchAngle,
         chassisFrameAngle);
 }
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

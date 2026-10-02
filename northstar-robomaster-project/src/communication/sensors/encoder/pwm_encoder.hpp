@@ -8,8 +8,7 @@
 
 #include "modm/platform/timer/timer_12.hpp"
 
-
-namespace tap::encoder
+namespace src::communication::sensors
 {
 /**
  * @ingroup communication
@@ -21,7 +20,7 @@ namespace tap::encoder
  * period on the rising edge and channel 2 the pulse width on the falling edge, and the ratio of the
  * two is the shaft angle.
  */
-class PwmEncoder : public WrappedEncoder
+class PwmEncoder : public tap::encoder::WrappedEncoder
 {
 public:
     /// Counts per revolution the duty cycle is mapped onto.
@@ -56,6 +55,6 @@ public:
     bool isOnline() const override;
 };
 
-}  // namespace tap::encoder
+}  // namespace src::communication::sensors
 
 #endif  // TAPROOT_PWM_ENCODER_HPP_

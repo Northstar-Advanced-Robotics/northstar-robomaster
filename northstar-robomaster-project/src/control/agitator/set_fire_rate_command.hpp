@@ -8,7 +8,7 @@
 #include "control/agitator/constant_velocity_agitator_command.hpp"
 #include "control/agitator/manual_fire_rate_reselection_manager.hpp"
 
-namespace src::agitator
+namespace src::control::agitator
 {
 /**
  * @ingroup agitator
@@ -82,6 +82,6 @@ private:
     /// The agitator command toggled between discrete shots and constant rotation, if any.
     std::optional<src::control::agitator::ConstantVelocityAgitatorCommand *> command;
 };
-}  // namespace src::agitator
+}  // namespace src::control::agitator
 
 #endif

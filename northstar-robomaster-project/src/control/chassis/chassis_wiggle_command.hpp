@@ -7,14 +7,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -39,7 +39,7 @@ public:
      */
     ChassisWiggleCommand(
         ChassisSubsystem *chassis,
-        src::control::ControlOperatorInterface *operatorInterface,
+        src::robot::ControlOperatorInterface *operatorInterface,
         float period,
         float maxWiggleSpeed);
 
@@ -64,10 +64,10 @@ public:
 
 private:
     /// The chassis being driven.
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
 
     /// The source of operator input.
-    src::control::ControlOperatorInterface *operatorInterface;
+    src::robot::ControlOperatorInterface *operatorInterface;
 
     /// Time in milliseconds of the previous iteration, used to measure `dt`.
     uint32_t prevTime;
@@ -90,4 +90,4 @@ private:
      */
     float calculateWiggle(uint32_t dt);
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

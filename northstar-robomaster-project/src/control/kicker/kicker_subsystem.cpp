@@ -15,10 +15,8 @@
 
 #include "modm/math/filter/pid.hpp"
 
-using namespace tap::motor;
-
 /* Subsystem for the kicker on the hero turret. */
-namespace src::kicker
+namespace src::control::kicker
 {
 KickerSubsystem::KickerSubsystem(
     tap::Drivers* drivers,
@@ -63,4 +61,4 @@ void KickerSubsystem::setSetpoint(float velocity)
         velocitySetpoint = velocity;
     }
 }
-}  // namespace src::kicker
+}  // namespace src::control::kicker

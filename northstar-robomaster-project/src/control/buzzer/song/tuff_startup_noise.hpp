@@ -3,6 +3,8 @@
 
 #include "control/buzzer/song_types.hpp"
 
+namespace src::control::buzzer
+{
 /// A short rising arpeggio played once at startup, as an audible sign that the board has booted.
 const Song tsnSong = {
     {REST, 150},
@@ -57,5 +59,7 @@ const Song theWorldRevolving{
     {NOTE_E6, TWR_SIXTEENTH},
     {NOTE_D6, TWR_QUARTER + TWR_QUARTER},
 };
+
+}  // namespace src::control::buzzer
 
 #endif

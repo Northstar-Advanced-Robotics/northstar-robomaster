@@ -8,7 +8,7 @@
 #include "control/turret/algorithms/turret_controller_interface.hpp"
 #include "control/turret/turret_subsystem.hpp"
 
-namespace src::control::turret::cv
+namespace src::robot::sentry
 {
 /**
  * @ingroup robots
@@ -40,10 +40,10 @@ public:
      */
     SentryScanCommand(
         tap::Drivers *drivers,
-        TurretSubsystem *turretSubsystem,
-        algorithms::TurretYawControllerInterface *yawController,
-        algorithms::TurretPitchControllerInterface *pitchController,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::turret::TurretSubsystem *turretSubsystem,
+        src::control::turret::TurretYawControllerInterface *yawController,
+        src::control::turret::TurretPitchControllerInterface *pitchController,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float MIN_PITCH_ANGLE,
         float MAX_PITCH_ANGLE,
         float PITCH_SPEED,
@@ -73,7 +73,7 @@ private:
     /// The global drivers object.
     tap::Drivers *drivers;
     /// The turret being swept.
-    TurretSubsystem *turretSubsystem;
+    src::control::turret::TurretSubsystem *turretSubsystem;
 
     /// Time in milliseconds of the previous iteration, used to measure `dt`.
     uint32_t prevTime = 0;
@@ -85,12 +85,12 @@ private:
     float currentYawSetpoint = 0;
 
     /// The controller driving yaw to its setpoint.
-    algorithms::TurretYawControllerInterface *yawController;
+    src::control::turret::TurretYawControllerInterface *yawController;
     /// The controller driving pitch to its setpoint.
-    algorithms::TurretPitchControllerInterface *pitchController;
+    src::control::turret::TurretPitchControllerInterface *pitchController;
 
     /// Supplies the chassis heading, so the sweep is defined in field terms.
-    src::chassis::ChassisOdometry *chassisOdometry;
+    src::control::chassis::ChassisOdometry *chassisOdometry;
 
     /// The bottom of the pitch sweep, in radians.
     float MIN_PITCH_ANGLE;
@@ -101,6 +101,6 @@ private:
     /// How fast yaw moves between headings, in radians/second.
     float YAW_SPEED;
 };
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry
 
 #endif  // SENTRY_TURRET_USER_CONTROL_COMMAND_HPP_

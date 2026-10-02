@@ -9,7 +9,7 @@
 #error "Do not include this file directly! Use uart_constants.hpp instead."
 #endif
 
-namespace src::serial
+namespace src::communication::serial
 {
 static constexpr uint32_t TIME_BEFORE_UART_START =
     1000;  // initial delay of 1 second to allow time for things to start up
@@ -37,5 +37,5 @@ static constexpr uint32_t TIME_BEFORE_SENDING_REF_TURRET_DATA_MSG =
 static tap::arch::PeriodicMilliTimer sendRefTurretDataMsgTimeout{
     TIME_BTWN_SENDING_REF_TURRET_DATA_MSG};
 
-}  // namespace src::serial
+}  // namespace src::communication::serial
 #endif

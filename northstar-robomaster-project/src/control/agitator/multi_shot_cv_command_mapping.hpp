@@ -32,7 +32,7 @@
 namespace src
 {
 class Drivers;
-}
+}  // namespace src
 
 namespace src::control::agitator
 {

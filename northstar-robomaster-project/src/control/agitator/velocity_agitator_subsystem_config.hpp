@@ -4,7 +4,7 @@
 #include "tap/communication/can/can_bus.hpp"
 #include "tap/motor/dji_motor.hpp"
 
-namespace src::agitator
+namespace src::control::agitator
 {
 /**
  * @ingroup agitator
@@ -19,7 +19,9 @@ namespace src::agitator
  */
 struct VelocityAgitatorSubsystemConfig
 {
-    /// Motor gear ratio, so we use shaft angle rather than encoder angle.
+    /// Output-shaft rotations per motor rotation (e.g. `1/36` for an M2006), so position and
+    /// velocity are reported at the agitator shaft rather than the motor. The motor encoder
+    /// multiplies by this value.
     float gearRatio;
     /// The motor ID for this motor.
     tap::motor::MotorId agitatorMotorId;
@@ -43,6 +45,6 @@ struct VelocityAgitatorSubsystemConfig
     /// controlled by sending voltage commands, this term should be 0.
     float velocityPIDFeedForwardGain;
 };
-}  // namespace src::agitator
+}  // namespace src::control::agitator
 
 #endif  // VELOCITY_AGITATOR_SUBSYSTEM_CONFIG_HPP_

@@ -15,9 +15,7 @@
 
 #include "modm/math/filter/pid.hpp"
 
-using namespace tap::motor;
-
-namespace src::agitator
+namespace src::control::agitator
 {
 VelocityAgitatorSubsystem::VelocityAgitatorSubsystem(
     tap::Drivers* drivers,
@@ -73,6 +71,8 @@ bool VelocityAgitatorSubsystem::calibrateHere()
     agitatorMotor.getEncoder()->resetEncoderValue();
     agitatorIsCalibrated = true;
     velocitySetpoint = 0.0f;
+    velocityPid.reset();
+    prevTime = tap::arch::clock::getTimeMilliseconds();
     clearJam();
     return true;
 }
@@ -106,4 +106,4 @@ void VelocityAgitatorSubsystem::setSetpoint(float velocity)
         velocitySetpoint = velocity;
     }
 }
-}  // namespace src::agitator
+}  // namespace src::control::agitator
