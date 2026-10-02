@@ -29,6 +29,7 @@ Import("sources")
 # Don't compile this stuff when testing
 IGNORED_FILES_WHILE_TESTING = [
     "main.cpp",
+    "robot_loop.cpp",
     "robot/**/*_control.cpp",
 ]
 
