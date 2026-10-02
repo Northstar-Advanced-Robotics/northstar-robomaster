@@ -19,7 +19,9 @@ namespace src::control::agitator
  */
 struct VelocityAgitatorSubsystemConfig
 {
-    /// Motor gear ratio, so we use shaft angle rather than encoder angle.
+    /// Output-shaft rotations per motor rotation (e.g. `1/36` for an M2006), so position and
+    /// velocity are reported at the agitator shaft rather than the motor. The motor encoder
+    /// multiplies by this value.
     float gearRatio;
     /// The motor ID for this motor.
     tap::motor::MotorId agitatorMotorId;

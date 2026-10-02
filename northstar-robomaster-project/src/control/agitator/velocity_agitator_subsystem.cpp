@@ -71,6 +71,8 @@ bool VelocityAgitatorSubsystem::calibrateHere()
     agitatorMotor.getEncoder()->resetEncoderValue();
     agitatorIsCalibrated = true;
     velocitySetpoint = 0.0f;
+    velocityPid.reset();
+    prevTime = tap::arch::clock::getTimeMilliseconds();
     clearJam();
     return true;
 }
