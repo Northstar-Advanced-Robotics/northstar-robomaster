@@ -60,6 +60,8 @@ using namespace src::standard;
 using namespace src::sentry;
 #elif TARGET_HERO
 using namespace src::hero;
+#elif TARGET_ENGINEER
+using namespace src::engineer
 #elif TURRET
 #include "communication/can/chassis/chassis_mcb_can_comm.hpp"
 using namespace src::gyro;

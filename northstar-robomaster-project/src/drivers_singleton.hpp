@@ -33,6 +33,9 @@ namespace src::sentry
 #elif TARGET_HERO
 #include "robot/hero/hero_drivers.hpp"
 namespace src::hero
+#elif TARGET_ENGINEER
+#include "robot/engineer/engineer_drivers.hpp"
+namespace src::engineer
 #elif TURRET
 #include "robot/turret/turret_drivers.hpp"
 namespace src::gyro

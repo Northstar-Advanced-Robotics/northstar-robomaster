@@ -30,6 +30,8 @@ namespace src::standard
 namespace src::sentry
 #elif TARGET_HERO
 namespace src::hero
+#elif TARGET_ENGINEER
+namespace src::engineer
 #elif TURRET
 namespace src::gyro
 #elif TARGET_TEST_BED

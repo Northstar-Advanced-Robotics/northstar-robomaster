@@ -92,6 +92,24 @@
             ]
         },
         {
+            "name": "engineer",
+            "includePath": [
+                "${default}",
+                "northstar-robomaster-project/taproot/modm/src",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+            ],
+            "compilerPath": "arm-none-eabi-g++",
+            "intelliSenseMode": "gcc-arm",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "defines": [
+                "TARGET_ENGINEER"
+            ]
+        },
+        {
             "name": "test-bed",
             "includePath": [
                 "${default}",
@@ -163,6 +181,25 @@
             },
             "defines": [
                 "TARGET_HERO",
+                "FLY_SKY"
+            ]
+        },
+        {
+            "name": "engineer fly_sky",
+            "includePath": [
+                "${default}",
+                "northstar-robomaster-project/taproot/modm/src",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/core",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/device",
+                "northstar-robomaster-project/taproot/modm/ext/cmsis/dsp"
+            ],
+            "compilerPath": "arm-none-eabi-g++",
+            "intelliSenseMode": "gcc-arm",
+            "browse": {
+                "limitSymbolsToIncludedHeaders": true
+            },
+            "defines": [
+                "TARGET_ENGINEER",
                 "FLY_SKY"
             ]
         },
