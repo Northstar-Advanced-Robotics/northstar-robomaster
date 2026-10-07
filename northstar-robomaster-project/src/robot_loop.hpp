@@ -30,6 +30,8 @@ using src::robot::standard::Drivers;
 using src::robot::sentry::Drivers;
 #elif TARGET_HERO
 using src::robot::hero::Drivers;
+#elif TARGET_ENGINEER
+using src::robot::engineer::Drivers;
 #elif TARGET_TURRET
 using src::robot::turret::Drivers;
 #elif TARGET_TEST_BED

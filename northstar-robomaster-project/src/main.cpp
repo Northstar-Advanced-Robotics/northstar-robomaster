@@ -48,6 +48,8 @@ using namespace src::robot::standard;
 using namespace src::robot::sentry;
 #elif TARGET_HERO
 using namespace src::robot::hero;
+#elif TARGET_ENGINEER
+using namespace src::robot::engineer;
 #elif TARGET_TURRET
 using namespace src::robot::turret;
 #elif TARGET_TEST_BED

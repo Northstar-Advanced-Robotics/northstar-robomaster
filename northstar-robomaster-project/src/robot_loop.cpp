@@ -46,6 +46,8 @@ using namespace src::robot::standard;
 using namespace src::robot::sentry;
 #elif TARGET_HERO
 using namespace src::robot::hero;
+#elif TARGET_ENGINEER
+using namespace src::robot::engineer;
 #elif TARGET_TURRET
 #include "communication/can/chassis/chassis_mcb_can_comm.hpp"
 using namespace src::robot::turret;
