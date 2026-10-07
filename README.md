@@ -22,29 +22,68 @@ Microsoft provides a [helpful
 website](https://code.visualstudio.com/docs/getstarted/tips-and-tricks) with a number of shortcuts
 for getting around VSCode. There are many shortcuts that make programming faster.
 
+### Adding a new subsystem or command
+
+Don't copy-paste an existing one. Use the scaffolder: it creates the `.hpp` and
+`.cpp` with the include guard, namespace, base class and overrides already
+filled in, and formats them with `clang-format`.
+
+**With the buttons** (installed by the devcontainer; see
+`tools/vscode-northstar-scaffold/README.md` if they're missing): click
+**New Subsystem** or **New Command** in the status bar, or use the Command
+Palette and search for `NorthStar: New Subsystem`. It asks for the name without
+"subsystem"/"command" (e.g. `chassis`), then the folder under `src/control/` (leave
+it blank to use the name). A command also asks for its subsystem's file name
+(e.g. `chassis_subsystem`).
+
+**With a task:** Command Palette → `Tasks: Run Task` → `Scaffold - New Subsystem`.
+
+**From the terminal**, run from the repo root (not `northstar-robomaster-project`):
+
+```bash
+python3 scripts/scaffold subsystem intake
+python3 scripts/scaffold command chassis_spin --requires chassis_subsystem
+python3 scripts/scaffold --help
+```
+
+The scaffolder only creates new files. Register the subsystem and command in
+your robot's `*_control.cpp` yourself. To undo a scaffold, delete the files it
+made.
+
+New `.cpp` files are picked up by the build automatically — `src/SConscript`
+globs, so there is no build file to edit.
+
 ### Installing your own VSCode extensions
 
 The extensions listed in [`.devcontainer/devcontainer.json`](.devcontainer/devcontainer.json)
 are the ones everyone gets. Rebuilding the container wipes anything else you installed by
-hand, so to add an extension just for yourself, run this from the repo root inside the
-container:
+hand. To keep an extension just for yourself, list it in your **own** VS Code settings,
+not in the repo:
 
-```
-.devcontainer/install-personal-extensions.sh --add <extension-id>
-```
+1. Command Palette → **Preferences: Open User Settings (JSON)**. Pick the plain *User*
+   settings, not *Remote Settings (Dev Container)*. They live outside the container.
+2. Add the extension IDs:
 
-That installs it and records its ID in `.devcontainer/personal-extensions.txt`, which is
-gitignored — it is yours alone, and nobody else gets what you put in it. From then on the
-extension is reinstalled automatically whenever VSCode attaches to the container, including
-after **Dev Containers: Rebuild Container**. Pass several IDs at once if you like, and run
-the script with `--help` for a reminder.
+   ```json
+   "dev.containers.defaultExtensions": [
+       "publisher.extension-name"
+   ]
+   ```
+
+   Or use Settings → search **Default Extensions** → *Dev › Containers: Default Extensions*.
+
+The Dev Containers extension installs everything in that list whenever it creates or
+rebuilds a container, for every repo, branch and clone. A container that is already running
+only gets a new entry on its next rebuild, so install the extension once by hand from the
+Extensions view if you want it right away.
 
 An extension's ID is shown on its Marketplace page, or in the Extensions view: right-click
-the extension and choose **Copy Extension ID**.
+the extension and choose **Copy Extension ID**. If an extension is useful to the whole team,
+add it to `devcontainer.json` instead.
 
-Only the extension itself comes back after a rebuild — its settings and any sign-in state
-live in the container's filesystem and are reset. If an extension is useful to the whole
-team, add it to `devcontainer.json` instead of your personal list.
+The **New Subsystem** / **New Command** buttons are not affected by this: that
+extension lives in the repo at `tools/vscode-northstar-scaffold` and is re-linked
+by `scripts/install-extension.sh` on every attach, so a rebuild restores it too.
 
 ### Building code and programming the RoboMaster Development Board
 

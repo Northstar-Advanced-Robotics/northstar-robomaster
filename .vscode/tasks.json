@@ -460,6 +460,59 @@
             "options": {
                 "cwd": "${workspaceRoot}/northstar-robomaster-project"
             }
+        },
+        {
+            "label": "Scaffold - New Subsystem",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 scripts/scaffold subsystem '${input:subsystemName}' --dir '${input:scaffoldDir}'",
+            "group": "none",
+            "problemMatcher": [],
+            // NOTE: unlike the build tasks, this one runs from the repo root --
+            // the scaffolder lives above northstar-robomaster-project.
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        },
+        {
+            "label": "Scaffold - New Command",
+            "type": "shell",
+            "presentation": {
+                "panel": "new"
+            },
+            "command": "python3 scripts/scaffold command '${input:commandName}' --dir '${input:scaffoldDir}' --requires '${input:scaffoldRequires}'",
+            "group": "none",
+            "problemMatcher": [],
+            "options": {
+                "cwd": "${workspaceRoot}"
+            }
+        }
+    ],
+    // Used by the Scaffold tasks above. The NorthStar Scaffold extension does
+    // the same from the status bar; these tasks are the no-install fallback.
+    "inputs": [
+        {
+            "id": "subsystemName",
+            "type": "promptString",
+            "description": "Subsystem name, without \"subsystem\" (e.g. chassis)"
+        },
+        {
+            "id": "commandName",
+            "type": "promptString",
+            "description": "Command name, without \"command\" (e.g. chassis_spin)"
+        },
+        {
+            "id": "scaffoldDir",
+            "type": "promptString",
+            "description": "Folder under src/control/ (e.g. chassis; leave blank to use the name)",
+            "default": ""
+        },
+        {
+            "id": "scaffoldRequires",
+            "type": "promptString",
+            "description": "Subsystem file name (e.g. chassis_subsystem or chassis_subsystem.hpp)"
         }
     ]
 }
