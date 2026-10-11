@@ -1,5 +1,5 @@
-#ifndef JOINT_ACTUATOR_HPP_
-#define JOINT_ACTUATOR_HPP_
+#ifndef JOINT_ACTUATOR_INTERFACE_HPP_
+#define JOINT_ACTUATOR_INTERFACE_HPP_
 
 namespace src::control::arm
 {
@@ -14,10 +14,14 @@ struct ActuatorLimits
     float thermalHeadroom;   ///< @brief 0-1 range. Hot at 1.
 };
 
-class JointActuator
+class JointActuatorInterface
 {
 public:
-    virtual ~JointActuator() = default;
+    virtual ~JointActuatorInterface() = default;
+
+    /// @brief One time setup.
+    virtual void initialize() = 0;
+
     /// @brief Updates the motor.
     virtual void update() = 0;
 
