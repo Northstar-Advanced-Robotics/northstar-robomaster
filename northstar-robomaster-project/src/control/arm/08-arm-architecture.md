@@ -1,6 +1,6 @@
 # Engineer Arm Architecture
 
-_NorthStarFleet controls · ARC Season 2 engineer robot · last updated 2026-10-07_
+_NorthStarFleet controls · ARC Season 2 engineer robot · last updated 2026-10-11_
 
 This is the guide to how the engineer's arm code is organised: what each piece does, how the pieces talk
 to each other, and the order to build them in. Read it top to bottom once; after that, use it as a reference.
@@ -85,7 +85,7 @@ src/robot/engineer/                         NUMBERS + WIRING (engineer-specific)
 └── engineer_control.cpp                      builds everything below and connects it   (exists)
 
 src/control/arm/                            TAPROOT GLUE
-├── arm_subsystem.hpp/.cpp                    thin Taproot wrapper   (exists as six_dof_arm_subsystem → rename)
+├── arm_subsystem.hpp/.cpp                    thin Taproot wrapper   (exists)
 ├── arm_operator_input.hpp                    "what is the driver asking for" (interface)
 ├── remote_arm_operator_input.hpp/.cpp        remote + keyboard/mouse → that interface
 ├── leader_arm_input.hpp                      latest sample from the custom controller (interface)
@@ -104,18 +104,20 @@ src/control/arm/                            TAPROOT GLUE
 
 src/control/arm/core/                       PURE C++ (no Taproot — runs on robot, sim, and tests)
 ├── arm_types.hpp                             JointVector, Pose, Transform
-├── joint_actuator.hpp                        the motor interface
+├── joint_actuator_interface.hpp              the motor interface (JointActuatorInterface)
 ├── joint_config.hpp                          per-joint limits, PID gains, homing settings
 ├── arm_joint.hpp                             ArmJointSpec + ArmJoint — the building block
 ├── arm_model.hpp                             from the joint list: forward kinematics, gravity, Jacobian
 ├── ik/                                       pose → joint angles (closed-form or numeric)
 ├── limits/  geometry/                        joint ranges, keep-out zones, self-collision, tipping
 ├── arm_controller_interface.hpp              what commands are allowed to ask the arm to do
-└── arm_controller.hpp/.cpp                   ArmController<N> — runs the tick
+└── arm_controller.hpp                        ArmController<N> — runs the tick (header-only template)
 ```
 
-> **Rename:** the subteam's `SixDofArmSubsystem` (`six_dof_arm_subsystem.*`) becomes `ArmSubsystem`
-> (`arm_subsystem.*`). The subsystem doesn't know or care how many joints there are — the controller does.
+> The subsystem is `ArmSubsystem`, not "six DOF arm subsystem": it doesn't know or care how many joints there
+> are — the controller does.
+
+Tests live in `test/control/arm/` (`arm_controller_test.cpp`, with `FakeJointActuator` standing in for motors).
 
 ---
 
@@ -154,6 +156,39 @@ If everything lived in the subsystem instead:
 2. **It would become one giant class** that the whole subteam edits at once (Taproot plumbing + PID + gravity +
    IK + limits + homing).
 3. **Commands would start reaching into the math** instead of just setting targets.
+
+### 4.1 `ArmControllerInterface` — what commands can ask for
+
+Commands and the subsystem hold an `ArmControllerInterface&`, never an `ArmController<N>`. The interface has no
+joint count in its type, so a command works with any arm. Angles are rad, speeds rad/s, torques N·m at the joint.
+
+| Method | Meaning |
+|---|---|
+| `initialize()` | one-time setup of every actuator |
+| `update(dt)` | one control tick (called by the subsystem only) |
+| `setJointTarget(angles, count)` | target for every joint; clamped to soft limits; ignored if `count` is wrong |
+| `setJointTarget(index, rad)` | target for one joint (joint jog); clamped; ignored if out of range |
+| `holdCurrent()` | target = where the arm is now |
+| `enterSafeHold()` | remote lost: hold the pose captured on the first call; safe to call every tick |
+| `disable()` | zero torque everywhere |
+| `jointCount()` | number of joints |
+| `jointPosition(i)` / `jointVelocity(i)` | latest feedback |
+| `jointTarget(i)` | final target (after clamping) |
+| `commandedTorque(i)` | torque sent on the last tick (logging, gravity tuning in §8.3) |
+| `mode()` | `DISABLED`, `RUNNING` or `SAFE_HOLD` |
+| `atTarget()` | every joint within its angle and velocity tolerance |
+| `allOnline()` | every joint has fresh feedback |
+
+`ArmController<N>` also has a typed `setJointTarget(const JointVector<N>&)` for code that knows `N` (the control
+file, tests).
+
+Not built yet — names reserved so the interface grows instead of changing:
+
+| Build step | Methods |
+|---|---|
+| 3 (homing) | `isHomed()`, `setJointHomed(index, rad)`, plus a homing motion mode |
+| 4 (arm model) | `setPayloadAttached(bool)` |
+| 6 (IK) | `setPoseTarget(pose)`, `gripperPose()` |
 
 ---
 
@@ -223,11 +258,14 @@ struct ArmJointSpec {
 ```cpp
 struct ArmJoint {
     const ArmJointSpec* spec;
-    JointActuator*      actuator;   // points at a backend; doesn't own the motor
+    JointActuatorInterface* actuator;   // points at a backend; doesn't own the motor
 };
 ```
 
 ### 6.3 `JointActuator` — the motor interface
+
+In code this is `JointActuatorInterface` (`core/joint_actuator_interface.hpp`); this doc says `JointActuator`
+for short.
 
 The **only** place a motor exists, as far as the arm is concerned. Everything is in **joint units** — radians and
 N·m at the joint. Gear ratios, direction flips, encoder offsets and CAN details stay hidden inside the backend.

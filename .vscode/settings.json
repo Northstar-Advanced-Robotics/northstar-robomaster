@@ -82,16 +82,13 @@
         "hash_map": "cpp",
         "future": "cpp"
     },
-    "C_Cpp.errorSquiggles": "Enabled",
+    "C_Cpp.errorSquiggles": "enabled",
     "C_Cpp.default.includePath": [
         "northstar-robomaster-project/taproot/src",
         "northstar-robomaster-project/src",
     ],
     "C_Cpp.default.cppStandard": "c++20",
     "C_Cpp.default.cStandard": "c11",
-    "C_Cpp.default.forcedInclude": [
-        "northstar-robomaster-project/robot-type/robot_type.hpp"
-    ],
     "[markdown]": {
         "editor.wordWrap": "off",
         "editor.quickSuggestions": {
@@ -104,7 +101,7 @@
         ]
     },
     "[cpp]": {
-    "editor.defaultFormatter": "xaver.clang-format",
-    "editor.formatOnSave": true
+        "editor.defaultFormatter": "xaver.clang-format",
+        "editor.formatOnSave": true
     },
 }

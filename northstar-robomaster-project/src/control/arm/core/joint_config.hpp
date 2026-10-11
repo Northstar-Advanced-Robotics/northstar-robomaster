@@ -10,7 +10,9 @@ struct JointConfig
     float maxTorque;           ///< N * m cap
     float kp;                  ///< N * m per rad
     float kd;                  ///< N * m per rad/s
-    float angleTolerence;
+    float angleTolerance;      ///< rad, atTarget() angle window
+    float velocityTolerance;   ///< rad/s, atTarget() speed window
+    float maxTrackingError;    ///< rad, how far the setpoint may lead the measured position
 };
 }  // namespace src::control::arm
 
