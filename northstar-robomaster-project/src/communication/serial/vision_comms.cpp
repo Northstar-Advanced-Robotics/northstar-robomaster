@@ -174,24 +174,22 @@ bool VisionComms::decodeToOdometeryData(const ReceivedSerialMessage& message)
 
 bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
 {
-    if (chassisAutoDrive == nullptr)
-    {
+    if (chassisAutoDrive == nullptr) {
         return false;
     }
 
-    if (sizeof(CubicBezier::CurveData) > message.header.dataLength)
-    {
+    if (sizeof(float) * 2 != message.header.dataLength) {
         return false;
     }
 
-    CubicBezier::CurveData wireData;
+    struct Vector2 {
+        float x;
+        float y;
+    }
 
-    std::memcpy(&wireData, message.data, sizeof(CubicBezier::CurveData));
 
-    CubicBezier* newCurve = new CubicBezier(wireData);
-
-    chassisAutoDrive->resetPath();
-    chassisAutoDrive->setCurve(newCurve);
+    // std::memcpy(&wireData, message.data, sizeof(CubicBezier::CurveData));
+    chassisAutoDrive->TryDriveAtVelocity(0, 0);
 
     return true;
 }
