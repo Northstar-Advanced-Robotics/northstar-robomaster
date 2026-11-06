@@ -185,10 +185,11 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
     struct Vector2 {
         float x;
         float y;
-    }
+    };
 
+    struct Vector2 drive_velocity;
 
-    // std::memcpy(&wireData, message.data, sizeof(CubicBezier::CurveData));
+    std::memcpy(&drive_velocity, message.data, sizeof(float) * 2);
     chassisAutoDrive->TryDriveAtVelocity(0, 0);
 
     return true;

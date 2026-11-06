@@ -88,9 +88,6 @@
 // imu
 #include "control/imu/imu_calibrate_command.hpp"
 
-// STATE MACHINE
-#include "control/stateMachine/state_machine_subsytem.hpp"
-
 // safe disconnect
 #include "control/safe_disconnect.hpp"
 
@@ -513,15 +510,6 @@ Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
-// STATE MACHINE
-src::stateMachine::StateMachineSubsystem stateMachineSubsystem =
-    src::stateMachine::StateMachineSubsystem(
-        drivers(),
-        &chassisSubsystem,
-        chassisAutoDrive,
-        &chassisBeyBladeCommand,
-        &matchRunningGovernor);
-
 src::control::client_display::graphics::UISubsystem ui(drivers());
 src::control::client_display::graphics::SentryDrawCommand sentryDrawCommand(
     drivers(),
@@ -556,7 +544,6 @@ void registerSentrySubsystems(Drivers *drivers)
     drivers->commandScheduler.registerSubsystem(&agitator);
     drivers->commandScheduler.registerSubsystem(&flywheel);
     drivers->commandScheduler.registerSubsystem(&turret);
-    drivers->commandScheduler.registerSubsystem(&stateMachineSubsystem);
     drivers->commandScheduler.registerSubsystem(&buzzerSubsystem);
     drivers->commandScheduler.registerSubsystem(&ui);
 }
