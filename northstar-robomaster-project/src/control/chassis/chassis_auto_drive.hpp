@@ -1,13 +1,11 @@
 #ifndef CHASSIS_AUTO_DRIVE_HPP
 #define CHASSIS_AUTO_DRIVE_HPP
 
-#include "../../../taproot/src/tap/control/subsystem.hpp"
-
+#include "control/governor/match_running_governor.hpp"
 #include "tap/control/subsystem.hpp"
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-#include "chassis_odometry.hpp"
 #include "chassis_subsystem.hpp"
 #include "chassis_beyblade_command.hpp"
 
@@ -18,10 +16,9 @@ class ChassisAutoDrive
 {   
 public:
 
-    ChassisAutoDrive(ChassisSubsystem* chassis, ChassisOdometry* chassisOdometry, ChassisBeybladeCommand* beybladeCommand,
+    ChassisAutoDrive(ChassisSubsystem* chassis, ChassisBeybladeCommand* beybladeCommand,
     src::control::governor::MatchRunningGovernor* matchRunningGovernor) : 
         chassisSubsystem(chassis),
-        chassisOdometry(chassisOdometry),
         beybladeCommand(beybladeCommand),
         matchRunningGovernor(matchRunningGovernor) { }
 
@@ -36,8 +33,6 @@ public:
 
 private:
     ChassisSubsystem* chassisSubsystem;
-    ChassisOdometry* chassisOdometry;
-
     ChassisBeybladeCommand* beybladeCommand;
     src::control::governor::MatchRunningGovernor* matchRunningGovernor;
 

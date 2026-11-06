@@ -387,9 +387,17 @@ src::chassis::ChassisSubsystem chassisSubsystem(
     &turret.yawMotor,
     chassisOdometry);
 
+src::chassis::ChassisBeybladeCommand chassisBeyBladeCommand(
+    &chassisSubsystem,
+    &drivers()->controlOperatorInterface,
+    -1,
+    true);
+
+MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
+
 // chassis auto drive
 src::chassis::ChassisAutoDrive *chassisAutoDrive =
-    new src::chassis::ChassisAutoDrive(&chassisSubsystem, chassisOdometry);
+    new src::chassis::ChassisAutoDrive(&chassisSubsystem, &chassisBeyBladeCommand, &matchRunningGovernor);
 
 src::chassis::OdometryResetCommand odometryResetCommand(&chassisSubsystem, chassisOdometry);
 
@@ -404,12 +412,6 @@ src::chassis::ChassisFieldCommand chassisFieldCommand(
 src::chassis::ChassisOrientDriveCommand chassisOrientDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
-
-src::chassis::ChassisBeybladeCommand chassisBeyBladeCommand(
-    &chassisSubsystem,
-    &drivers()->controlOperatorInterface,
-    -1,
-    true);
 
 src::chassis::ChassisWiggleCommand chassisWiggleCommand(
     &chassisSubsystem,
@@ -458,8 +460,6 @@ cv::SentryScanCommand sentryScanCommand(
     cv::SCAN_MAX_PITCH_ANGLE,
     cv::SCAN_PITCH_SPEED,
     cv::SCAN_YAW_SPEED);
-
-MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
 Trigger cvGate =
     (TriggerHelpers::switchState(
