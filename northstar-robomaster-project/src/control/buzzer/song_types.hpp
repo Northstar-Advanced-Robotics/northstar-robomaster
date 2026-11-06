@@ -4,6 +4,8 @@
 #include <cstdint>
 #include <vector>
 
+namespace src::control::buzzer
+{
 // --- Core Data Structures ---
 
 /**
@@ -131,5 +133,7 @@ constexpr uint32_t halfNote(uint32_t bpm) { return quarterNote(bpm) * 2; }
 constexpr uint32_t wholeNote(uint32_t bpm) { return quarterNote(bpm) * 4; }
 
 constexpr uint32_t dottedQuarterNote(uint32_t bpm) { return quarterNote(bpm) + eighthNote(bpm); }
+
+}  // namespace src::control::buzzer
 
 #endif  // SONG_TYPES_HPP

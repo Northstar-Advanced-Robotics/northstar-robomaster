@@ -6,13 +6,11 @@
 
 #include "chassis_subsystem.hpp"
 
-using tap::algorithms::limitVal;
-
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisWiggleCommand::ChassisWiggleCommand(
     ChassisSubsystem* chassis,
-    src::control::ControlOperatorInterface* operatorInterface,
+    src::robot::ControlOperatorInterface* operatorInterface,
     float period,
     float maxWiggleSpeed)
     : chassis(chassis),
@@ -50,6 +48,6 @@ float ChassisWiggleCommand::calculateWiggle(uint32_t dt)
         return 0;
     }
     accumTime += dt;
-    return maxWiggleSpeed * sin((1 / period) * ((float)accumTime / 1000.0f) * M_TWOPI);
+    return -maxWiggleSpeed * sin((1 / period) * ((float)accumTime / 1000.0f) * M_TWOPI);
 }
-};  // namespace src::chassis
+}  // namespace src::control::chassis

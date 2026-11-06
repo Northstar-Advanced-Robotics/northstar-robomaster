@@ -16,7 +16,7 @@
     +Rotation: CCW
 */
 
-namespace src::chassis
+namespace src::control::chassis
 {
 /**
  * @ingroup chassis
@@ -423,6 +423,6 @@ public:
     }
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

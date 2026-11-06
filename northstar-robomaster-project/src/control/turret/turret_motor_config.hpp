@@ -16,19 +16,19 @@ namespace src::control::turret
  */
 struct TurretMotorConfig
 {
-    /// Angle in radians the turret is assumed to be at while its motor is offline. `TurretMotorDJI`
+    /// Angle in radians the turret is assumed to be at while its motor is offline. `TurretMotor`
     /// reports this as the measurement until the motor comes up.
     float startAngle = 0;
 
     /// Encoder count that `startAngle` corresponds to.
     ///
-    /// @warning `TurretMotorDJI` never reads this; it derives the angle from the raw encoder
+    /// @warning `TurretMotor` never reads this; it derives the angle from the raw encoder
     ///      position scaled by `ratio`. The value is consumed at construction by the `DjiMotor`
     ///      itself (see each robot's control file), not by the turret motor wrapper.
     uint16_t startEncoderValue = 0;
 
     /// Lower travel limit in radians, applied only when `limitMotorAngles` is set. Need not be
-    /// wrapped to [0, 2*PI), but must be **less than or equal to** `maxAngle` -- `TurretMotorDJI`
+    /// wrapped to [0, 2*PI), but must be **less than or equal to** `maxAngle` -- `TurretMotor`
     /// asserts this at construction.
     float minAngle = 0;
 
@@ -43,9 +43,18 @@ struct TurretMotorConfig
     /// Gearing between the motor and the axis it drives: output revolutions per motor revolution.
     /// Scales the encoder angle into an axis angle. 1 means the motor drives the axis directly.
     ///
-    /// @note Applied to the position measurement but **not** to `getChassisFrameVelocity`, so with
-    ///      a ratio other than 1 the position and velocity getters are in different units.
+    /// @note Applied to the position measurement only. Velocity is scaled by `velocityRatio`,
+    ///      since velocity may be read from a different encoder than position.
     float ratio = 1;
+
+    /// Scales the velocity encoder's reading into the axis' angular velocity. When position comes
+    /// from an external axis-mounted encoder, velocity is usually read from the motor's internal
+    /// encoder instead, and this is then the gearing between the motor and the axis.
+    float velocityRatio = 1;
+
+    /// Output clamp, in the motor's command units. The default is the GM6020 voltage-control
+    /// range, where [-24, 24] volts maps to [-30,000, 30,000].
+    float maxOutput = 30'000;
 };
 }  // namespace src::control::turret
 

@@ -3,6 +3,8 @@
 
 #include "control/buzzer/song_types.hpp"
 
+namespace src::control::buzzer
+{
 /// "Bow Down to Washington" (the Rouser), played on the buzzer at startup or on command.
 /// Durations are given directly in milliseconds rather than derived from a tempo.
 const Song rouser_song = {
@@ -68,5 +70,7 @@ const Song rouser_song = {
 
     {0, 0}  // Sentinel to stop playback
 };
+
+}  // namespace src::control::buzzer
 
 #endif  // MEGALOVANIA_SONG_HPP

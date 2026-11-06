@@ -7,14 +7,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -43,7 +43,7 @@ public:
      */
     ChassisBeybladeCommand(
         ChassisSubsystem *chassis,
-        src::control::ControlOperatorInterface *operatorInterface,
+        src::robot::ControlOperatorInterface *operatorInterface,
         short direction,
         bool isVariable);
 
@@ -82,10 +82,10 @@ public:
 
 private:
     /// The chassis being driven.
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
 
     /// The source of operator input.
-    src::control::ControlOperatorInterface *operatorInterface;
+    src::robot::ControlOperatorInterface *operatorInterface;
 
     /// Time in milliseconds of the previous iteration, used to measure `dt`.
     uint32_t prevTime;
@@ -105,8 +105,8 @@ private:
     /// The current spin rate as a fraction of the maximum, held between re-randomizations.
     float calcSpeed;
 
-    /// Chassis speed in meters/second below which the robot counts as stationary and the spin
-    /// rate is boosted.
+    /// Chassis speed in meters/second below which the robot counts as beyblading in place (see
+    /// `ChassisSubsystem::setBeybladingOnly`).
     float beyBladeFastSpinSpeedThreshold = 0.3f;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis

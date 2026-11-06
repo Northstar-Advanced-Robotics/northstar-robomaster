@@ -7,13 +7,13 @@
 
 #include "state_machine_subsytem.hpp"
 
-namespace src::stateMachine
+namespace src::control::state_machine
 {
 StateMachineSubsystem::StateMachineSubsystem(
     tap::Drivers* drivers,
-    src::chassis::ChassisSubsystem* chassisSubsystem,
-    src::chassis::ChassisAutoDrive* chassisAutoDrive,
-    src::chassis::ChassisBeybladeCommand* beybladeCommand,
+    src::control::chassis::ChassisSubsystem* chassisSubsystem,
+    src::control::chassis::ChassisAutoDrive* chassisAutoDrive,
+    src::control::chassis::ChassisBeybladeCommand* beybladeCommand,
     src::control::governor::MatchRunningGovernor* matchRunningGovernor)
     : Subsystem(drivers),
       drivers(drivers),
@@ -44,13 +44,10 @@ void StateMachineSubsystem::refresh()
         {
             if (beyblade && beybladeCommand != nullptr)
             {
-                float maxRot = chassisSubsystem->calculateMaxRotationSpeed(0, 0);
+                float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
                 float rotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
-                chassisSubsystem->isBeybladingOnly = true;
-                chassisSubsystem->setVelocityFieldDrive(
-                    0,
-                    0,
-                    rotation * src::chassis::BEYBLADE_SPEEDUP_FACTOR);
+                chassisSubsystem->setBeybladingOnly(true);
+                chassisSubsystem->setVelocityFieldDrive(0, 0, rotation);
             }
             else
             {
@@ -65,33 +62,24 @@ void StateMachineSubsystem::refresh()
 
         if (beyblade && beybladeCommand != nullptr)
         {
-            float maxRot = chassisSubsystem->calculateMaxRotationSpeed(
-                desiredGlobalVelocity.x,
-                desiredGlobalVelocity.y);
+            float maxRot = chassisSubsystem->calculateMaxRotationSpeed();
             desiredRotation = beybladeCommand->calculateBeyBladeRotationSpeed(maxRot, dt);
 
             if (chassisSubsystem->getChassisOdometry()->getVelocityLocal().getLength() < 0.3f)
             {
-                chassisSubsystem->isBeybladingOnly = true;
-                desiredRotation *= src::chassis::BEYBLADE_SPEEDUP_FACTOR;
+                chassisSubsystem->setBeybladingOnly(true);
             }
             else
             {
-                chassisSubsystem->isBeybladingOnly = false;
+                chassisSubsystem->setBeybladingOnly(false);
             }
         }
 
-        chassisSubsystem->setIsSprinting(true);
         chassisSubsystem->setVelocityFieldDrive(
             desiredGlobalVelocity.x,
             desiredGlobalVelocity.y,
             desiredRotation);
     }
-    else
-    {
-        chassisSubsystem->setIsSprinting(false);
-        return;
-    }
 }
 
-}  // namespace src::stateMachine
+}  // namespace src::control::state_machine

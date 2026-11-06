@@ -40,7 +40,38 @@ subsystem interrupts whatever held it.
 **Governors** gate commands. A governor answers "may this run right now?" -- used for firing
 conditions like heat limits, flywheel readiness, and whether auto-aim is on target.
 
-Input reaches commands through ``ControlOperatorInterface``, never from the remote directly.
+Input reaches commands through ``src::robot::ControlOperatorInterface``, never from the remote
+directly.
+
+Directory layout and namespaces
+-------------------------------
+
+Source is split into three top-level trees under ``src/``:
+
+==================  ==================================================================
+Directory           Contents
+==================  ==================================================================
+``control/``        Subsystems, commands, governors, and the algorithms they use.
+``communication/``  CAN, UART, and sensor drivers: links to other boards and hardware.
+``robot/``          Per-robot wiring and constants, plus the operator interface.
+==================  ==================================================================
+
+Namespaces follow the directory path down to the *module* -- the first directory that names a
+single piece of the robot -- and stop there. Subdirectories inside a module share its namespace:
+
+=================================================  ================================
+File                                               Namespace
+=================================================  ================================
+``control/chassis/chassis_subsystem.hpp``          ``src::control::chassis``
+``control/turret/algorithms/...``                  ``src::control::turret``
+``control/client_display/indicators/...``          ``src::control::client_display``
+``communication/serial/vision_comms.hpp``          ``src::communication::serial``
+``communication/can/chassis/...``                  ``src::communication::can``
+``robot/sentry/sentry_scan_command.hpp``           ``src::robot::sentry``
+=================================================  ================================
+
+So the namespace of a class tells you which directory to find it in. Refer to types in other
+modules by their fully qualified name rather than a ``using namespace`` directive in a header.
 
 Coordinate frames
 -----------------
@@ -67,13 +98,14 @@ Where to start reading
 - ``src/control/chassis/chassis_subsystem.hpp`` -- driving, power limiting, and the frame convention.
 - ``src/control/turret/`` -- aiming. The controllers in ``algorithms/`` are the interesting part.
 - ``src/communication/serial/vision_comms.hpp`` -- the link to the vision computer.
+- ``src/robot/control_operator_interface.hpp`` -- how remote and keyboard input becomes commands.
 
 A caution
 ---------
 
-Some classes here are not built into any robot -- the older ``clientDisplay/indicators`` HUD and
-the turret-MCB CAN path in particular. These carry a ``@deprecated`` or ``@warning`` note saying so.
-Check for one before building on a class.
+Some classes here are not built into any robot, or have known gaps between what they claim and
+what they do -- the turret-MCB CAN path in ``communication/can/`` in particular. These carry a
+``@deprecated`` or ``@warning`` note saying so. Check for one before building on a class.
 
 .. toctree::
     :maxdepth: 2

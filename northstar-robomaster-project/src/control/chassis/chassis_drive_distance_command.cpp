@@ -6,11 +6,11 @@
 
 using tap::algorithms::limitVal;
 
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisDriveDistanceCommand::ChassisDriveDistanceCommand(
     ChassisSubsystem* chassis,
-    src::chassis::ChassisOdometry* chassisOdometry,
+    src::control::chassis::ChassisOdometry* chassisOdometry,
     float xDist,
     float yDist,
     float maxError)
@@ -63,4 +63,4 @@ bool ChassisDriveDistanceCommand::isFinished() const
     return chassisOdometry->getPositionGlobal().getDistanceTo(targetPosition) <= maxError;
 }
 
-};  // namespace src::chassis
+}  // namespace src::control::chassis

@@ -29,9 +29,7 @@
 #include "tap/drivers.hpp"
 #include "tap/util_macros.hpp"
 
-namespace src
-{
-namespace control
+namespace src::robot
 {
 /**
  * @ingroup robots
@@ -84,9 +82,9 @@ public:
     /**
      * @return Desired sideways chassis velocity in **meters/second**, positive to the left.
      *
-     * Blends the remote stick with A/D keyboard input, uses `CHASSIS_WALK_SPEED_MPS` unless shift
-     * is held for the full power-limited speed, and clamps the total to what the referee system's
-     * current power budget allows.
+     * Blends the remote stick with A/D keyboard input, uses `CHASSIS_WALK_SPEED_MPS` unless Shift
+     * is held for `MAX_CHASSIS_SPEED_MPS`, and clamps the total to `MAX_CHASSIS_SPEED_MPS`. Actual
+     * speed is decided by the chassis power loop.
      */
     float getDrivetrainHorizontalTranslation();
 
@@ -116,8 +114,6 @@ private:
     tap::algorithms::LinearInterpolationPredictor chassisYInput;
     tap::algorithms::LinearInterpolationPredictor chassisRInput;
 };
-}  // namespace control
-
-}  // namespace src
+}  // namespace src::robot
 
 #endif  // CONTROL_OPERATOR_INTERFACE_HPP_

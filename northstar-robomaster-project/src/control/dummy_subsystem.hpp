@@ -3,6 +3,8 @@
 
 #include "tap/control/subsystem.hpp"
 
+namespace src::control
+{
 /**
  * @ingroup util
  *
@@ -20,5 +22,7 @@ public:
      */
     DummySubsystem(tap::Drivers *drivers) : tap::control::Subsystem(drivers) {}
 };
+
+}  // namespace src::control
 
 #endif  // DUMMY_SUBSYSTEM_HPP_

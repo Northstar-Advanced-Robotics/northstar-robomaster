@@ -22,15 +22,15 @@
 #include "drivers_singleton.hpp"
 
 #ifdef TARGET_STANDARD
-namespace src::standard
+namespace src::robot::standard
 #elif TARGET_SENTRY
-namespace src::sentry
+namespace src::robot::sentry
 #elif TARGET_HERO
-namespace src::hero
+namespace src::robot::hero
 #elif TURRET
-namespace src::gyro
+namespace src::robot::turret
 #elif TARGET_TEST_BED
-namespace src::testbed
+namespace src::robot::testbed
 #endif
 {
 /**
@@ -46,6 +46,6 @@ public:
 Drivers DriversSingleton::drivers;
 
 Drivers *DoNotUse_getDrivers() { return &DriversSingleton::drivers; }
-}  // namespace src
+}  // namespace src::robot::<robot>
 
 #endif

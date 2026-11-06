@@ -8,11 +8,11 @@
 
 using tap::algorithms::limitVal;
 
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisBeybladeCommand::ChassisBeybladeCommand(
     ChassisSubsystem* chassis,
-    src::control::ControlOperatorInterface* operatorInterface,
+    src::robot::ControlOperatorInterface* operatorInterface,
     short direction,
     bool isVariable)
     : chassis(chassis),
@@ -27,7 +27,7 @@ void ChassisBeybladeCommand::initialize()
 {
     prevTime = tap::arch::clock::getTimeMilliseconds();
     calcSpeed = 1.0f * direction;
-    chassis->beyBladeCommandRunning = true;
+    chassis->setBeybladeCommandRunning(true);
 }
 
 float calcedRot;
@@ -44,26 +44,21 @@ void ChassisBeybladeCommand::execute()
     float verticalSpeed = normInput.first;
     float horizontalSpeed = normInput.second;
     calcedRot = calculateBeyBladeRotationSpeed(
-        chassis->calculateMaxRotationSpeed(verticalSpeed, horizontalSpeed),
+        chassis->calculateMaxRotationSpeed(),
         dt);
-    if (chassis->getChassisOdometry()->getVelocityLocal().getLength() <
-        beyBladeFastSpinSpeedThreshold)
-    {
-        chassis->isBeybladingOnly = true;
-        calcedRot *= BEYBLADE_SPEEDUP_FACTOR;
-    }
-    else
-    {
-        chassis->isBeybladingOnly = false;
-    }
+    // Measured speed when odometry is attached, otherwise the operator's requested speed.
+    ChassisOdometry* odometry = chassis->getChassisOdometry();
+    float speed = (odometry != nullptr) ? odometry->getVelocityLocal().getLength()
+                                        : hypotf(verticalSpeed, horizontalSpeed);
+    chassis->setBeybladingOnly(speed < beyBladeFastSpinSpeedThreshold);
     chassis->setVelocityTurretDrive(verticalSpeed, horizontalSpeed, calcedRot);
 }
 
 void ChassisBeybladeCommand::end([[maybe_unused]] bool interrupted)
 {
     chassis->setVelocityTurretDrive(0, 0, 0);
-    chassis->isBeybladingOnly = false;
-    chassis->beyBladeCommandRunning = false;
+    chassis->setBeybladingOnly(false);
+    chassis->setBeybladeCommandRunning(false);
 }
 
 float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uint32_t dt)
@@ -87,6 +82,6 @@ float ChassisBeybladeCommand::calculateBeyBladeRotationSpeed(float maxSpeed, uin
         }
         accumTime = 0;
     }
-    return calcSpeed * maxSpeed * direction;
+    return calcSpeed * maxSpeed;
 }
-};  // namespace src::chassis
+}  // namespace src::control::chassis

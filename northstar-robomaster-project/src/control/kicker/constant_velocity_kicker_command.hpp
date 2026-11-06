@@ -23,7 +23,9 @@ public:
      * @param[in] kicker The kicker to drive, taken as a subsystem requirement.
      * @param[in] velocitySetpoint The velocity to run at, in radians/second at the output shaft.
      */
-    ConstantVelocityKickerCommand(src::kicker::KickerSubsystem* kicker, float velocitySetpoint);
+    ConstantVelocityKickerCommand(
+        src::control::kicker::KickerSubsystem* kicker,
+        float velocitySetpoint);
 
     /// Commands the kicker to the configured velocity.
     void initialize() override;
@@ -50,7 +52,7 @@ public:
 
 private:
     /// The kicker being driven.
-    src::kicker::KickerSubsystem* kicker;
+    src::control::kicker::KickerSubsystem* kicker;
 
     /// The velocity being commanded, in radians/second at the output shaft.
     float velocitySetpoint;

@@ -25,17 +25,18 @@
 #include "../turret_subsystem.hpp"
 #include "robot/control_operator_interface.hpp"
 
+using tap::algorithms::Angle;
 using tap::algorithms::WrappedFloat;
 
-namespace src::control::turret::cv
+namespace src::control::turret
 {
 TurretCVControlCommand::TurretCVControlCommand(
     tap::Drivers *drivers,
-    ControlOperatorInterface &controlOperatorInterface,
-    src::serial::VisionComms &visionComms,
+    src::robot::ControlOperatorInterface &controlOperatorInterface,
+    src::communication::serial::VisionComms &visionComms,
     TurretSubsystem *turretSubsystem,
-    algorithms::TurretYawControllerInterface *yawController,
-    algorithms::TurretPitchControllerInterface *pitchController,
+    TurretYawControllerInterface *yawController,
+    TurretPitchControllerInterface *pitchController,
     float userYawInputScalar,
     float userPitchInputScalar,
     uint8_t turretID)
@@ -127,4 +128,4 @@ void TurretCVControlCommand::end(bool interrupted)
     withinAimingTolerance = false;
 }
 
-}  // namespace src::control::turret::cv
+}  // namespace src::control::turret

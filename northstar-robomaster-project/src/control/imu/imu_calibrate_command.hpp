@@ -36,8 +36,6 @@
 
 #include "imu_calibrate_template.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::imu
 {
 /**
@@ -97,13 +95,13 @@ public:
     struct TurretIMUCalibrationConfig
     {
         /// (Unused: the turret-MCB IMU member this described is commented out below.)
-        // src::can::TurretMCBCanComm *turretMCBCanComm;
+        // src::communication::can::TurretMCBCanComm *turretMCBCanComm;
         /// A `TurretSubsystem` that this command will control (will lock the turret).
         turret::TurretSubsystem *turret;
         /// A chassis relative yaw controller used to lock the turret.
-        turret::algorithms::TurretYawControllerInterface *yawController;
+        turret::TurretYawControllerInterface *yawController;
         /// A chassis relative pitch controller used to lock the turret.
-        turret::algorithms::TurretPitchControllerInterface *pitchController;
+        turret::TurretPitchControllerInterface *pitchController;
         /**
          * `true` if the turret IMU is mounted on the pitch axis of the
          * turret. In this case the pitch controller doesn't have to reach the horizontal setpoint
@@ -183,8 +181,8 @@ protected:
      * Timeout that we set after initially starting the turret PID controller to allow any residual
      * movement from starting the new PID controller to be resolved.
      *
-     * Also the delay that we set after the onboard BMI088 is calibrated to ensure that turret IMU has
-     * enough time to successfully calibrate.
+     * Also the delay that we set after the onboard BMI088 is calibrated to ensure that turret IMU
+     * has enough time to successfully calibrate.
      */
     tap::arch::MilliTimeout calibrationTimer;
 
@@ -198,13 +196,13 @@ protected:
     inline bool turretReachedCenterAndNotMoving(turret::TurretSubsystem *turret, bool ignorePitch)
         const
     {
-        return compareFloatClose(
+        return tap::algorithms::compareFloatClose(
                    0.0f,
                    turret->yawMotor.getChassisFrameVelocity(),
                    velocityZeroThreshold) &&
                (turret->yawMotor.getChassisFrameMeasuredAngle().minDifference(0) <
                 positionZeroThreshold) &&
-               (ignorePitch || (compareFloatClose(
+               (ignorePitch || (tap::algorithms::compareFloatClose(
                                     0.0f,
                                     turret->pitchMotor.getChassisFrameVelocity(),
                                     velocityZeroThreshold) &&

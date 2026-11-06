@@ -1,6 +1,6 @@
 #include "vision_comms.hpp"
 
-namespace src::serial
+namespace src::communication::serial
 {
 VisionComms::VisionComms(tap::Drivers* drivers)
     : DJISerial(drivers, VISION_COMMS_RX_UART_PORT),
@@ -179,16 +179,17 @@ bool VisionComms::decodeToAutoPathData(const ReceivedSerialMessage& message)
         return false;
     }
 
-    if (sizeof(CubicBezier::CurveData) > message.header.dataLength)
+    if (sizeof(src::control::algorithms::CubicBezier::CurveData) > message.header.dataLength)
     {
         return false;
     }
 
-    CubicBezier::CurveData wireData;
+    src::control::algorithms::CubicBezier::CurveData wireData;
 
-    std::memcpy(&wireData, message.data, sizeof(CubicBezier::CurveData));
+    std::memcpy(&wireData, message.data, sizeof(src::control::algorithms::CubicBezier::CurveData));
 
-    CubicBezier* newCurve = new CubicBezier(wireData);
+    src::control::algorithms::CubicBezier* newCurve =
+        new src::control::algorithms::CubicBezier(wireData);
 
     chassisAutoDrive->resetPath();
     chassisAutoDrive->setCurve(newCurve);
@@ -483,4 +484,4 @@ void VisionComms::sendHealthData()
 
 bool VisionComms::isCvOnline() const { return !cvOfflineTimeout.isExpired(); }
 
-}  // namespace src::serial
+}  // namespace src::communication::serial

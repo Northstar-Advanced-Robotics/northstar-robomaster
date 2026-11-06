@@ -6,8 +6,9 @@
 #include "tap/util_macros.hpp"
 
 #include "control/chassis/chassis_auto_drive.hpp"
-#include "control/chassis/chassis_subsystem.hpp"
 
+namespace src::control::algorithms
+{
 /**
  * @ingroup util
  *
@@ -186,5 +187,7 @@ private:
     /// The control points and cached arc length defining this curve.
     CurveData curveData;
 };
+
+}  // namespace src::control::algorithms
 
 #endif
