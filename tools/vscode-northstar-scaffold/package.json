@@ -1,0 +1,32 @@
+{
+    "name": "scaffold",
+    "displayName": "NorthStar Scaffold",
+    "description": "Status-bar buttons for generating new Taproot subsystems and commands.",
+    "publisher": "northstar",
+    "version": "0.0.1",
+    "license": "SEE LICENSE IN ../../COPYING",
+    "engines": {
+        "vscode": "^1.75.0"
+    },
+    "categories": [
+        "Other"
+    ],
+    "main": "./extension.js",
+    "activationEvents": [
+        "onStartupFinished"
+    ],
+    "contributes": {
+        "commands": [
+            {
+                "command": "northstar.newSubsystem",
+                "title": "New Subsystem",
+                "category": "NorthStar"
+            },
+            {
+                "command": "northstar.newCommand",
+                "title": "New Command",
+                "category": "NorthStar"
+            }
+        ]
+    }
+}

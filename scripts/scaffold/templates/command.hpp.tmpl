@@ -1,0 +1,30 @@
+#ifndef ${guard}
+#define ${guard}
+
+#include "tap/control/command.hpp"
+
+#include "${requires_include}"
+
+namespace ${namespace}
+{
+class ${class_name} : public tap::control::Command
+{
+public:
+    explicit ${class_name}(${requires_class}* ${requires_instance});
+
+    const char* getName() const override { return "${display_name}"; }
+
+    void initialize() override;
+
+    void execute() override;
+
+    void end(bool interrupted) override;
+
+    bool isFinished() const override;
+
+private:
+    ${requires_class}* ${requires_instance};
+};
+}  // namespace ${namespace}
+
+#endif  // ${guard}
