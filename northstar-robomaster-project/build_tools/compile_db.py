@@ -15,6 +15,7 @@
 
 import json
 import os
+import re
 import shutil
 import subprocess
 import sys
@@ -113,6 +114,71 @@ def _write(path, entries):
     os.replace(tmp, path)
 
 
+def _run_gcc(compiler, args):
+    try:
+        return subprocess.run(
+            [compiler] + args + [os.devnull],
+            stdout=subprocess.PIPE,
+            stderr=subprocess.PIPE,
+            universal_newlines=True,
+            timeout=30,
+        )
+    except (OSError, subprocess.SubprocessError):
+        return None
+
+
+# GCC's integer typedef macros that clang gets wrong for arm-none-eabi. GCC makes int32_t a
+# 'long'; clang makes it an 'int'. modm (io/iostream.hpp) has separate overloads for both, so
+# under clang they collide ("class member cannot be redeclared").
+_TYPE_MACRO_RE = re.compile(r"#define (__U?INT(_LEAST)?32_TYPE__) (.+)")
+
+
+def _gcc_clang_compat_flags(compiler, lang, cache={}):
+    """
+    Flags that make clang (clangd, clang-tidy) see what this GCC driver sees:
+    its built-in system include directories and its 32-bit integer types.
+    """
+    key = (compiler, lang)
+    if key not in cache:
+        flags = []
+
+        result = _run_gcc(compiler, ["-E", "-x", lang, "-v"])
+        if result is not None:
+            in_list = False
+            for line in result.stderr.splitlines():
+                if line.startswith("#include <...> search starts here:"):
+                    in_list = True
+                elif line.startswith("End of search list."):
+                    break
+                elif in_list:
+                    flags += ["-isystem", os.path.normpath(line.strip())]
+
+        result = _run_gcc(compiler, ["-E", "-dM", "-x", lang])
+        if result is not None:
+            for line in result.stdout.splitlines():
+                m = _TYPE_MACRO_RE.match(line)
+                if m:
+                    flags += ["-U" + m.group(1), "-D{}={}".format(m.group(1), m.group(3))]
+
+        cache[key] = flags
+    return cache[key]
+
+
+def _add_clang_compat_flags(entries):
+    """
+    clangd uses its own built-in system headers, not the ones from arm-none-eabi-gcc, so
+    <cstdint>, <array>, etc. fail to resolve unless clangd is started with --query-driver (and
+    even then clangd 14 ignores them for headers). Spelling the toolchain's settings out in the
+    database makes it work with any clangd/clang-tidy, no editor setup needed.
+    """
+    for entry in entries:
+        args = entry.get("arguments")
+        if not args or not re.search(r"(gcc|g\+\+)(-[\d.]+)?$", os.path.basename(args[0])):
+            continue
+        lang = "c" if entry["file"].endswith(".c") else "c++"
+        entry["arguments"] = args[:1] + _gcc_clang_compat_flags(args[0], lang) + args[1:]
+
+
 def _update_databases(run_db, project_dir, build_root, config_dir, robot_dir):
     new_entries = _load(run_db)
     if isfile(run_db):
@@ -143,6 +209,7 @@ def _update_databases(run_db, project_dir, build_root, config_dir, robot_dir):
         selected[_entry_file(entry)] = entry
 
     entries = sorted(selected.values(), key=_entry_file)
+    _add_clang_compat_flags(entries)
     _write(join(project_dir, OUTPUT_DB_NAME), entries)
     print(
         "compile_commands.json: {} entries for {}/{}".format(
