@@ -83,6 +83,7 @@
         "future": "cpp"
     },
     "C_Cpp.errorSquiggles": "Enabled",
+    "C_Cpp.default.compileCommands": "${workspaceFolder}/northstar-robomaster-project/compile_commands.json",
     "C_Cpp.default.includePath": [
         "northstar-robomaster-project/taproot/src",
         "northstar-robomaster-project/src",
