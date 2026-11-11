@@ -28,14 +28,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::control::turret::user
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::turret
 {
 /**
  * @ingroup turret
@@ -64,10 +64,10 @@ public:
      */
     TurretUserControlCommand(
         tap::Drivers *drivers,
-        ControlOperatorInterface &controlOperatorInterface,
+        src::robot::ControlOperatorInterface &controlOperatorInterface,
         TurretSubsystem *turretSubsystem,
-        algorithms::TurretYawControllerInterface *yawController,
-        algorithms::TurretPitchControllerInterface *pitchController,
+        TurretYawControllerInterface *yawController,
+        TurretPitchControllerInterface *pitchController,
         float userYawInputScalar,
         float userPitchInputScalar,
         uint8_t turretID = 0);
@@ -86,19 +86,19 @@ public:
 
 private:
     tap::Drivers *drivers;
-    ControlOperatorInterface &controlOperatorInterface;
+    src::robot::ControlOperatorInterface &controlOperatorInterface;
     TurretSubsystem *turretSubsystem;
 
     uint32_t prevTime = 0;
 
-    algorithms::TurretYawControllerInterface *yawController;
-    algorithms::TurretPitchControllerInterface *pitchController;
+    TurretYawControllerInterface *yawController;
+    TurretPitchControllerInterface *pitchController;
 
     const float userYawInputScalar;
     const float userPitchInputScalar;
 
     const uint8_t turretID;
 };
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret
 
 #endif  // TURRET_USER_CONTROL_COMMAND_HPP_

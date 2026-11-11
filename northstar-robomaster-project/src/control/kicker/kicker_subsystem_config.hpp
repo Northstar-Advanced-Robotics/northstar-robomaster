@@ -4,7 +4,7 @@
 #include "tap/communication/can/can_bus.hpp"
 #include "tap/motor/dji_motor.hpp"
 
-namespace src::kicker
+namespace src::control::kicker
 {
 /**
  * @ingroup hopper_kicker
@@ -29,6 +29,6 @@ struct KickerSubsystemConfig
     /// controlled by sending voltage commands, this term should be 0.
     float velocityPIDFeedForwardGain;
 };
-}  // namespace src::kicker
+}  // namespace src::control::kicker
 
 #endif  // KICKER_SUBSYSTEM_CONFIG_HPP_

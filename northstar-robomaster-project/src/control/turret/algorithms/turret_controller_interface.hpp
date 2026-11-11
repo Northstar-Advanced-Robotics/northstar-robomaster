@@ -22,15 +22,10 @@
 
 #include "tap/algorithms/wrapped_float.hpp"
 
-using namespace tap::algorithms;
-
 namespace src::control::turret
 {
 class TurretMotor;
-}
 
-namespace src::control::turret::algorithms
-{
 /**
  * @ingroup turret
  *
@@ -70,7 +65,9 @@ public:
      * @param[in] desiredSetpoint The controller's desired setpoint in whatever frame the
      * controller operates in, in radians.
      */
-    virtual void runController(const uint32_t dt, const WrappedFloat desiredSetpoint) = 0;
+    virtual void runController(
+        const uint32_t dt,
+        const tap::algorithms::WrappedFloat desiredSetpoint) = 0;
 
     /**
      * Updates the controller's target without stepping the control loop. Use when taking over from
@@ -78,34 +75,40 @@ public:
      *
      * @param[in] desiredSetpoint The desired setpoint, in radians, in the controller's own frame.
      */
-    virtual void setSetpoint(WrappedFloat desiredSetpoint) = 0;
+    virtual void setSetpoint(tap::algorithms::WrappedFloat desiredSetpoint) = 0;
 
     /**
      * Convenience overload wrapping a raw angle.
      *
      * @param[in] desiredSetpoint The desired setpoint, in radians, in the controller's own frame.
      */
-    inline void setSetpoint(float desiredSetpoint) { setSetpoint(Angle(desiredSetpoint)); }
+    inline void setSetpoint(float desiredSetpoint)
+    {
+        setSetpoint(tap::algorithms::Angle(desiredSetpoint));
+    }
 
     /**
      * @return The controller's setpoint, units radians, in whatever frame this controller operates
      * in -- which is **not** necessarily the chassis frame the `TurretMotor` stores its setpoint
      * in.
      */
-    virtual WrappedFloat getSetpoint() const = 0;
+    virtual tap::algorithms::WrappedFloat getSetpoint() const = 0;
 
     /**
      * @return The controller's measurement (current value of the system), units radians. **Does
      * not** have to be in the same reference frame as the TurretMotor's `getChassisFrame*`
      * functions. Does not need to be normalized.
      */
-    virtual WrappedFloat getMeasurement() const = 0;
+    virtual tap::algorithms::WrappedFloat getMeasurement() const = 0;
 
     /// @return The measurement taken from the motor encoder specifically, as opposed to
     /// `getMeasurement`, which a world-frame controller sources from an IMU instead. Lets a caller
     /// compare the two. The base implementation returns a constant zero; controllers that can
     /// distinguish the two sources override it.
-    virtual WrappedFloat getMeasurementMotor() const { return WrappedFloat(0, 0, M_TWOPI); };
+    virtual tap::algorithms::WrappedFloat getMeasurementMotor() const
+    {
+        return tap::algorithms::WrappedFloat(0, 0, M_TWOPI);
+    };
 
     /**
      * @return `false` if the turret controller should not be running, whether this is because the
@@ -123,8 +126,8 @@ public:
      * @return The controllerFrameAngle converted to the chassis frame, a value in radians that is
      * not required to be normalized.
      */
-    virtual WrappedFloat convertControllerAngleToChassisFrame(
-        WrappedFloat controllerFrameAngle) const = 0;
+    virtual tap::algorithms::WrappedFloat convertControllerAngleToChassisFrame(
+        tap::algorithms::WrappedFloat controllerFrameAngle) const = 0;
 
     /**
      * Converts the passed in controllerFrameAngle from the chassis frame to the controller frame of
@@ -135,8 +138,8 @@ public:
      * @return The chassisFrameAngle converted to the controller frame, a value in radians that is
      * not required to be normalized.
      */
-    virtual WrappedFloat convertChassisAngleToControllerFrame(
-        WrappedFloat chassisFrameAngle) const = 0;
+    virtual tap::algorithms::WrappedFloat convertChassisAngleToControllerFrame(
+        tap::algorithms::WrappedFloat chassisFrameAngle) const = 0;
 
 protected:
     /// The axis this controller drives. Subclasses read its measurement and write its output.
@@ -173,6 +176,6 @@ public:
     {
     }
 };
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret
 
 #endif  // TURRET_CONTROLLER_INTERFACE_HPP_

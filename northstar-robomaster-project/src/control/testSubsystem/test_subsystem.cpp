@@ -8,9 +8,7 @@
 
 #include <cmath>
 
-using tap::algorithms::limitVal;
-
-namespace HardwareTesting
+namespace src::control::test_subsystem
 {
 // STEP 1 (Tank Drive): create constructor
 TestSubsystem::TestSubsystem(tap::Drivers* drivers)
@@ -49,4 +47,4 @@ void TestSubsystem::refresh()
         debugPitchMotor.getInternalEncoder().getPosition().getUnwrappedValue();
 }
 // STEP
-}  // namespace HardwareTesting
+}  // namespace src::control::test_subsystem

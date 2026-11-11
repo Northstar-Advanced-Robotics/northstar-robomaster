@@ -1,6 +1,6 @@
 #include "vision_comms.hpp"
 
-namespace src::serial
+namespace src::communication::serial
 {
 VisionComms::VisionComms(tap::Drivers* drivers)
     : DJISerial(drivers, VISION_COMMS_RX_UART_PORT),
@@ -482,4 +482,4 @@ void VisionComms::sendHealthData()
 
 bool VisionComms::isCvOnline() const { return !cvOfflineTimeout.isExpired(); }
 
-}  // namespace src::serial
+}  // namespace src::communication::serial

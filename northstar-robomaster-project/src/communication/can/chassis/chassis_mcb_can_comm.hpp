@@ -29,8 +29,10 @@
  
  namespace src {
     class Drivers;
-}
+}  // namespace src
  
+namespace src::communication::can
+{
  /**
   * The CAN link from the turret MCB (the follower) to the chassis MCB (the leader).
   *
@@ -299,5 +301,7 @@
      void handleTimeSynchronizationMessage(const modm::can::Message& message);
  };
  
+}  // namespace src::communication::can
+
  #endif  // CHASSIS_MCB_CAN_COMM_HPP_
  

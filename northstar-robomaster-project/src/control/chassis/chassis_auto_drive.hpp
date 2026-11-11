@@ -9,7 +9,7 @@
 #include "chassis_subsystem.hpp"
 #include "chassis_beyblade_command.hpp"
 
-namespace src::chassis
+namespace src::control::chassis
 {
 
 class ChassisAutoDrive 
@@ -42,6 +42,6 @@ private:
     
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

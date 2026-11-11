@@ -5,13 +5,13 @@
 #include "tap/drivers.hpp"
 
 #include "communication/serial/vision_comms.hpp"
-#include "control/turret/cv/turret_cv_control_command.hpp"
 #include "control/turret/algorithms/turret_controller_interface.hpp"
+#include "control/turret/cv/turret_cv_control_command.hpp"
 #include "control/turret/turret_subsystem.hpp"
 #include "robot/control_operator_interface.hpp"
 #include "robot/sentry/sentry_scan_command.hpp"
 
-namespace src::control::turret::cv
+namespace src::robot::sentry
 {
 /**
  * @ingroup robots
@@ -43,12 +43,12 @@ public:
      */
     SentryCvManagerCommand(
         tap::Drivers *drivers,
-        src::serial::VisionComms &visionComms,
+        src::communication::serial::VisionComms &visionComms,
         src::control::turret::TurretSubsystem *sentryTurretSubsystem,
-        src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand,
-        src::control::turret::algorithms::TurretYawControllerInterface *yawController,
-        src::control::turret::algorithms::TurretPitchControllerInterface *pitchController,
-        src::chassis::ChassisOdometry *chassisOdometry,
+        src::control::turret::TurretCVControlCommand &turretCVControlCommand,
+        src::control::turret::TurretYawControllerInterface *yawController,
+        src::control::turret::TurretPitchControllerInterface *pitchController,
+        src::control::chassis::ChassisOdometry *chassisOdometry,
         float userYawInputScalar,
         float userPitchInputScalar,
         float MIN_PITCH_ANGLE,
@@ -82,13 +82,13 @@ public:
 
 private:
     /// Drives the turret from vision's aim solution while a target is tracked.
-    src::control::turret::cv::TurretCVControlCommand &turretCVControlCommand;
+    src::control::turret::TurretCVControlCommand &turretCVControlCommand;
     /// Sweeps the turret looking for targets when vision has none.
-    src::control::turret::cv::SentryScanCommand turretScanCommand;
+    SentryScanCommand turretScanCommand;
     /// The vision link, consulted for whether a target is currently tracked.
-    src::serial::VisionComms &visionComms;
+    src::communication::serial::VisionComms &visionComms;
 };  // class SentryCvManagerCommand
 
-}  // namespace src::control::turret::cv
+}  // namespace src::robot::sentry
 
 #endif  // SENTRY_TURRET_USER_WORLD_RELATIVE_COMMAND_HPP_

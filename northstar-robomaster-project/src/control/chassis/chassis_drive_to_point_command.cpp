@@ -4,13 +4,11 @@
 
 #include "robot/control_operator_interface.hpp"
 
-using tap::algorithms::limitVal;
-
-namespace src::chassis
+namespace src::control::chassis
 {
 ChassisDriveToPointCommand::ChassisDriveToPointCommand(
     ChassisSubsystem* chassis,
-    src::chassis::ChassisOdometry* chassisOdometry,
+    src::control::chassis::ChassisOdometry* chassisOdometry,
     float xPosition,
     float yPosition,
     float maxError)
@@ -55,4 +53,4 @@ bool ChassisDriveToPointCommand::isFinished() const
     return chassisOdometry->getPositionGlobal().getDistanceTo(targetPosition) <= maxError;
 }
 
-};  // namespace src::chassis
+}  // namespace src::control::chassis

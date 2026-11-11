@@ -16,7 +16,7 @@
     +Rotation: CCW
 */
 
-namespace src::chassis
+namespace src::control::chassis
 {
 /**
  * @ingroup chassis
@@ -35,7 +35,7 @@ namespace src::chassis
  *
  * @note This is the same frame `ChassisSubsystem` uses, as of the coordinate frame refactor.
  *      Velocities and positions pass between the two classes unchanged -- see
- *      `state_machine_subsystem.cpp`, which hands auto-drive output straight to
+ *      `chassis_auto_drive.hpp`, which hands auto-drive output straight to
  *      `setVelocityFieldDrive(vel.x, vel.y, rot)` with no axis swap. Older code that swapped or
  *      negated axes at this boundary was correcting for a frame mismatch that no longer exists,
  *      and is now a bug.
@@ -423,6 +423,6 @@ public:
     }
 };
 
-}  // namespace src::chassis
+}  // namespace src::control::chassis
 
 #endif

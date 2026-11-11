@@ -10,7 +10,7 @@
 
 #include "turret_cv_control_command_template.hpp"
 
-namespace src::control::turret::cv
+namespace src::control::turret
 {
 /**
  * @ingroup turret
@@ -48,11 +48,11 @@ public:
      */
     TurretCVControlCommand(
         tap::Drivers *drivers,
-        ControlOperatorInterface &controlOperatorInterface,
-        src::serial::VisionComms &visionComms,
+        src::robot::ControlOperatorInterface &controlOperatorInterface,
+        src::communication::serial::VisionComms &visionComms,
         TurretSubsystem *turretSubsystem,
-        algorithms::TurretYawControllerInterface *yawController,
-        algorithms::TurretPitchControllerInterface *pitchController,
+        TurretYawControllerInterface *yawController,
+        TurretPitchControllerInterface *pitchController,
         float userYawInputScalar,
         float userPitchInputScalar,
         uint8_t turretID = 0);
@@ -80,14 +80,14 @@ public:
 
 private:
     tap::Drivers *drivers;
-    ControlOperatorInterface &controlOperatorInterface;
-    src::serial::VisionComms &visionComms;
+    src::robot::ControlOperatorInterface &controlOperatorInterface;
+    src::communication::serial::VisionComms &visionComms;
     TurretSubsystem *turretSubsystem;
 
     uint32_t prevTime = 0;
 
-    algorithms::TurretYawControllerInterface *yawController;
-    algorithms::TurretPitchControllerInterface *pitchController;
+    TurretYawControllerInterface *yawController;
+    TurretPitchControllerInterface *pitchController;
 
     const float userYawInputScalar;
     const float userPitchInputScalar;
@@ -101,6 +101,6 @@ private:
 
     bool pitchOnlyMode = false;
 };
-}  // namespace src::control::turret::cv
+}  // namespace src::control::turret
 
 #endif  // TURRET_USER_CONTROL_COMMAND_HPP_

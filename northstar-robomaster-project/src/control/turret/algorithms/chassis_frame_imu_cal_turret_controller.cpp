@@ -27,10 +27,10 @@
 
 #include "turret_gravity_compensation.hpp"
 
-using namespace tap::control::turret;
+using tap::algorithms::limitVal;
 using tap::algorithms::WrappedFloat;
 
-namespace src::control::turret::algorithms
+namespace src::control::turret
 {
 ChassisFrameYawImuCalTurretController::ChassisFrameYawImuCalTurretController(
     TurretMotor &yawMotor,
@@ -187,4 +187,4 @@ WrappedFloat ChassisFramePitchImuCalTurretController::getMeasurement() const
 
 bool ChassisFramePitchImuCalTurretController::isOnline() const { return turretMotor.isOnline(); }
 
-}  // namespace src::control::turret::algorithms
+}  // namespace src::control::turret

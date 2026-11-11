@@ -27,7 +27,7 @@
 namespace tap
 {
 class Drivers;
-}
+}  // namespace tap
 
 namespace src::control
 {

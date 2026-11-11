@@ -27,14 +27,14 @@
 
 using tap::algorithms::WrappedFloat;
 
-namespace src::control::turret::user
+namespace src::control::turret
 {
 TurretUserControlCommand::TurretUserControlCommand(
     tap::Drivers *drivers,
-    ControlOperatorInterface &controlOperatorInterface,
+    src::robot::ControlOperatorInterface &controlOperatorInterface,
     TurretSubsystem *turretSubsystem,
-    algorithms::TurretYawControllerInterface *yawController,
-    algorithms::TurretPitchControllerInterface *pitchController,
+    TurretYawControllerInterface *yawController,
+    TurretPitchControllerInterface *pitchController,
     float userYawInputScalar,
     float userPitchInputScalar,
     uint8_t turretID)
@@ -92,4 +92,4 @@ void TurretUserControlCommand::end(bool)
     turretSubsystem->pitchMotor.setMotorOutput(0);
 }
 
-}  // namespace src::control::turret::user
+}  // namespace src::control::turret

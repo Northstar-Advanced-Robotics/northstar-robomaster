@@ -25,6 +25,8 @@
 
 #include "modm/architecture/interface/can_message.hpp"
 
+namespace src::communication::can
+{
 ChassisMcbCanComm::ChassisMcbCanComm(tap::Drivers* drivers)
     : drivers(drivers),
       commandMsgBitmask(),
@@ -134,7 +136,7 @@ void ChassisMcbCanComm::sendAxisData(
 
 void ChassisMcbCanComm::sendIMUData()
 {
-    using namespace tap::communication::sensors::imu::bmi088;
+    using tap::communication::sensors::imu::bmi088::Bmi088;
     const Bmi088::ImuState imuState = drivers->bmi088.getImuState();
 
     if (getImuRecalibrationRequested())
@@ -194,3 +196,5 @@ void ChassisMcbCanComm::MainMcbRxHandler::processMessage(const modm::can::Messag
 {
     (msgHandler->*funcToCall)(message);
 }
+
+}  // namespace src::communication::can

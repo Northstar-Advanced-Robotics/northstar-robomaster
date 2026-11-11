@@ -7,14 +7,14 @@
 namespace src
 {
 class Drivers;
-
-namespace control
-{
-class ControlOperatorInterface;
-}
 }  // namespace src
 
-namespace src::chassis
+namespace src::robot
+{
+class ControlOperatorInterface;
+}  // namespace src::robot
+
+namespace src::control::chassis
 {
 class ChassisSubsystem;
 
@@ -37,7 +37,7 @@ public:
      */
     ChassisDriveCommand(
         ChassisSubsystem *chassis,
-        src::control::ControlOperatorInterface *operatorInterface);
+        src::robot::ControlOperatorInterface *operatorInterface);
 
     /// @return The name used to identify this command in logs and the scheduler.
     const char *getName() const override { return "Chassis tank drive"; }
@@ -61,9 +61,9 @@ public:
 
 private:
     /// The chassis being driven.
-    src::chassis::ChassisSubsystem *chassis;
+    src::control::chassis::ChassisSubsystem *chassis;
 
     /// The source of operator input.
-    src::control::ControlOperatorInterface *operatorInterface;
+    src::robot::ControlOperatorInterface *operatorInterface;
 };
-}  // namespace src::chassis
+}  // namespace src::control::chassis
