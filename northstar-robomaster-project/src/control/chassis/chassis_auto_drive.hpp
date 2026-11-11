@@ -16,14 +16,15 @@ class ChassisAutoDrive
 {   
 public:
 
-    ChassisAutoDrive(ChassisSubsystem* chassis, ChassisBeybladeCommand* beybladeCommand,
+    ChassisAutoDrive(tap::Drivers* drivers, ChassisSubsystem* chassis, ChassisBeybladeCommand* beybladeCommand,
     src::control::governor::MatchRunningGovernor* matchRunningGovernor) : 
+        drivers(drivers),
         chassisSubsystem(chassis),
         beybladeCommand(beybladeCommand),
         matchRunningGovernor(matchRunningGovernor) { }
 
     void TryDriveAtVelocity(float x, float y) {
-        if (autoDriveEnabled) {
+        if ((matchRunningGovernor->isReady() || ((drivers->remote.getSwitch(tap::communication::serial::Remote::Switch::RIGHT_SWITCH) == tap::communication::serial::Remote::SwitchState::UP) && (drivers->remote.getSwitch(tap::communication::serial::Remote::Switch::LEFT_SWITCH) == tap::communication::serial::Remote::SwitchState::DOWN)))) {
             chassisSubsystem->setVelocityFieldDrive(x, y, 0);
         }
         else {
@@ -32,6 +33,7 @@ public:
     }
 
 private:
+    tap::Drivers* drivers;
     ChassisSubsystem* chassisSubsystem;
     ChassisBeybladeCommand* beybladeCommand;
     src::control::governor::MatchRunningGovernor* matchRunningGovernor;

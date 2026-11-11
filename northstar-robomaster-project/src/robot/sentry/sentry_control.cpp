@@ -397,7 +397,7 @@ MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
 // chassis auto drive
 src::chassis::ChassisAutoDrive *chassisAutoDrive =
-    new src::chassis::ChassisAutoDrive(&chassisSubsystem, &chassisBeyBladeCommand, &matchRunningGovernor);
+    new src::chassis::ChassisAutoDrive(drivers(), &chassisSubsystem, &chassisBeyBladeCommand, &matchRunningGovernor);
 
 src::chassis::OdometryResetCommand odometryResetCommand(&chassisSubsystem, chassisOdometry);
 
