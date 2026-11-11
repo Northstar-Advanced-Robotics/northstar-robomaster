@@ -27,7 +27,8 @@ HARDWARE_BUILD_TARGET_ACCEPTED_ARGS = ["build", "run", "size", "gdb", "all"]
 VALID_BUILD_PROFILES                = ["debug", "release", "fast"]
 VALID_PROFILING_TYPES               = ["true", "false"]
 
-USAGE = "Usage: scons <target> [profile=<debug|release|fast>] [robot=TARGET_<ROBOT_TYPE>] [profiling=<true|false>]\n\
+USAGE = "Usage: scons <target> [profile=<debug|release|fast>] [robot=TARGET_<ROBOT_TYPE>] [profiling=<true|false>] [compiledb=<true|false>]\n\
+    \"compiledb=false\" skips generating compile_commands.json with bear (on by default).\n\
     \"<target>\" is one of:\n\
         - \"build\": build all code for the hardware platform.\n\
         - \"run\": build all code for the hardware platform, and deploy it to the board via a connected ST-Link.\n\

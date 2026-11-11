@@ -82,9 +82,6 @@
 // imu
 #include "control/imu/imu_calibrate_command.hpp"
 
-// STATE MACHINE
-#include "control/stateMachine/state_machine_subsytem.hpp"
-
 // safe disconnect
 #include "control/safe_disconnect.hpp"
 
@@ -380,9 +377,17 @@ src::control::chassis::HolonomicChassisSubsystem chassisSubsystem(
     &turret.yawMotor,
     chassisOdometry);
 
+src::control::chassis::ChassisBeybladeCommand chassisBeyBladeCommand(
+    &chassisSubsystem,
+    &drivers()->controlOperatorInterface,
+    -1,
+    true);
+
+MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
+
 // chassis auto drive
 src::control::chassis::ChassisAutoDrive *chassisAutoDrive =
-    new src::control::chassis::ChassisAutoDrive(&chassisSubsystem, chassisOdometry);
+    new src::control::chassis::ChassisAutoDrive(drivers(), &chassisSubsystem, &chassisBeyBladeCommand, &matchRunningGovernor);
 
 src::control::chassis::OdometryResetCommand odometryResetCommand(
     &chassisSubsystem,
@@ -399,12 +404,6 @@ src::control::chassis::ChassisFieldCommand chassisFieldCommand(
 src::control::chassis::ChassisOrientDriveCommand chassisOrientDriveCommand(
     &chassisSubsystem,
     &drivers()->controlOperatorInterface);
-
-src::control::chassis::ChassisBeybladeCommand chassisBeyBladeCommand(
-    &chassisSubsystem,
-    &drivers()->controlOperatorInterface,
-    -1,
-    true);
 
 src::control::chassis::ChassisWiggleCommand chassisWiggleCommand(
     &chassisSubsystem,
@@ -453,8 +452,6 @@ SentryScanCommand sentryScanCommand(
     cv::SCAN_MAX_PITCH_ANGLE,
     cv::SCAN_PITCH_SPEED,
     cv::SCAN_YAW_SPEED);
-
-MatchRunningGovernor matchRunningGovernor(drivers()->refSerial);
 
 Trigger cvGate =
     (TriggerHelpers::switchState(
@@ -505,15 +502,6 @@ Trigger switchesMidOrientDriveWhenImuCalibratedAndNotInMatch =
 
 RemoteSafeDisconnectFunction remoteSafeDisconnectFunction(drivers());
 
-// STATE MACHINE
-src::control::state_machine::StateMachineSubsystem stateMachineSubsystem =
-    src::control::state_machine::StateMachineSubsystem(
-        drivers(),
-        &chassisSubsystem,
-        chassisAutoDrive,
-        &chassisBeyBladeCommand,
-        &matchRunningGovernor);
-
 src::control::client_display::UISubsystem ui(drivers());
 src::control::client_display::SentryDrawCommand sentryDrawCommand(
     drivers(),
@@ -548,7 +536,6 @@ void registerSentrySubsystems(Drivers *drivers)
     drivers->commandScheduler.registerSubsystem(&agitator);
     drivers->commandScheduler.registerSubsystem(&flywheel);
     drivers->commandScheduler.registerSubsystem(&turret);
-    drivers->commandScheduler.registerSubsystem(&stateMachineSubsystem);
     drivers->commandScheduler.registerSubsystem(&buzzerSubsystem);
     drivers->commandScheduler.registerSubsystem(&ui);
 }

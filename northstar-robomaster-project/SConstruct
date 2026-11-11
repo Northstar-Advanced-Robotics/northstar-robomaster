@@ -18,7 +18,7 @@
 import os
 from os.path import abspath, join
 
-from build_tools import extract_remote_type, parse_args
+from build_tools import compile_db, extract_remote_type, parse_args
 from SCons.Script import *
 
 # Define project settings and build paths
@@ -52,6 +52,24 @@ env["CONFIG_BUILD_BASE"] = abspath(join(BUILD_PATH, build_env_dir))
 env["CONFIG_PROJECT_NAME"] = PROJECT_NAME
 env["CONFIG_ARTIFACT_PATH"] = join(env["CONFIG_BUILD_BASE"], "artifact")
 env["CONFIG_PROFILE"] = args["BUILD_PROFILE"]
+
+# "remote" only adds a -D to src (see src/SConscript), not to taproot, so splitting the
+# per-robot object directory is enough. The default remote keeps the historical path.
+robot_build_dir = args["ROBOT_TYPE"]
+if args["REMOTE_TYPE"] != extract_remote_type.DEFAULT_REMOTE:
+    robot_build_dir += "-" + args["REMOTE_TYPE"]
+
+config_build_dir = join(env["CONFIG_BUILD_BASE"], "scons-" + args["BUILD_PROFILE"])
+
+# Re-run this whole build under Bear to produce compile_commands.json (see
+# build_tools/compile_db.py). In the outer invocation this does not return; in the inner one
+# (or with compiledb=false) it returns immediately and the build continues as normal.
+compile_db.run_under_bear(
+    project_dir=abspath("."),
+    build_root=abspath(BUILD_PATH),
+    config_dir=config_build_dir,
+    robot_dir=robot_build_dir,
+)
 
 # Speed up incremental builds, especially when switching between robot types (each robot
 # already gets its own object directory, so switching back to a robot you have built before
@@ -96,18 +114,7 @@ if args["TARGET_ENV"] == "tests":
 
 # Now we can add the src and test.
 # We modify the "BUILDPATH" environment variable to have the code for each robot have its own directory.
-#
-# "remote" only adds a -D to src (see src/SConscript), not to taproot, so splitting the
-# per-robot object directory is enough. The default remote keeps the historical path.
-robot_build_dir = args["ROBOT_TYPE"]
-if args["REMOTE_TYPE"] != extract_remote_type.DEFAULT_REMOTE:
-    robot_build_dir += "-" + args["REMOTE_TYPE"]
-
-env["BUILDPATH"] = join(
-    env["CONFIG_BUILD_BASE"],
-    "scons-" + ARGUMENTS.get("profile", "release"),
-    robot_build_dir,
-)
+env["BUILDPATH"] = join(config_build_dir, robot_build_dir)
 env.SConscript(dirs=[SRC_PATH, TEST_PATH], exports=["env", "args", "sources"])
 env.Append(
     toolpath=[

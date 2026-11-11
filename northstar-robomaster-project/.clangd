@@ -1,0 +1,14 @@
+# clangd settings for this project. Include paths and flags come from compile_commands.json,
+# which every scons build generates (see build_tools/compile_db.py).
+Diagnostics:
+  # modm contains code that GCC accepts but clang rejects. These are false errors in clangd,
+  # not real build problems:
+  #   rcc_impl.hpp repeats a default template argument from rcc.hpp
+  #   arithmetic_traits.hpp has a partial specialization through an alias template, which
+  #   clang also reports as a redefinition of 'WideType'
+  # Suppressing "redefinition" also hides real redefinition mistakes in the editor; the
+  # build (GCC) still reports those.
+  Suppress:
+    - template_param_default_arg_redefinition
+    - partial_spec_args_match_primary_template
+    - redefinition

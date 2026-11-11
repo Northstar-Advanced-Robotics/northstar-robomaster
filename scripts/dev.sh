@@ -3,12 +3,12 @@
 # CLI entry point for the dev container. Builds the image if needed, then drops
 # you into a shell inside it. Run from anywhere in the repo:
 #
-#     ./scripts/dev.sh                  # interactive shell
-#     ./scripts/dev.sh make -j8         # run one command and exit
+#    ./scripts/dev.sh                    # interactive shell
+#    ./scripts/dev.sh make -j8           # run one command and exit
 #
 # NOTE: container settings live in two places and must be kept in sync:
-#   - the knobs below                       -> CLI workflow
-#   - .devcontainer/devcontainer.json       -> VS Code workflow
+#   - the knobs below                        -> CLI workflow
+#   - .devcontainer/devcontainer.json        -> VS Code workflow
 # If you add a device, mount, or network flag to one, add it to the other.
 
 set -euo pipefail
@@ -20,7 +20,7 @@ DOCKERFILE=".devcontainer/Dockerfile"
 BUILD_CONTEXT=".devcontainer"
 
 # Mirrors "remoteUser" in devcontainer.json.
-CONTAINER_USER="vscode"
+CONTAINER_USER="root"
 
 # Mirrors the directory in "postCreateCommand".
 PROJECT_DIR="northstar-robomaster-project"
@@ -28,7 +28,7 @@ PROJECT_DIR="northstar-robomaster-project"
 # --- repo-specific flags ---------------------------------------------------
 # Mirror any change here in devcontainer.json "runArgs" (currently absent, so
 # this stays empty). Example if you ever pass through a J-Link:
-#   RUN_FLAGS=( "--device" "/dev/bus/usb" )
+#    RUN_FLAGS=( "--device" "/dev/bus/usb" )
 RUN_FLAGS=()
 # ---------------------------------------------------------------------------
 
@@ -57,6 +57,16 @@ exec "$ENGINE" run -it --rm \
   -e PIPENV_VENV_IN_PROJECT=1 \
   ${RUN_FLAGS[@]+"${RUN_FLAGS[@]}"} \
   "$IMAGE" bash -lc '
+    if ! command -v clangd &> /dev/null || ! command -v fzf &> /dev/null; then
+      apt-get update && apt-get install -y --no-install-recommends \
+        clangd \
+        fzf \
+        build-essential \
+        gdb \
+        cmake \
+        ninja-build \
+        pkg-config
+    fi
     if [ ! -d .venv ]; then
       pipenv install --dev --python /usr/bin/python3.11
     fi
