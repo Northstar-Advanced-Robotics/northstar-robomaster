@@ -35,7 +35,9 @@ class VelocityAgitatorSubsystem : public tap::control::setpoint::IntegrableSetpo
 {
 public:
     /**
-     * Agitator gear ratios of different motors, for determining shaft rotation angle.
+     * Motor-to-output reductions of common agitator motors (motor rotations per output-shaft
+     * rotation). Note these are the **inverse** of what
+     * `VelocityAgitatorSubsystemConfig::gearRatio` expects. Currently unused.
      */
     static constexpr float AGITATOR_GEAR_RATIO_M2006 = 36.0f;
     static constexpr float AGITATOR_GEAR_RATIO_GM3508 = (3591.0f / 187.0f);
@@ -84,7 +86,8 @@ public:
     }
 
     /**
-     * Meaningless function that nothing uses
+     * Only read by taproot's `UnjamCommand`. This project unjams with `UnjamSpokeAgitatorCommand`,
+     * which does not use it, so 0 is returned.
      * @return 0
      */
     inline float getJamSetpointTolerance() const override { return 0; }
@@ -161,7 +164,7 @@ private:
     /// The velocity setpoint in radians / second
     float velocitySetpoint = 0;
 
-    /// Runes the velocity PID controller
+    /// Runs the velocity PID controller
     void runVelocityPidControl();
 
 #if defined(PLATFORM_HOSTED) && defined(ENV_UNIT_TESTS)
