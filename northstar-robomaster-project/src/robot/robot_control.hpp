@@ -30,7 +30,7 @@ namespace src::robot::standard
 namespace src::robot::sentry
 #elif TARGET_HERO
 namespace src::robot::hero
-#elif TURRET
+#elif TARGET_TURRET
 namespace src::robot::turret
 #elif TARGET_TEST_BED
 namespace src::robot::testbed

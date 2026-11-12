@@ -15,7 +15,7 @@
 #include "robot/sentry/sentry_uart_constants.hpp"
 #elif TARGET_HERO
 #include "robot/hero/hero_uart_constants.hpp"
-#elif TURRET
+#elif TARGET_TURRET
 #include "robot/standard/standard_uart_constants.hpp"
 #else
 #include "robot/standard/standard_uart_constants.hpp"

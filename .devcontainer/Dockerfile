@@ -5,6 +5,7 @@ RUN apt-get update && apt-get install -y --no-install-recommends \
     python3.11 python3-pip python3.11-venv \
     build-essential git wget xz-utils ca-certificates sudo openssh-client \
     doxygen graphviz \
+    libgtest-dev libgmock-dev \
     && rm -rf /var/lib/apt/lists/*
 
 RUN ARCH="$(uname -m)" \

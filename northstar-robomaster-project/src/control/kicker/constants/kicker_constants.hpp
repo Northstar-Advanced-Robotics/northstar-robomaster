@@ -13,7 +13,7 @@
 #include "robot/sentry/sentry_kicker_constants.hpp"
 #elif TARGET_HERO
 #include "robot/hero/hero_kicker_constants.hpp"
-#elif TURRET
+#elif TARGET_TURRET
 #include "robot/standard/standard_kicker_constants.hpp"
 #elif TARGET_TEST_BED
 #include "robot/hero/hero_kicker_constants.hpp"

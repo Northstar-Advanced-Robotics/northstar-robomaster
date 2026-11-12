@@ -18,7 +18,7 @@
 #include "robot/sentry/sentry_chassis_constants.hpp"
 #elif TARGET_HERO
 #include "robot/hero/hero_chassis_constants.hpp"
-#elif TURRET
+#elif TARGET_TURRET
 #include "robot/standard/standard_chassis_constants.hpp"
 #elif TARGET_TEST_BED
 #include "robot/standard/standard_chassis_constants.hpp"

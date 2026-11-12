@@ -1,7 +1,9 @@
 #include "pwm_encoder.hpp"
 
+#ifndef PLATFORM_HOSTED
 // We need device.hpp to ensure definitions are visible
 #include <modm/platform/device.hpp>
+#endif
 
 namespace src::communication::sensors
 {
@@ -12,6 +14,7 @@ PwmEncoder::PwmEncoder(bool isInverted, float gearRatio)
 
 void PwmEncoder::initialize()
 {
+#ifndef PLATFORM_HOSTED
     // 1. Configure Pin PB14 -> Connect to Timer 12 Channel 1
     // (This remains the same)
     modm::platform::GpioB14::Ch1<modm::platform::Peripheral::Tim12>::connect();
@@ -53,10 +56,12 @@ void PwmEncoder::initialize()
 
     // 5. Start
     modm::platform::Timer12::start();
+#endif
 }
 
 void PwmEncoder::update()
 {
+#ifndef PLATFORM_HOSTED
     // Channel 2 holds Pulse Width (falling edge capture)
     uint32_t pulseWidth = modm::platform::Timer12::getCompareValue(2);
     // Channel 1 holds Period (rising edge capture/reset)
@@ -82,13 +87,18 @@ void PwmEncoder::update()
     // Calculate position: (PulseWidth / Period) * ENC_RESOLUTION
     uint16_t encoderActual = (pulseWidth * ENC_RESOLUTION) / period;
     updateEncoderValue(encoderActual);
+#endif
 }
 
 bool PwmEncoder::isOnline() const
 {
     // Non-zero once Channel 1 has captured a period. Note the register retains its last
     // value after the signal stops, so this does not detect the signal going away.
+#ifndef PLATFORM_HOSTED
     return modm::platform::Timer12::getCompareValue(1) > 0;
+#else
+    return false;
+#endif
 }
 
 }  // namespace src::communication::sensors

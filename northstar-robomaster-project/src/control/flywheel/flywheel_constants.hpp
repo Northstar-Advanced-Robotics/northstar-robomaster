@@ -17,7 +17,7 @@
 #include "robot/sentry/sentry_flywheel_constants.hpp"
 #elif TARGET_HERO
 #include "robot/hero/hero_flywheel_constants.hpp"
-#elif TURRET
+#elif TARGET_TURRET
 #include "robot/standard/standard_flywheel_constants.hpp"
 #else
 #include "robot/hero/hero_flywheel_constants.hpp"

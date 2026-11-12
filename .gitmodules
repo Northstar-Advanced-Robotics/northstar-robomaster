@@ -3,5 +3,5 @@
 	url = https://gitlab.com/aruw/controls/taproot-scripts.git
 [submodule "taproot"]
 	path = taproot
-	url = https://gitlab.com/aruw/controls/taproot.git
-	branch = develop
+	url = https://github.com/Northstar-Advanced-Robotics/LateralRoot.git
+	branch = northstar-2026
