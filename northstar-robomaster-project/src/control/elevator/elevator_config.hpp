@@ -11,10 +11,6 @@ struct ElevatorConfig
     double maxSpeed;      // Maximum speed of the elevator in meters per second
     double acceleration;  // Acceleration of the elevator in meters per second squared
     double deceleration;  // Deceleration of the elevator in meters per second squared
-
-private:
-    double maxHeight = 2.0;  // Enter the maximum height of the elevator in meters
-    double minHeight = 0.0;  // Enter the minimum height of the elevator in meters
 };
 
 }  // namespace src::control::elevator

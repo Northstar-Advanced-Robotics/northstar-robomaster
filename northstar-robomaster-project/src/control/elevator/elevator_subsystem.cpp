@@ -13,10 +13,7 @@ ElevatorSubsystem::ElevatorSubsystem(
 
 void ElevatorSubsystem::initialize() { elevator_motor->initialize(); }
 
-void ElevatorSubsystem::refresh()
-{
-    elevator_motor->updateMotorAngle();
-}  // namespace src::control::elevator
+void ElevatorSubsystem::refresh() { elevator_motor->updateMotorAngle(); }
 
 void ElevatorSubsystem::refreshSafeDisconnect() { elevator_motor->setMotorOutput(0.0f); }
 
@@ -25,7 +22,7 @@ void ElevatorSubsystem::setTargetPosition(float position)
     targetPosition = position;
     if (position > elevator_motor->config.maxHeight)
         targetPosition = elevator_motor->config.maxHeight;
-    if (position < elevator_motor->config.maxHeight)
+    if (position < elevator_motor->config.minHeight)
         targetPosition = elevator_motor->config.minHeight;
 }
 
