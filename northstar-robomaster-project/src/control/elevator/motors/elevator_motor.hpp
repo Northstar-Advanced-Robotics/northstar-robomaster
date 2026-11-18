@@ -16,7 +16,9 @@ public:
     void updateMotorAngle();
 
     void setMotorOutput(float out);
-}
+
+    ElevatorConfig& config;
+};
 
 }  // namespace src::control::elevator
 

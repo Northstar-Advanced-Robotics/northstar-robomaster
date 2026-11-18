@@ -26,9 +26,12 @@ public:
 
     void refreshSafeDisconnect() override;
 
+    void setTargetPosition(float position);
+
 private:
     ElevatorMotor* elevator_motor;
-}
+    float targetPosition = 0.0f;
+};
 
 }  // namespace src::control::elevator
 #endif  // ELEVATOR_SUBSYSTEM_HPP
