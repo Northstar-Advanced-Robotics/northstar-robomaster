@@ -19,9 +19,9 @@ public:
 
     void initialize() override;
 
-    /// Refreshes both axes' cached encoder angles. Called once per control loop iteration by the
-    /// scheduler. Note it does **not** run the control loops -- the attached controllers do that,
-    /// driven by whichever command is scheduled.
+    /// Called once per control loop iteration by the scheduler. Updates the encoder and runs the
+    /// height PID toward targetPosition (see TODO(PID step 4) in the .cpp). Commands never drive
+    /// the motor directly. They only call setTargetPosition().
     void refresh() override;
 
     void refreshSafeDisconnect() override;
@@ -31,6 +31,16 @@ public:
 private:
     ElevatorMotor* elevator_motor;
     float targetPosition = 0.0f;
+
+    // TODO(PID step 3): add the loop's state.
+    //   (needs #include "tap/algorithms/smooth_pid.hpp")
+    //
+    //   tap::algorithms::SmoothPid heightPid;
+    //       Construct it in the constructor's initializer list: heightPid(config.pidConfig)
+    //   float kG;                  // copy from config.kG in the constructor
+    //   uint32_t prevTimeMs = 0;   // time of the last refresh(), used to compute dt
+    //   float homingOutput = 0.0f; // raw output sent while un-homed. Only the home command sets it,
+    //                              // through a public setHomingOutput(float).
 };
 
 }  // namespace src::control::elevator
