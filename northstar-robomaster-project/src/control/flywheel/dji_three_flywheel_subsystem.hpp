@@ -33,13 +33,19 @@ public:
      * @param[in] rightMotorId CAN ID of the right flywheel motor.
      * @param[in] downMotorId CAN ID of the lower flywheel motor.
      * @param[in] canBus The CAN bus all three motors are on.
+     * @param[in] leftInverted Whether the left motor's direction is reversed.
+     * @param[in] rightInverted Whether the right motor's direction is reversed.
+     * @param[in] downInverted Whether the lower motor's direction is reversed.
      */
     DJIThreeFlywheelSubsystem(
         tap::Drivers *drivers,
         tap::motor::MotorId leftMotorId,
         tap::motor::MotorId rightMotorId,
         tap::motor::MotorId downMotorId,
-        tap::can::CanBus canBus);
+        tap::can::CanBus canBus,
+        bool leftInverted = true,
+        bool rightInverted = true,
+        bool downInverted = true);
 
     /// Initializes all three motors. Must be called before the flywheels can be commanded.
     void initialize() override;

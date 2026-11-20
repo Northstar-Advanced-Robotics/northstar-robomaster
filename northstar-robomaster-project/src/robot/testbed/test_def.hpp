@@ -30,9 +30,10 @@
 
 // #define USING_CHASSIS
 // #define USING_TURRET
-#define USING_AGITATOR
+// #define USING_AGITATOR
 // #define USING_HERO_AGITATOR
-// #define USING_FLYWHEEL
+#define USING_FLYWHEEL
+// #define USING_TWO_FLYWHEEL  // with USING_FLYWHEEL: test two flywheels instead of three
 
 #include "control/dummy_subsystem.hpp"
 
@@ -46,9 +47,9 @@ src::control::DummySubsystem dummySubsystem(drivers());
 #include "control/chassis/chassis_beyblade_command.hpp"
 #include "control/chassis/chassis_drive_command.hpp"
 #include "control/chassis/chassis_orient_drive_command.hpp"
-#include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/chassis/chassis_wiggle_command.hpp"
 #include "control/chassis/constants/chassis_constants.hpp"
+#include "control/chassis/holonomic_chassis_subsystem.hpp"
 #include "control/turret/constants/turret_constants.hpp"
 
 #endif
@@ -106,9 +107,11 @@ src::control::DummySubsystem dummySubsystem(drivers());
 
 #ifdef USING_FLYWHEEL
 
+#include "control/flywheel/dji_three_flywheel_subsystem.hpp"
+#include "control/flywheel/dji_two_flywheel_subsystem.hpp"
 #include "control/flywheel/flywheel_constants.hpp"
-#include "control/flywheel/flywheel_run_command.hpp"
-#include "control/flywheel/flywheel_subsystem.hpp"
+#include "control/flywheel/three_flywheel_run_command.hpp"
+#include "control/flywheel/two_flywheel_run_command.hpp"
 
 #endif
 

@@ -19,6 +19,8 @@
 #include "robot/hero/hero_flywheel_constants.hpp"
 #elif TURRET
 #include "robot/standard/standard_flywheel_constants.hpp"
+#elif TARGET_TEST_BED
+#include "robot/testbed/testbed_flywheel_constants.hpp"
 #else
 #include "robot/hero/hero_flywheel_constants.hpp"
 #endif
