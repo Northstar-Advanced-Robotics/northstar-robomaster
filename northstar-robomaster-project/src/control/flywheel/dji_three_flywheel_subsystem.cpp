@@ -13,7 +13,10 @@ DJIThreeFlywheelSubsystem::DJIThreeFlywheelSubsystem(
     tap::motor::MotorId leftMotorId,
     tap::motor::MotorId rightMotorId,
     tap::motor::MotorId downMotorId,
-    tap::can::CanBus canBus)
+    tap::can::CanBus canBus,
+    bool leftInverted,
+    bool rightInverted,
+    bool downInverted)
     : ThreeFlywheelSubsystem(drivers, SPIN_TO_INTERPOLATABLE_MPS_TO_RPM),
       velocityPidLeftWheel(
           FLYWHEEL_PID_KP_DJI,
@@ -33,9 +36,9 @@ DJIThreeFlywheelSubsystem::DJIThreeFlywheelSubsystem(
           FLYWHEEL_PID_KD_DJI,
           FLYWHEEL_PID_MAX_ERROR_SUM_DJI,
           FLYWHEEL_PID_MAX_OUTPUT_DJI),
-      leftWheel(drivers, leftMotorId, canBus, true, "Left Flywheel"),
-      rightWheel(drivers, rightMotorId, canBus, true, "Right Flywheel"),
-      downWheel(drivers, downMotorId, canBus, true, "Down Flywheel"),
+      leftWheel(drivers, leftMotorId, canBus, leftInverted, "Left Flywheel"),
+      rightWheel(drivers, rightMotorId, canBus, rightInverted, "Right Flywheel"),
+      downWheel(drivers, downMotorId, canBus, downInverted, "Down Flywheel"),
       desiredLaunchSpeedLeft(0),
       desiredLaunchSpeedRight(0),
       desiredLaunchSpeedDown(0),
@@ -76,9 +79,9 @@ void DJIThreeFlywheelSubsystem::setDesiredLaunchSpeed(float speed)
 
 void DJIThreeFlywheelSubsystem::setDesiredFlywheelSpeed(float rpm)
 {
-    desiredRpmRampLeft.setTarget(launchSpeedToFlywheelRpm(rpm));
-    desiredRpmRampRight.setTarget(launchSpeedToFlywheelRpm(rpm));
-    desiredRpmRampDown.setTarget(launchSpeedToFlywheelRpm(rpm * (desiredSpinValue / 100.0f)));
+    desiredRpmRampLeft.setTarget(rpm);
+    desiredRpmRampRight.setTarget(rpm);
+    desiredRpmRampDown.setTarget(rpm * (desiredSpinValue / 100.0f));
 }
 
 float DJIThreeFlywheelSubsystem::launchSpeedToFlywheelRpm(float launchSpeed) const

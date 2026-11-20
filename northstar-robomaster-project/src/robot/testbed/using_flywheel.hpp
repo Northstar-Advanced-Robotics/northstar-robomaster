@@ -2,7 +2,8 @@
  * Declares the flywheels: the subsystem, its run command, and the remote mapping that spins it up.
  *
  * `testbed_control.cpp` includes this file unconditionally; the `#ifdef USING_FLYWHEEL` below is
- * what actually selects it, and that switch is set in `test_def.hpp`.
+ * what actually selects it, and that switch is set in `test_def.hpp`. Also define
+ * `USING_TWO_FLYWHEEL` there to test two flywheels instead of three.
  *
  * Everything is declared at file scope, which is why exactly one translation unit may include it.
  */
@@ -16,22 +17,22 @@
 using namespace tap::control;
 using namespace src::control::flywheel;
 
-FlywheelSubsystem flywheel(
+#ifdef USING_TWO_FLYWHEEL
+DJITwoFlywheelSubsystem flywheel(drivers(), LEFT_MOTOR_ID, RIGHT_MOTOR_ID, CAN_BUS);
+
+// flywheel commands
+TwoFlywheelRunCommand flywheelRunCommand(&flywheel, 15.0f, &drivers()->refSerial);
+#else
+DJIThreeFlywheelSubsystem flywheel(
     drivers(),
     LEFT_MOTOR_ID,
     RIGHT_MOTOR_ID,
-    UP_MOTOR_ID,
-    CAN_BUS,
-    tap::motor::RevMotor::PIDConfig{
-        .PIDSlot = 0,
-        .kP = FLYWHEEL_PID_KP,
-        .kI = FLYWHEEL_PID_KI,
-        .kD = FLYWHEEL_PID_KD,
-        .kF = FLYWHEEL_PID_KF,
-    });
+    DOWN_MOTOR_ID,
+    CAN_BUS);
 
 // flywheel commands
-FlywheelRunCommand flywheelRunCommand(&flywheel);
+ThreeFlywheelRunCommand flywheelRunCommand(&flywheel);
+#endif
 
 // flywheel mappings
 Trigger fPressedRunFlywheel =
