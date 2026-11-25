@@ -1,5 +1,6 @@
 #ifndef ELEVATOR_SUBSYSTEM_HPP
 #define ELEVATOR_SUBSYSTEM_HPP
+#include "tap/algorithms/smooth_pid.hpp"
 #include "tap/control/subsystem.hpp"
 #include "tap/drivers.hpp"
 
@@ -35,11 +36,11 @@ private:
     // TODO(PID step 3): add the loop's state.
     //   (needs #include "tap/algorithms/smooth_pid.hpp")
     //
-    //   tap::algorithms::SmoothPid heightPid;
+    tap::algorithms::SmoothPid heightPid;
     //       Construct it in the constructor's initializer list: heightPid(config.pidConfig)
-    //   float kG;                  // copy from config.kG in the constructor
-    //   uint32_t prevTimeMs = 0;   // time of the last refresh(), used to compute dt
-    //   float homingOutput = 0.0f; // raw output sent while un-homed. Only the home command sets it,
+    float kG;                   // copy from config.kG in the constructor
+    uint32_t prevTimeMs = 0;    // time of the last refresh(), used to compute dt
+    float homingOutput = 0.0f;  // raw output sent while un-homed. Only the home command sets it,
     //                              // through a public setHomingOutput(float).
 };
 

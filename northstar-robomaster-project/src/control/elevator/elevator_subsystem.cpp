@@ -1,5 +1,7 @@
 #include "elevator_subsystem.hpp"
 
+#include "tap/architecture/clock.hpp"
+
 namespace src::control::elevator
 {
 ElevatorSubsystem::ElevatorSubsystem(
@@ -23,31 +25,36 @@ void ElevatorSubsystem::refresh()
     //      height is meaningless until homing finishes. NOTE: Taproot runs command execute()
     //      BEFORE subsystem refresh(), so the home command must NOT call setMotorOutput itself
     //      (this line would overwrite it). It calls setHomingOutput(), which stores homingOutput.
-    //        if (!elevator_motor->isHomed()) { elevator_motor->setMotorOutput(homingOutput); return; }
+    if (!elevator_motor->isHomed())
+    {
+        elevator_motor->setMotorOutput(homingOutput);
+        return;
+    }
     //
     //   2. dt since the last tick (needs #include "tap/architecture/clock.hpp"):
-    //        uint32_t now = tap::arch::clock::getTimeMilliseconds();
-    //        float dt = now - prevTimeMs;
-    //        prevTimeMs = now;
+    uint32_t now = tap::arch::clock::getTimeMilliseconds();
+    float dt = now - prevTimeMs;
+    prevTimeMs = now;
     //
     //   3. Error in meters:
-    //        float error = targetPosition - elevator_motor->getHeight();
+    float error = targetPosition - elevator_motor->getHeight();
     //
     //   4. PID. Pass -velocity as the derivative: at a fixed target, d(error)/dt = -velocity, and
     //      it's much less noisy than differentiating the error yourself.
-    //        float out = heightPid.runController(error, -elevator_motor->getVelocity(), dt);
+    float out = heightPid.runController(error, -elevator_motor->getVelocity(), dt);
     //
     //   5. Gravity comp. Add it AFTER the PID so the PID's maxOutput clamp doesn't cut it off:
-    //        out += kG;
+    out += kG;
     //
     //   6. Clamp to what the motor accepts and send it:
-    //        out = tap::algorithms::limitVal(out, -MAX_OUTPUT, MAX_OUTPUT);  // C620: 16384
-    //        elevator_motor->setMotorOutput(out);
+    out = tap::algorithms::limitVal(out, -MAX_OUTPUT, MAX_OUTPUT);  // C620: 16384
+    elevator_motor->setMotorOutput(out);
 }
 
 void ElevatorSubsystem::refreshSafeDisconnect() { elevator_motor->setMotorOutput(0.0f); }
 
-// The ONLY way commands move the elevator: set a target height (meters), and refresh() does the rest.
+// The ONLY way commands move the elevator: set a target height (meters), and refresh() does the
+// rest.
 void ElevatorSubsystem::setTargetPosition(float position)
 {
     targetPosition = position;
@@ -67,7 +74,8 @@ void ElevatorSubsystem::setTargetPosition(float position)
 //
 // Tuning order (motor on a stand, hand on the e-stop, low maxOutput at first):
 //   1. kp = ki = kd = 0. Raise kG until the carriage stays still at mid-height.
-//      Slides down = kG too low. Creeps up = too high. If raising kG makes it fall faster, flip the sign.
+//      Slides down = kG too low. Creeps up = too high. If raising kG makes it fall faster, flip the
+//      sign.
 //   2. Raise kp until it reaches targets briskly with a little overshoot.
 //   3. Raise kd until the overshoot / bouncing goes away (too much kd = buzzing).
 //   4. Only add a small ki (and set maxICumulative) if it consistently stops short of the target.
